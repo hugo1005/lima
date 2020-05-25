@@ -1,0 +1,83 @@
+- "Computed" properties are 'Cached' which means they only get recomputed when there dependencies are changed
+whereas "methods" are computed everytime they are called
+    > If a computed property has no dependencies eg function() { Date.now() } it will never up date 
+    as date is not a reactive dependecy
+    > Computed properties can have a {get: ..., set(newvalue)} getter and setter to reverse the dependency
+    > Useul when used in conh=juton with v-bind:class
+
+- "Watch" properties provide an overgeneralisation of computed properties which calls a function when a specific data property changes
+    > However it is much better to use computed in which does not create side effects 
+    > We may use it to monitor a field and make an async request
+
+Styling  / class (All legit)
+<div v-bind:class="[isActive ? activeClass : '', errorClass]"></div>
+<div v-bind:class="[{ active: isActive }, errorClass]"></div>
+<div v-bind:class="classObject"></div> 
+<div class="static" v-bind:class="{ active: isActive, 'text-danger': hasError }"></div>
+
+class can be bound on custom components (which will bind to the root element of the class)
+all of the above holds for v-bind:style
+note browser vendor prefixes are automatically added to all styles :)
+
+v-if, v-else-if, v-else
+<template v-if=...>
+    .... all code inside displayed / not displayed and template will not appear in render which is nice, no unescessary divs
+<template>
+
+note fields will be reused instead of rerendered if key= not specified
+
+v-show will toggle css display property whereas v-if is render or not render. and does not support template
+
+v-for has higher priority than v-if so they shouldnt be used on the same tag.
+v-bind:key= can be used to tract elements of a v-for so they can be patched in place rather than rerendered
+No filtering an array rteurns a new object but vue handles this efficiently
+
+<template> works with w-for as well
+
+<input v-on:keyup.enter="submit"> when enter key is released
+<div v-on:scroll.passive="onScroll">...</div> does while the default occurs
+<div v-on:scroll.prevent="onScroll">...</div> prevents the default
+
+
+NOTE: For components data must be a function for independent copies for each instance
+
+
+All props:
+data:
+computed:
+watch:
+methods:
+props:
+components: # for registering components which have been created as pure JSON
+
+# Passing events back up the chain to the parent can be handles by v-on:click="$emit('enlarge-text')" in the child
+and v-on:enlarge-text="postFontSize += 0.1" in the parent
+
+we can also emit a value with $emit('enlarge-text', 0.1)
+v-on:enlarge-text="postFontSize += $event" or pass a relevant method here in name only v-on:enlarge-text="onEnlargeText"
+
+<slot></slot> can be used to have placeholders inside a tempplate to be passed in later
+
+<component v-bind:is="currentTab.component"><\component>
+coerces the ambiguous components to a specific component either by name or options object
+
+similarly we can coerce things such as table rows to become specified compoennts using 
+<table>
+  <tr is="blog-post-row"></tr>
+</table>
+
+to avoid DOM errors
+
+With webpack we need to do: to include HelloWorld in the components template
+
+import HelloWorld from '@/components/HelloWorld.vue'
+
+export default {
+  name: 'Home',
+  components: {
+    HelloWorld
+  }
+}
+</script>
+
+Note porperties must be set with v-bind to evaluate as a js expression

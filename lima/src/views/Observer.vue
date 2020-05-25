@@ -1,0 +1,59 @@
+<template>
+  <div class="home">
+    <!-- <h1>Traders</h1> -->
+    <p>Observer View</p>
+    {{ traders }} 
+    
+    <!-- <h1>Books</h1> -->
+    <div >
+      <div id='book-pair'>
+        <Book :ticker="ticker" orderType="LMT" v-for="ticker in tickers" v-bind:key="ticker"></Book>
+      </div>
+      <div id='book-pair'>
+        <Book :ticker="ticker" orderType="MKT" v-for="ticker in tickers" v-bind:key="ticker"></Book>
+      </div>
+      
+    </div>
+    <Tape></Tape>
+    
+    <!-- <img alt="Vue logo" src="../assets/logo.png"> -->
+    <!-- <HelloWorld msg="Welcome to Your Vue.js App"/> -->
+  </div>
+</template>
+
+<script>
+// @ is an alias to /src
+import Book from '../components/Book.vue'
+import Tape from '../components/Tape.vue'
+import { mapGetters } from 'vuex'
+
+export default {
+  name: 'Observer',
+  components: {
+    Book, Tape
+  },
+  computed: {
+    ...mapGetters({
+      tickers: 'backend/getTickers',
+      traders: 'backend/getTraders',
+      tape: 'backend/displayTape',
+      displayLimitBook: 'backend/displayLimitBook',
+      displayMarketBook: 'backend/displayMarketBook'
+    }),
+  },
+}
+</script>
+
+<style scoped>
+  #book-pair {
+    display:flex;
+    flex-direction: row;
+    width: 100%;
+  }
+
+  #book-pair Book {
+    display:flex;
+    flex-direction: row;
+    width: 50%;
+  }
+</style>

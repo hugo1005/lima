@@ -1,0 +1,6 @@
+{
+    "app-websocket": {
+        "port": 6789,
+        "ip": "localhost"
+    }
+}

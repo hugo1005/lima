@@ -1,0 +1,56 @@
+Realised - From Closed Out Positions
+Unrealised - From Open Positions (Marked to Market)
+
+Cash
+Accruals (Interest, Dividends)
+
+Execution Costs / Slippage
+
+Overseas Cash Items (Overseas Equities) ~ Changes in Pnl due to price and exchange rate
+
+
+# -----------
+PNL = REALISED PNL + UNREALISED PNL  (Fill matching using FIFO, LIFO and Averagiing methods available)
+
+Averaging Methodology
+i = 1, ..., N where we have N fills
+> [1] Avg Price = sum(Qty[i] * Price[i]) / sum(Qty[i])
+> Total Buy Quantity = sum(Qty[i] * Indicator[i is BUY])
+> Total Sell Quantity = sum(Qty[i] * Indicator[i is SELL])
+> Avg Buy Price, Avg Sell Price (As Above [1])
+> REALISED PNL (Points) = (Avg Sell Price - Avg Buy Price) * min(Total Buy Quantity, Total Sell Quantity) 
+> REALISED PNL (Contract Currency) = REALISED PNL (Points) * Contract Point Value Value
+> Net Position (Points) = Total Buy Quantity - Total Sell Quantity
+> Average Open Price = Avg Buy Price * Indicator[Net Position > 0] + Avg Sell Price * Indicator[Net Position < 0]
+> UNREALISED PNL (Points) = (Theoretical Exit Price - Average Open Price) * Net Position
+> UNREALISED PNL (Contract Currency) = UNREALISED PNL (Points) * Contract Point Value Value
+> PNL TOTAL = REALISED PNL (Contract Currency) + UNREALISED PNL (Contract Currency)
+
+
+Mark To Market Methodology
+
+> Delta =  Change in position qty since last period = (Current Positions - New Trade Quantity)
+> Gamma = Change in Price since last period = ( Current Price - Prior Period Price )
+
+> MtM = Delta * Gamma  (CHANGE IN EXISTING POSITION SINCE PRIOR PERIOD)
+
+> New Trades Pnl = New Trade Qty  * ( Current Price - Trade Price )                 (IMPACT OF TRADE ENTRY)
+
+> ClosedTradesP&L = -1 * ( Closed Trade Qty * (Trade Price - Prior Period Price))    (IMPACT OF TRADE EXIT)
+
+TPL = MtM + NewTradesP&L + ClosedTradesP&L
+
+Intitively TPL = Mtm (Value Closing out all)
+
+
+So essentially we have:
+MtM = Current Positions * Change in Price since last period - New Trade Qty * Change in Price since last period
+    = Change in Current Position Value - Change in New Position Value 
+    = Change in Prior Period Position Value
+
+New Trades Pnl
+
+ClosedTradesPnL = -1 * ( Closed Trade Qty * (Trade Price - Prior Period Price))
+                = -1 * ( Value of closing trade - Prior Value of Trade Amount)
+                = Prior Value of Trade Amount - Value of closing the trade
+

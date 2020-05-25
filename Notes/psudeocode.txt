@@ -1,0 +1,131 @@
+"""
+Declare Securities
+"""
+RITC = Security('RITC', EXCHANGE)
+BEAR = Security('BEAR', EXCHANGE)
+BULL = Security('BULL', EXCHANGE)
+USD = Security('USD', EXCHANGE)
+
+QTY = 100
+
+"""
+Product Building:
+
+Construct Custom Products Derived from Base Securities
+We use the operators as follows to create new products:
+
+A + B : For every unit of A (Bought / Sold) Buy / Sell a unit of B 
+A - B : For every unit of A (Bought / Sold) Sell / Buy a unit of B 
+X * A : Buy / Sell X units of A
+
+These calculations are all essentially placeholder nodes which will be computed at runtime continuously
+"""
+
+# Creates a spread between ETF and components
+UNDERLYINGS = BEAR + BULL
+SPREAD = RITC - USD * UNDERLYINGS
+
+# Thus we have two different security pricings depending on bid or ask
+# BUY SPREAD -> BUY RITC (At Bid) SELL UNDERLYINGS (At Ask)
+# SELL SPREAD -> SELL RITC (At Ask) BUY UNDERLYINGS (At Bid)
+
+# Compute the currency exposure from a trade of SPREAD
+SPREAD_USD_EXPSOURE = RITC * USD
+# Create a product which will trade a spread an neutralise any FX expsoure created
+HEDGED_SPREAD = SPREAD - SPREAD_USD_EXPSOURE
+
+""" Registers a product so that it can be displayed in the dashboard """ 
+register(SPREAD)
+
+""" Order Building: """ 
+# Creates an order for the product, which will always BUY the product, by default at market (MKT) 
+ORDER = make_order(HEDGED_SPREAD, qty=QTY, order_type="MKT")
+
+# Uses + / - to indicate whether to buy or sell the product (inv_sign returns -1 * sign of order)
+SIGNED_ORDER = SPREAD.inv_sign() * ORDER
+
+# Will fail to execute unless the condition is met
+THRESHOLD = SPREAD.trade_cost()
+MAX_ACTIVE_ORDERS = 3
+
+CONDITIONAL_ORDER = SIGNED_ORDER % SPREAD.abs() > THRESHOLD
+CAPPED_ORDER = cap_executions(CONDITIONAL_ORDER, MAX_ACTIVE_ORDERS)
+
+# Here sign() indicticates whether it is a BUY / SELL order
+# undwind() Will execute the reverse order
+UNWIND_CONDITIONAL_ORDER = unwind(CAPPED_ORDER) % SPREAD * CAPPED_ORDER.sign() > THRESHOLD
+
+# Pair orders ~ When the order compeletes or is cancelled, the second order will be executed
+PAIRED_ORDER = on_complete(CONDITIONAL_ORDER, do=UNWIND_CONDITIONAL_ORDER)
+
+# Execute the order on repeatedly on an interval in milliseconds
+SMART_ORDER = on_interval(PAIRED_ORDER, delay = 100)  # % is exec when
+
+# Executing the order will also display this in the dashboard
+SMART_ORDER.execute()
+
+"""Tender Monitoring
+We define using TENDER() which security we want to listen for tenders on. This returns 2 securities whose reported price is the QTY demanded and the price
+which is +/- to indicate whether we should BUY or SELL. Note tenders may only come in one at a time for any given security
+"""
+
+TENDER_QTY, TENDER_PRICE = get_tenders(RITC)
+
+# Defines the new products
+TENDER_ORDER = TENDER_PRICE.sign() * make_order(RITC, qty=TENDER_QTY, order_type='TDR') # Order type is tender
+TENDER_HEDGE = TENDER_PRICE.inv_sign() * make_order(RITC + RITC * USD, qty=TENDER_QTY, order_type='MKT')
+
+EDGE = 2 * TENDER_HEDGE.trade_cost() # Assuming no costs in accepting the tender
+TENDER_PROFITABLE = TENDER_PRICE.sign() * (TENDER_PRICE.abs() - RITC) > EDGE # Checks the tender is sufficiently profitable
+
+# Checks regularly for new tenders and only executes the profitable ones
+SMART_TENDER = on_interval(on_complete(TENDER_ORDER % TENDER_PROFITABLE, do=TENDER_HEDGE), delay = 100)
+SMART_TENDER.execute()
+
+# Set Limits
+
+# Instantiate a connection to the exchange
+EXCHANGE = ExchangeConnection(securities=[RITC, BEAR, BULL, USD])
+
+""" Submitting Orders """
+
+# Returns a dictionary of parameters (security, qty, price, direction). 
+# Note any price that is None or crosses the spread is automatically MKT order
+ORDER = EXCHANGE.make_exchange_order(security='RITC', qty=100, price=20, direction='BUY') 
+
+# Posts the order to the exchange, returns the order id, 
+oid = EXCHANGE.add_order(ORDER)
+
+# Removes the order from the exchange, returns succes or failure to cancel order
+EXCHANGE.cancel_order(oid)
+
+""" Trade Information """
+
+# Gets update on partial filling of order
+EXCHANGE.get_qty_filled(oid)
+
+# Gets the Tape and LOB for a given security
+TAPE = EXCHANGE.get_tape(security='RITC')
+BOOK = EXCHANGE.get_LOB(security='RITC')
+
+""" Regulatory (Returns relevant integers) """
+EXCHANGE.get_net_limit()
+EXCHANGE.get_gross_limit()
+EXCHANGE.max_trade_qty(security='RITC')
+EXCHANGE.get_trade_cost(security='RITC')
+
+
+# API Model
+
+User:
+- Produces: Order, Cancel Order
+- Consumes: OrderUpdates (Partial Fills, Order Fill), Orderbook, Tape
+
+Exchange:
+- Produces: OrderUpdates, Orderbook, Tape
+- Consumes: Order, Cancel Order
+
+
+# TODO:
+BOOKKEEPING :) Next up....
+MOCK BACKEND
