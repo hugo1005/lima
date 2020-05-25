@@ -9,9 +9,16 @@ export default function createWebSocketPlugin() {
         client.onerror = function(event) {
             store.dispatch('backend/connectionError', event)
         }
+
+        client.onclose = function() {
+            store.dispatch('backend/connectionClosed')
+        };
         
         client.onmessage = function(event) {  
             let msg = JSON.parse(event.data)
+            if(msg.type == 'config') {
+                store.dispatch('backend/configBackend', msg.data)
+            }
             if(msg.type == 'LOBS') {
                 store.dispatch('backend/updateLimitBook', msg.data)
             }

@@ -13,7 +13,7 @@ from math import log10, floor
 
 from shared import LOB, OrderSpec, ExchangeOrder, Transaction, TransactionPair, ExchangeOrderAnon, TapeTransaction, MarketBook, TickerPnL, TraderRisk, TenderOrder
 from shared import to_named_tuple, update_named_tuple, named_tuple_to_dict
-from traders import GiveawayTrader
+# from traders import GiveawayTrader
 
 from aiodebug import log_slow_callbacks
 
@@ -356,8 +356,8 @@ class MarketDynamics:
 
         # ------------- Tender Paramaters --------------------
         if self._tenders_enabled:
-            self._automated_trader_config = self._market_dynamics['automated_traders']
-            self._automated_traders = []
+            # self._automated_trader_config = self._market_dynamics['automated_traders']
+            # self._automated_traders = []
 
             # tender specification
             tenders_per_price_step = self._tender_config['avg_num_tenders_per_second'] / self._updates_per_second
@@ -381,16 +381,18 @@ class MarketDynamics:
 
         print("Creating Market Dynamics...")
 
-        if self._tenders_enabled:
-            for traderType, count in self._automated_trader_config.items():
-                if traderType == 'giveaway_trader':
-                    self._automated_traders += [GiveawayTrader() for i in range(0, count)]
+        # if self._tenders_enabled:
+        #     for traderType, count in self._automated_trader_config.items():
+        #         if traderType == 'giveaway_trader':
+        #             self._automated_traders += [GiveawayTrader() for i in range(0, count)]
 
-            trader_activations = asyncio.gather(*[t.connect() for t in self._automated_traders])
-            print("Activating automated traders...")
-            await asyncio.gather(trader_activations, self.step_market_price_path())
-        else:
-            await self.step_market_price_path()
+        #     trader_activations = asyncio.gather(*[t.connect() for t in self._automated_traders])
+        #     print("Activating automated traders...")
+        #     await asyncio.gather(trader_activations, self.step_market_price_path())
+        # else:
+        #     await self.step_market_price_path()
+
+        await self.step_market_price_path()
 
     async def step_market_price_path(self):
         while True:
@@ -405,7 +407,6 @@ class MarketDynamics:
         
             # Only do this once per second
             if self._tenders_enabled and self._step % self._updates_per_second == 0:
-                print('MIDPRICE ', self._midprice)
                 await self.generate_tenders()
             
             await asyncio.sleep(self._step_price_delay)
@@ -462,10 +463,12 @@ class Exchange:
         with open(config_dir) as config_file:
             self._config = json.load(config_file)
         
-        self._exchange_name = 'citadel_algo_case'
+        self._exchange_name = self._config['exchanges']['active_case']
         self._books = self.init_books()
         self._port = self._config['websocket']['port']
         self._ip = self._config['websocket']['ip']
+        self._webserver_port = self._config['app-websocket']['port']
+        self._webserver_ip = self._config['app-websocket']['ip']
         self._traders = {}
         self._observers = {} # Front End Web Apps Observers
         self._pnls = {} # key is tid
@@ -491,10 +494,17 @@ class Exchange:
         log_slow_callbacks.enable(0.05) # Logs anything more than 100ms
         # handler = websockets.serve(self.exchange_handler, self._ip, self._port, ssl=ssl_context)
         
+        # Backend Frontend Communications
         handler = websockets.serve(self.exchange_handler, self._ip, self._port)
+
+        # Creating Price Paths for securities
         dynamics = asyncio.gather(*[md.create_dynamics() for ticker, md in self._market_dynamics.items()])
 
-        core = asyncio.gather(handler, dynamics)
+        # Communications to web app intermediary
+        webserver = self.connect_to_web_server()
+
+        # NOTE Something may be causing this to cut out on web reload...
+        core = asyncio.gather(webserver, handler, dynamics)
 
         server, _ = loop.run_until_complete(core)
 
@@ -503,6 +513,35 @@ class Exchange:
         # Close the server
         server.close()
         loop.run_until_complete(server.wait_closed())
+
+    async def connect_to_web_server(self):
+        # Abstracts away messages sent to vuejs
+        async with websockets.connect("ws://%s:%s/backend" % (self._webserver_ip, self._webserver_port)) as ws:
+            oid = self.get_trader_id_from_socket(ws)
+            self._observers[oid] = ws
+
+            try:
+                setup_msg = {
+                    'type':'config', 
+                    'data':{
+                        'oid': oid,
+                        'exchange': self._config['exchanges'][self._exchange_name],
+                        'exchange_open_time': self._initial_time
+                    }
+                }
+
+                await ws.send(json.dumps(setup_msg)) # Send the trader their oid and exchange settings
+                await ws.send(json.dumps({'type': 'LOBS', 'data': self.get_books()}))
+                # MBS stands for Market Order Books; really will only be busy if market is illiquid
+                await ws.send(json.dumps({'type': 'MBS', 'data': self.get_books(order_type='MKT')}))
+                await ws.send(json.dumps({'type': 'tape', 'data': self.get_tape()}))
+
+                while True:
+                    # NOTE: This is probably not reccomended
+                    await asyncio.sleep(1) # Holds the connection open
+            except:
+                # This will hopefully never be called but just to be clear
+                del(self._observers[oid])
 
     async def exchange_handler(self, ws, path):
         # Paths
@@ -524,18 +563,6 @@ class Exchange:
                     'exchange_open_time': self._initial_time
                 }
             }
-        elif is_observer:
-            oid = self.get_trader_id_from_socket(ws)
-            self._observers[oid] = ws
-
-            setup_msg = {
-                'type':'config', 
-                'data':{
-                    'oid': oid,
-                    'exchange': self._config['exchanges'][self._exchange_name],
-                    'exchange_open_time': self._initial_time
-                }
-            }
         else:
             print("Socket path not recognised...")
             return # Unrecognised path
@@ -544,29 +571,36 @@ class Exchange:
             if is_trader:
                 # Give recently joined trder basic information required for setup
                 await ws.send(json.dumps(setup_msg)) # Send the trader their tid and exchange settings
-                
                 await self.init_trader_account(tid) # Init the risk, pnl, transaction records amd transmit
-
-            await ws.send(json.dumps({'type': 'LOBS', 'data': self.get_books()}))
-
-            if is_observer:
-                await ws.send(json.dumps({'type': 'MBS', 'data': self.get_books(order_type='MKT')}))
-
-            await ws.send(json.dumps({'type': 'tape', 'data': self.get_tape()}))
-
-            if is_trader:
+                await ws.send(json.dumps({'type': 'LOBS', 'data': self.get_books()}))
+                await ws.send(json.dumps({'type': 'tape', 'data': self.get_tape()}))
                 await asyncio.gather(self.handle_msgs(ws), self.broadcast_active_traders(ws))
-            elif is_observer:
-                await asyncio.gather(self.broadcast_current_time(ws))
 
-        except websockets.ConnectionClosed:
-            print("Connection with trader [%s] closed" % tid if is_trader else oid) 
+            # if is_observer:
+            #     await ws.send(json.dumps(setup_msg)) # Send the trader their oid and exchange settings
+            #     await ws.send(json.dumps({'type': 'LOBS', 'data': self.get_books()}))
+            #     # MBS stands for Market Order Books; really will only be busy if market is illiquid
+            #     await ws.send(json.dumps({'type': 'MBS', 'data': self.get_books(order_type='MKT')}))
+            #     await ws.send(json.dumps({'type': 'tape', 'data': self.get_tape()}))
+                
+            #     # Deprecated broadcast
+            #     while True:
+            #         await asyncio.sleep(1)
+                # await asyncio.gather(self.broadcast_current_time(ws))  
+        # except websockets.ConnectionClosed:
+        #     print("Connection with [%s] [%s] closed" % (('trader', tid) if is_trader else ('observer', oid))) 
+        except websockets.ConnectionClosedError:
+            print("Connection with [%s] [%s] closed" % (('trader', tid) if is_trader else ('observer', oid))) 
+        except websockets.ConnectionClosedOK:
+            print("Connection with [%s] [%s] closed" % (('trader', tid) if is_trader else ('observer', oid))) 
         finally:
+            print("Connection with [%s] [%s] closed" % (('trader', tid) if is_trader else ('observer', oid))) 
+
             if is_trader:
                 del(self._traders[tid])
-                await self.broadcast_active_traders(ws)
-            elif is_observer:
-                del(self._observers[oid])
+                # await self.broadcast_active_traders(ws)
+            # elif is_observer:
+            #     del(self._observers[oid])
 
     async def handle_msgs(self, ws):
         async for msg in ws:
@@ -575,7 +609,7 @@ class Exchange:
     async def broadcast_current_time(self, ws):
         while True:
             await ws.send(json.dumps({'type': 'current_time', 'data': self.get_time()}))
-            await asyncio.sleep(0.01) # We can't wait too long as stuff like tenders are time sensitive
+            await asyncio.sleep(10)
 
     async def broadcast_active_traders(self, ws):
         for oid in self._observers:
@@ -629,7 +663,6 @@ class Exchange:
 
             self._tape += latest_transactions
 
-            # Deprecated for more efficient method
             # Broadcast new limit order books
             async def broadcast_to_trader(tid):
                 # Optimised to not send back everything

@@ -15,7 +15,8 @@
       
     </div>
     <Tape></Tape>
-    
+    <TechnicalChart ticker='RITC'></TechnicalChart>
+
     <!-- <img alt="Vue logo" src="../assets/logo.png"> -->
     <!-- <HelloWorld msg="Welcome to Your Vue.js App"/> -->
   </div>
@@ -25,12 +26,13 @@
 // @ is an alias to /src
 import Book from '../components/Book.vue'
 import Tape from '../components/Tape.vue'
+import TechnicalChart from '../components/TechnicalChart.vue'
 import { mapGetters } from 'vuex'
 
 export default {
   name: 'Observer',
   components: {
-    Book, Tape
+    Book, Tape, TechnicalChart
   },
   computed: {
     ...mapGetters({

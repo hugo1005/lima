@@ -145,7 +145,7 @@ class UnitTest():
         # TODO: Test conditional orders
         # TODO: In order to test the this properly we need to be able to register and display
         # # synthetic product price charts to properly debug. 
-        # TODO: Think about converting mkt orders to limit orders
+        # NOTE: Think about converting mkt orders to limit orders
         # in very illiquid markets cause thr prices are probably 
         # really poor
         # TODO: Decide where to encorporate RISK MANAGEMENT into the frontend

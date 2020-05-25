@@ -1,5 +1,6 @@
 <template>
     <div>
+        {{ticker}}
     </div>
 </template>
 
@@ -8,8 +9,13 @@ import { mapGetters } from 'vuex'
 
 export default {
   name: 'TechnicalChart',
+  props: {
+      ticker: String,
+  },
   computed: {
-
+    //   ...mapGetters({
+    //       ohlc: `backend/getTickData${this.ticker}`,
+    //   })
   }
 }
 </script>

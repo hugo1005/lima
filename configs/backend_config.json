@@ -1,15 +1,23 @@
 {
+    "app-websocket": {
+        "port": 3456,
+        "ip": "localhost"
+    },
     "websocket": {
         "port": 5678,
         "ip": "localhost"
     },
     "exchanges": {
         "notes": "Base currency is a direct quote => USD will be the # CAD required to buy 1 USD",
+        "active_case": "citadel_algo_case",
         "citadel_algo_case": {
             "base_currency": "CAD", 
             "simulation_end_time": 300,
             "prevent_self_trades": 0,
             "simulation_notional_timestep": 3600,
+            "market_agents": {
+                "giveaway_trader": 30
+            },
             "securities": {
                 "RITC": {
                     "trade_cost": 0.02,
@@ -27,16 +35,13 @@
                             "updates_per_second": 4
                         },
                         "institutional_orders": {
-                            "enabled": false,
+                            "enabled": true,
                             "avg_num_tenders_per_second": 20,
                             "prob_of_bad_tender_price": 0.05,
                             "tender_price_mean": 1,
                             "tender_price_deviation": 3,
                             "expected_tender_qty": 500,
                             "expires_after": 10
-                        } ,
-                        "automated_traders": {
-                            "giveaway_trader": 30
                         }
                     }
                 },
