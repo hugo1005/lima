@@ -6,7 +6,8 @@
         <div id='chart-container'>
             <svg :height='height' :width='width'>
                 <!-- x-axis -->
-                <g v-for="(timestamp, index) in xTicks" :key="timestamp">
+                <!-- Naming of keys avoids key clashes across the several v-for loops -->
+                <g v-for="(timestamp, index) in xTicks" :key="'x-axis:' + timestamp">
                     <text 
                         v-if="index % 2 == 0"
                         :fill='colorOutline' 
@@ -26,7 +27,7 @@
                      />
                 </g>
                 <!-- y-axis -->
-                <g v-for="(tick, index) in yTicks" :key="tick">
+                <g v-for="(tick, index) in yTicks" :key="'y-axis:' + tick">
                     <text 
                         :fill='colorOutline' 
                         :x='marginLeft / 4' 
@@ -49,7 +50,7 @@
                         <!-- Real Body -->
                         <rect
                             v-for="body in realBodies"
-                            :key='body.xLabel'
+                            :key="'body:' +body.xLabel"
                             :fill='body.fill'
                             :height='body.height'
                             :width='body.width'
@@ -61,7 +62,7 @@
                         <!-- Shadows -->
                         <line 
                             v-for="shadow in shadows"
-                            :key='shadow.xlabel'
+                            :key="'shadow:' + shadow.xLabel"
                             :x1='shadow.x1'
                             :y1='shadow.y1'
                             :x2='shadow.x2'
@@ -238,7 +239,6 @@ export default {
             let bodyHeight = Math.abs(this.y(tick.o) - this.y(tick.c))
             let lowerShadowHeight = Math.abs(this.y(bodyLowestPoint) - this.y(tick.l))
             let higherShadowHeight = Math.abs(this.y(tick.h) - this.y(bodyHighestPoint))
-            
 
             return {
                 xLabel: tick.timestamp,
