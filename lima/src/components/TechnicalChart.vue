@@ -106,66 +106,74 @@ export default {
   computed: {
     ...mapGetters({
         tickData: 'backend/getTickData',
-        securityParams: 'backend/getSecurityParams'
+        securityParams: 'backend/getSecurityParams',
+        getTickerOHLC: 'backend/getTickerOHLC'
     }),
-    ticks: function() {
-        return this.tickData(this.ticker)
+    unfilteredOHLC: function() {
+        return this.getTickerOHLC(this.ticker)
     },
-    groupedTicks: function() {
-        return this.ticks.reduce((agg, tick) => {
-            // We bucket timestamps by resolution
-            let bucketedTimestamp = Math.floor(tick.timestamp / this.resolution) * this.resolution
-            agg[bucketedTimestamp] = agg[bucketedTimestamp] || []
-            agg[bucketedTimestamp].push(tick)
+    ohlc: function() {
+        let lastTimestamp = Math.max(...this.unfilteredOHLC.map(candle => candle.timestamp))
+        return this.unfilteredOHLC.filter(candle => candle.timestamp >= (lastTimestamp - this.maxTimePeriodDisplay))
+    },
+    // ticks: function() {
+    //     return this.tickData(this.ticker)
+    // },
+    // groupedTicks: function() {
+    //     return this.ticks.reduce((agg, tick) => {
+    //         // We bucket timestamps by resolution
+    //         let bucketedTimestamp = Math.floor(tick.timestamp / this.resolution) * this.resolution
+    //         agg[bucketedTimestamp] = agg[bucketedTimestamp] || []
+    //         agg[bucketedTimestamp].push(tick)
 
-            return agg
-        }, {})
-    },
+    //         return agg
+    //     }, {})
+    // },
     securityResolution: function() {
         let params = this.securityParams(this.ticker)
         return params? params.resolution: 2
     },
-    roundPrice: function() {
-        return (price) => round(price, this.securityResolution)
-    },
-    ohlc: function() {
-        // TODO: Refactor most of this and grouped ticks to the vuex state management
-        let bucketedTimestampsAll = Object.keys(this.groupedTicks).map(timestamp => Number(timestamp))
-        let lastTimestamp = Math.max(...bucketedTimestampsAll)
-        let bucketedTimestamps = bucketedTimestampsAll
-            .filter(timestamp => timestamp >= (lastTimestamp - this.maxTimePeriodDisplay))
+    // roundPrice: function() {
+    //     return (price) => round(price, this.securityResolution)
+    // },
+    // ohlc: function() {
+    //     // TODO: Refactor most of this and grouped ticks to the vuex state management
+    //     let bucketedTimestampsAll = Object.keys(this.groupedTicks).map(timestamp => Number(timestamp))
+    //     let lastTimestamp = Math.max(...bucketedTimestampsAll)
+    //     let bucketedTimestamps = bucketedTimestampsAll
+    //         .filter(timestamp => timestamp >= (lastTimestamp - this.maxTimePeriodDisplay))
 
-        let ohlcAggregation = bucketedTimestamps.map(timestamp => {
-            // Aggregate statistics for each bucket
-            let timestampTickData = this.groupedTicks[timestamp]
-            let firstTick = timestampTickData[0]
-            let lastTick = timestampTickData[timestampTickData.length - 1]
-            let bestBids = timestampTickData.map(tick => tick.bestBid)
-            let bestAsks = timestampTickData.map(tick => tick.bestAsk)
-            let minBid = Math.min(...bestBids)
-            let maxBid = Math.max(...bestBids)
-            let minAsk = Math.min(...bestAsks)
-            let maxAsk = Math.max(...bestAsks)
+    //     let ohlcAggregation = bucketedTimestamps.map(timestamp => {
+    //         // Aggregate statistics for each bucket
+    //         let timestampTickData = this.groupedTicks[timestamp]
+    //         let firstTick = timestampTickData[0]
+    //         let lastTick = timestampTickData[timestampTickData.length - 1]
+    //         let bestBids = timestampTickData.map(tick => tick.bestBid)
+    //         let bestAsks = timestampTickData.map(tick => tick.bestAsk)
+    //         let minBid = Math.min(...bestBids)
+    //         let maxBid = Math.max(...bestBids)
+    //         let minAsk = Math.min(...bestAsks)
+    //         let maxAsk = Math.max(...bestAsks)
 
-            let bidVol = timestampTickData.reduce((total, tick) => total + tick.buyerInitiatedVol, 0)
-            let askVol = timestampTickData.reduce((total, tick) => total + tick.sellerInitiatedVol, 0)
+    //         let bidVol = timestampTickData.reduce((total, tick) => total + tick.buyerInitiatedVol, 0)
+    //         let askVol = timestampTickData.reduce((total, tick) => total + tick.sellerInitiatedVol, 0)
 
-            let tickOHLC = {
-                'timestamp': timestamp,
-                'o': this.roundPrice((firstTick.bestBid + firstTick.bestAsk)/2),
-                'h': this.roundPrice((maxBid + maxAsk)/2), // To obtain less biased estimates we avg
-                'l': this.roundPrice((minBid + minAsk)/2),
-                'c': this.roundPrice((lastTick.bestBid + lastTick.bestAsk)/2),
-                'buyerInitiatedVol': bidVol,
-                'sellerInitiatedVol': askVol,
-                'vol': bidVol + askVol,
-            }
+    //         let tickOHLC = {
+    //             'timestamp': timestamp,
+    //             'o': this.roundPrice((firstTick.bestBid + firstTick.bestAsk)/2),
+    //             'h': this.roundPrice((maxBid + maxAsk)/2), // To obtain less biased estimates we avg
+    //             'l': this.roundPrice((minBid + minAsk)/2),
+    //             'c': this.roundPrice((lastTick.bestBid + lastTick.bestAsk)/2),
+    //             'buyerInitiatedVol': bidVol,
+    //             'sellerInitiatedVol': askVol,
+    //             'vol': bidVol + askVol,
+    //         }
 
-            return tickOHLC
-        })
+    //         return tickOHLC
+    //     })
         
-        return ohlcAggregation
-    },
+    //     return ohlcAggregation
+    // },
     xTicks: function() {
         if(this.ohlc.length > 0) {
             let numXTicks = Math.floor(this.maxTimePeriodDisplay / this.resolution) + 1

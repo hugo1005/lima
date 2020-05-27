@@ -5,6 +5,10 @@ https://github.com/davecliff/BristolStockExchange
 
 
 import asyncio
+from time import time
+import json
+from random import betavariate
+from math import floor, log10
 from frontend import ExchangeConnection, Security, Tender, Order
 from abc import ABC, abstractmethod
 
@@ -39,7 +43,56 @@ class Trader(ABC):
     async def run(self):
         pass
 
+class LiquidityTaker(Trader):
+    """
+    Its only role is to absorb some of the liquidity provided by Giveaway Traders.
+    Remember the role of the giveaway trader is simply to convey clients opinions on price
+    movements into the market. By hoovering up these limit orders we enable transactions to occur
+    and to bake those movements into the market.
+    """
+    def __init__(self, backend_config_dir='./configs/backend_config.json'):
+        super().__init__()
+        
+        with open(backend_config_dir) as config_file:
+             self._backend_config = json.load(config_file)
+
+        self._case_name = self._backend_config['exchanges']['active_case']
+        self._secuirties_config = self._backend_config['exchanges'][self._case_name]['securities']
+
+    async def run(self):
+        await asyncio.gather(*[self.absorb_market_liquidity(ticker) for ticker in self._securities])
+
+    @staticmethod
+    def round_to_2_sf(x):
+        return round(x, 1-int(floor(log10(abs(x)))))
+
+    async def absorb_market_liquidity(self, ticker):
+        institutional_orders = self._secuirties_config[ticker]['market_dynamics']['institutional_orders']
+        security = self._securities[ticker]
+
+        if institutional_orders['enabled']:
+            expected_tender_qty = institutional_orders['expected_tender_qty']
+
+            while True:
+                qty1 = self.round_to_2_sf(expected_tender_qty * 3/2 * betavariate(3, 1.5))
+                qty2 = self.round_to_2_sf(expected_tender_qty * 3/2 * betavariate(3, 1.5))
+                mkt_order_1 = security.to_order(qty = qty1, order_type = 'MKT', group_name='liquidity_taker_%s' % security._ticker, await_fills=False) # Again really don't care when its executed 
+                mkt_order_2 = security.to_order(qty = qty2, order_type = 'MKT', group_name='liquidity_taker_%s' % security._ticker, await_fills=False) # Again really don't care when its executed
+
+                # Execute a market order on each side
+                await mkt_order_1.execute()
+                await (-1 * mkt_order_2).execute() 
+                await asyncio.sleep(3) # Send out an order every second
+
+
 class GiveawayTrader(Trader):
+    """
+    A simple trader who accepts tenders from clients and executes them at the clients limit price
+    hence a 'giveaway' trader who earns no money. Note the trader will however dump the position at MKT
+    if it holds its position longer than a predefined timeout
+    """
+
+
     def __init__(self):
         super().__init__()
 
@@ -52,6 +105,8 @@ class GiveawayTrader(Trader):
         :param security: A security object assigned to the trader
         """
         security = self._securities[ticker]
+        self._outstanding_hedges = 1 # Avoids divide by zero
+        self._completed_hedges = 1
 
         async def on_timeout(filled, unfilled):
             # Cancel the unfilled LMT orders
@@ -65,7 +120,7 @@ class GiveawayTrader(Trader):
             # Don't check if these fill, we really don't care these are dumb liquidity providers / 
             # drive the market price path forward, not supposed to be a responsible trader
             
-            await asyncio.gather(*[security.to_order(qty = order.qty, order_type = 'MKT', no_await=True).execute() for order in unfilled_orders])
+            await asyncio.gather(*[security.to_order(qty = order.qty, order_type = 'MKT', await_fills=False).execute() for order in unfilled_orders])
     
         async def hedge(tender_order):
             inv_direction = Tender.get_inv_direction(tender_order)
@@ -73,8 +128,8 @@ class GiveawayTrader(Trader):
 
             # Implements timeout to revert to market order if unable to fill limit within 30 seconds
             # This is purely to prevent market seizing up.
-            hedging_order = inv_direction * security.to_order(qty = tender_order.qty, order_type = 'LMT', price_fn=price_fn, group_name='tender_%s' % security._ticker, timeout = 30, timeout_fn=on_timeout)
-
+            hedging_order = inv_direction * security.to_order(qty = tender_order.qty, order_type = 'LMT', price_fn=price_fn, group_name='tender_%s' % security._ticker, timeout = 3, timeout_fn=on_timeout)
+            
             await hedging_order.execute()
 
         def can_execute_tender(price, qty, direction):

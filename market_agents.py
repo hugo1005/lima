@@ -1,4 +1,4 @@
-from traders import GiveawayTrader
+from traders import GiveawayTrader, LiquidityTaker
 import asyncio
 import json
 
@@ -19,6 +19,8 @@ class MarketAgentsManager():
         for traderType, count in self._market_agents_config.items():
             if traderType == 'giveaway_trader':
                 self._agents += [GiveawayTrader() for i in range(0, count)]
+            # elif traderType == 'liquidity_taker':
+            #     self._agents += [LiquidityTaker() for i in range(0, count)]
 
         trader_activations = asyncio.gather(*[t.connect() for t in self._agents])
         print("Activating automated traders...")

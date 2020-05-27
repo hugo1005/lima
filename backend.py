@@ -17,6 +17,10 @@ from shared import to_named_tuple, update_named_tuple, named_tuple_to_dict
 
 from aiodebug import log_slow_callbacks
 
+# Profiling command line prompts
+# python3 -m cProfile -s filename -o profiles/backend_long_run.cprof backend.py
+# pyprof2calltree -k -i profiles/backend_long_run.cprof
+
 class HalfOrderbook:
     def __init__(self, book_side, starting_best_price):
         self.anonymised_lob = {}
@@ -58,17 +62,37 @@ class HalfOrderbook:
         price = order_spec.price
 
         if order_spec.order_type == 'LMT':
-            # Remove the order
-            self.lob[price] = list(filter(lambda x: x.order_id != order_id, self.lob[price]))
-            self.anonymised_lob[price] = list(filter(lambda x: x['order_id'] != order_id, self.anonymised_lob[price]))
-            self.book_volume -= (order_spec.qty - order_spec.qty_filled) # Remove remainining liquidity
+            # Edge case (Order already processed)
+            if price not in self.lob:
+                return False
 
-            # Remove the price if there is nothing available
-            self.update_price(price)
+            # Remove the order
+            order_match = list(filter(lambda x: x.order_id == order_id, self.lob[price]))
+            if len(order_match) > 0:
+                order = order_match[0]
+                self.lob[price] = list(filter(lambda x: x.order_id != order_id, self.lob[price]))
+                self.anonymised_lob[price] = list(filter(lambda x: x['order_id'] != order_id, self.anonymised_lob[price]))
+                
+                self.book_volume -= (order.qty - order.qty_filled) # Remove remainining liquidity
+
+                # Remove the price if there is nothing available
+                self.update_price(price)
+                return True
+            else:
+                # Edge case (Order already processed)
+                return False
         elif order_spec.order_type == 'MKT':
-            self._market_order_q = list(filter(lambda x: x.order_id != order_id, self._market_order_q))
-            self.anonymised_market_order_q = list(filter(lambda x: x['order_id'] != order_id, self.anonymised_market_order_q))
-            self.recompute_stats()
+            order_match = list(filter(lambda x: x.order_id == order_id, self._market_order_q))
+
+            if len(order_match) > 0:
+                self._market_order_q = list(filter(lambda x: x.order_id != order_id, self._market_order_q))
+                self.anonymised_market_order_q = list(filter(lambda x: x['order_id'] != order_id, self.anonymised_market_order_q))
+                self.recompute_stats()
+                return True
+            else:
+                return False
+
+        return False
 
     def has_market_orders(self):
         return len(self._market_order_q) > 0
@@ -306,11 +330,12 @@ class Orderbook:
         halfbook.add_order(exchange_order)
         
     def cancel_order(self, order_spec):
-        if order_spec.order_type == "LMT":
+        if order_spec.order_type == "LMT" or order_spec.order_type == "MKT":
             halfbook = self._bids if order_spec.action == "BUY" else self._asks
-            halfbook.cancel_order(order_spec)
+            return halfbook.cancel_order(order_spec)
         else:
             warnings.warn('Order of type [%s] is not a cancellable type' % order_spec.action, UserWarning)
+            return False
     
     def get_LOB(self):
         return LOB(self._bids.anonymised_lob, self._asks.anonymised_lob, self._bids.best_price, self._asks.best_price, self._bids.book_depth, self._asks.book_depth, self._bids.num_orders, self._asks.num_orders, self._bids.book_volume, self._asks.book_volume)
@@ -584,8 +609,17 @@ class Exchange:
                 await self.broadcast_active_traders(ws)
 
     async def handle_msgs(self, ws):
+        self._sum_x = 0 
+        self._sum_x2 = 0
+        self._n = 0
         async for msg in ws:
+            START_TIME = time.time()
             await self.route_msg(ws, msg)
+            TIME_TAKEN = time.time() - START_TIME
+            self._sum_x += TIME_TAKEN
+            self._sum_x2 += TIME_TAKEN ** 2
+            self._n += 1
+            print("MSG HANDLED IN: ", round(self._sum_x/self._n, 3), 'STD: ', round((1/self._n) * (self._sum_x2 - (self._sum_x**2) / self._n),4))
 
     async def broadcast_current_time(self, ws):
         while True:
@@ -668,16 +702,16 @@ class Exchange:
         elif s_type == 'cancel_order':
             # TODO: Frontend implementation of cancellation still needs to be worked out
             order_spec = to_named_tuple(data, OrderSpec)
-            self._books[order_spec.ticker].cancel_order(order_spec)
+            success = self._books[order_spec.ticker].cancel_order(order_spec)
 
             # Send to confirmation back to user
-            await ws.send({'type': 'order_opened', 'data': named_tuple_to_dict(order_spec)})
+            await ws.send(json.dumps({'type': 'order_cancelled', 'data': {'order_spec': named_tuple_to_dict(order_spec), 'success': success}}))
 
             # TODO: Convert to efficient versions of below as above
 
             # Broadcast new limit order books
-            for trader_ws in self._traders:
-                await trader_ws.send(json.dumps({'type': 'LOBS', 'data': self.get_books()}))
+            for tid in self._traders:
+                await self._traders[tid].send(json.dumps({'type': 'LOBS', 'data': self.get_books()}))
 
             # Broadcast new limit order books to observers
             for oid in self._observers:
@@ -729,7 +763,8 @@ class Exchange:
         """
         print("Initialising Trader Account [%s]" % tid)
         self._pnls[tid] = {} 
-        self._risk[tid] = TraderRisk(0,0,0,0,0,[])
+        # self._risk[tid] = TraderRisk(0,0,0,0,0,[])
+        self._risk[tid] = TraderRisk(0,0,0,0,0)
         self._transaction_records[tid] = {}
         self._suspect_trade_records[tid] = [] 
         
@@ -737,7 +772,7 @@ class Exchange:
         await trader.send(json.dumps({'type':'risk', 'data': named_tuple_to_dict(self._risk[tid])}))
 
         for ticker in self._books:
-            self._pnls[tid][ticker] = TickerPnL(ticker,0,0,0,0,[])
+            self._pnls[tid][ticker] = TickerPnL(ticker,0,0,0,0)
             await trader.send(json.dumps({'type':'pnl', 'data': named_tuple_to_dict(self._pnls[tid][ticker])}))
             
             # NOTE Right now i can't see any reason to need this for client to need this
@@ -808,7 +843,7 @@ class Exchange:
         exchange_config = self._config['exchanges'][self._exchange_name]
         securities_config = exchange_config['securities']
         contract_config = securities_config[ticker]
-        contract_point_value =contract_config['contract_point_value']
+        contract_point_value = contract_config['contract_point_value']
         contract_currency = contract_config['quote_currency']
         base_currency = exchange_config['base_currency']
 
@@ -865,11 +900,16 @@ class Exchange:
         # PnL history by ticker
         current_time = self.get_time()
         trader_pnls = self._pnls[tid]
-        ticker_pnl_history = trader_pnls[ticker].total_pnl_history
-        ticker_pnl_history.append({'time':current_time,'value':pnl_total_base_currency})
+        # ticker_pnl_history = trader_pnls[ticker].total_pnl_history
+        # ticker_pnl_history.append({'time':current_time,'value':pnl_total_base_currency})
+
+        # NOTE We remove history objects as it was becoming v expensive to keep encoding and sending
+        # these to the clients many many times!
 
         # Update ticker pnl
-        trader_pnls[ticker] = TickerPnL(ticker, net_position, unrealised_pnl_base_currency, realised_pnl_base_currency, pnl_total_base_currency, ticker_pnl_history)
+        # trader_pnls[ticker] = TickerPnL(ticker, net_position, unrealised_pnl_base_currency, realised_pnl_base_currency, pnl_total_base_currency, ticker_pnl_history)
+
+        trader_pnls[ticker] = TickerPnL(ticker, net_position, unrealised_pnl_base_currency, realised_pnl_base_currency, pnl_total_base_currency)
 
         # Recompute risk
         trader_risk = self._risk[tid]
@@ -880,11 +920,13 @@ class Exchange:
         overall_realised = sum([pnl.realised for ticker, pnl in trader_pnls.items()])
         overall_pnl = sum([pnl.total_pnl for ticker, pnl in trader_pnls.items()])
 
-        pnl_history = trader_risk.pnl_history
-        # We avoid deeply nesting named tuples as this can be painful for data transfer
-        pnl_history.append({'time':current_time,'value':overall_pnl})
+        # pnl_history = trader_risk.pnl_history
+        # # We avoid deeply nesting named tuples as this can be painful for data transfer
+        # pnl_history.append({'time':current_time,'value':overall_pnl})
         
-        self._risk[tid] = TraderRisk(overall_net_position, overall_gross_position,overall_unrealised, overall_realised, overall_pnl, pnl_history)
+        # self._risk[tid] = TraderRisk(overall_net_position, overall_gross_position,overall_unrealised, overall_realised, overall_pnl, pnl_history)
+
+        self._risk[tid] = TraderRisk(overall_net_position, overall_gross_position,overall_unrealised, overall_realised, overall_pnl)
 
         # TODO: Compute SHARPE, CALMAR, SORTINO, etc
 

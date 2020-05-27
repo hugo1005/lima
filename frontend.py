@@ -466,12 +466,21 @@ class ExchangeConnection:
                 await self.pass_to_app(ws_app, 'order_opened', order_key)
 
             elif s_type == 'order_cancelled':
-                order_id = data['order_id']
-                self._cancellation_completed_events[order_id].set() # Set cancellation flag
+                success = data['success']
+                order_id = data['order_spec']['order_id']
 
-                # Some general state management NOTE I think this is probably unused
-                self._cancelled_orders[order_id] = self._open_orders[order_id]
-                del(self._open_orders[order_id])
+                if success == False:
+                    warnings.warn('Order with id: %s was already filled by the time you cancelled it! This is not serious but something to be concerned about if this is a very frequent! We will proceed for now as if it had been cancelled (But clearly this needs fixing)...')
+                else:
+                    self._cancellation_completed_events[order_id].set() # Set cancellation flag
+
+                    # Some general state management NOTE I think this is probably unused
+                    self._cancelled_orders[order_id] = self._open_orders[order_id]
+
+                    # TODO We will still keep it in open orders for the moment
+                    # Until we can figure out how to handle out of sequence fills
+                    # and cancellations
+                    # del(self._open_orders[order_id])
                 
             elif s_type == 'order_fill':
                 # 1. Get the qty, price of fill, order id [x]
@@ -615,6 +624,8 @@ class Order:
             raise ValueError('If a timeout is specified you MUST specify an async timeout_fn')
         elif timeout_fn != None:
             self._on_timeout = timeout_fn
+        else:
+            self._on_timeout = None
 
         if type(on_complete) == type(None):
             async def complete():
@@ -642,7 +653,7 @@ class Order:
         state = {
             'args':[self._security], 
             'kwargs': {
-            'order_type': self.order_type, 'can_execute': self.can_execute, 'direction': self._direction, 'on_complete': self._on_complete, 'price_fn': self.get_target_price, 'qty_fn': self.evaluate_qty, 'group_name': self.group_name}
+            'order_type': self.order_type, 'can_execute': self.can_execute, 'direction': self._direction, 'on_complete': self._on_complete, 'price_fn': self.get_target_price, 'qty_fn': self.evaluate_qty, 'group_name': self.group_name, 'timeout': self._timeout, 'timeout_fn':self._on_timeout, 'await_fills':self._await_fills}
         }
 
         state['kwargs'] = {**state['kwargs'], **kwarg_mods} # Overwrites optional arguments where appropriate
@@ -802,7 +813,6 @@ class Order:
                 if len(pending) > 0:
                     for task in pending:
                         task.cancel()
-                    
                     raise asyncio.TimeoutError()
                     
             await self._on_complete() # This is deliberately outside the if, so that 

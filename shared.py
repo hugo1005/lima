@@ -31,9 +31,15 @@ TapeTransaction = namedtuple('TapeTransaction', ['ticker','action', 'qty', 'pric
 # We avoid deeply nesting named tuples as this can be painful for data transfer
 # format of pnl history items {'time':self.get_time(),'value':overall_pnl}
 
-TickerPnL = namedtuple('TickerPnL', ['ticker','net_position','unrealised','realised','total_pnl', 'total_pnl_history']) # Per Ticker Pnl
+# TickerPnL = namedtuple('TickerPnL', ['ticker','net_position','unrealised','realised','total_pnl', 'total_pnl_history']) # Per Ticker Pnl
 
-TraderRisk = namedtuple('TraderRisk', ['net_position','gross_position','unrealised','realised','pnl','pnl_history']) # Overall Risk per trader
+TickerPnL = namedtuple('TickerPnL', ['ticker','net_position','unrealised','realised','total_pnl']) # Per Ticker Pnl
+
+# TraderRisk = namedtuple('TraderRisk', ['net_position','gross_position','unrealised','realised','pnl','pnl_history']) # Overall Risk per trader
+
+# NOTE We removed pnl_history as it was compuationally expensive to encode
+# pnl history many times for transfer to client
+TraderRisk = namedtuple('TraderRisk', ['net_position','gross_position','unrealised','realised','pnl'])
 
 # TickerPNL = namedtuple('TickerPNL', ['buys','sells','realised_points','unrealised_points',])
 

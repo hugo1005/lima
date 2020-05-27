@@ -28,6 +28,9 @@ const state = {
     traders: [],
     // Tick data will be irregular intervals and at maximum possible resolution timestamp
     tickData: [], // {[{ticker:, Timestamp:, BestBid:, BestAsk:, BuyerInitiatedVol:, SellerInitiatedVol:}]}
+    resolution: 5,
+    groupedTicks: {}, // {ticker:{bucketedTimestamp:[{ timestamp:, bestBid:, bestAsk:, buyerInitiatedVol:, bellerInitiatedVol:}]}
+    ohlc: [], // {[{ticker:, timestamp:, o:, h:, l:, c:, buyerInitiatedVol:, bellerInitiatedVol:, vol:}]}
     securityParams: {}, // {ticker:{resolution:}}
     // risk: {},
     // pnl: {}
@@ -41,6 +44,7 @@ const getters = {
     getTickData: state => ticker => state.tickData.filter(tick => tick.ticker == ticker),
     getTraders: state => state.traders,
     getSecurityParams: state => ticker => state.securityParams[ticker],
+    getTickerOHLC: state => ticker => state.ohlc.filter(candle => candle.ticker == ticker),
     displayLimitBooks: function(state, getters) {
       return getters.getTickers.map(ticker => getters.displayLimitBook(ticker))
     },
@@ -76,6 +80,8 @@ const mutations = {
       state.tape = state.tape.concat(payloadFmted)
     },
     UPDATE_TICK_DATA(state, payload) {
+      let resolution = state.resolution
+
       for(let transaction of payload) {
         let ticker = transaction.ticker
         let qty = transaction.qty
@@ -83,15 +89,65 @@ const mutations = {
         let book = state.limitBooks[ticker]
         let bestBid = book.bid_book.length > 0? book.bid_book[0].price: transaction.price
         let bestAsk = book.ask_book.length > 0? book.ask_book[0].price: transaction.price
-
-        state.tickData.push({
+        
+        let tick = {
           'ticker': ticker,
           'timestamp': transaction.timestamp, 
           'bestBid': bestBid, 
           'bestAsk': bestAsk, 
           'buyerInitiatedVol': action == 'BUY'? qty: 0,  // Action in direction of liquidity taker
           'sellerInitiatedVol': action == 'SELL'? qty: 0,
-        })
+        }
+
+        // Stores the raw tick
+        state.tickData.push(tick)
+        
+        // Note this intermediary state is currently unused
+        // But may be useful in the future
+        // Store the bucketed tick
+        let bucketedTimestamp = Math.floor(tick.timestamp / resolution) * resolution
+        state.groupedTicks[ticker] = state.groupedTicks[ticker] || {}
+        state.groupedTicks[ticker][bucketedTimestamp] = state.groupedTicks[ticker][bucketedTimestamp] || []
+        state.groupedTicks[ticker][bucketedTimestamp].push(tick)
+
+        // Update OHLC
+        // This is slightly more efficient than the previous implementation
+        // As we only ever need to update the latest candle
+        let idx = state.ohlc.findIndex(candle => candle.ticker == ticker && candle.timestamp == bucketedTimestamp)
+        
+        let timestampTickData = state.groupedTicks[ticker][bucketedTimestamp]
+        let firstTick = timestampTickData[0]
+        let lastTick = timestampTickData[timestampTickData.length - 1]
+        let bestBids = timestampTickData.map(tick => tick.bestBid)
+        let bestAsks = timestampTickData.map(tick => tick.bestAsk)
+        let minBid = Math.min(...bestBids)
+        let maxBid = Math.max(...bestBids)
+        let minAsk = Math.min(...bestAsks)
+        let maxAsk = Math.max(...bestAsks)
+
+        let bidVol = timestampTickData.reduce((total, tick) => total + tick.buyerInitiatedVol, 0)
+        let askVol = timestampTickData.reduce((total, tick) => total + tick.sellerInitiatedVol, 0)
+        
+        let roundPrice = price => round(price, state.securityParams[ticker].resolution)
+
+        let candle = {
+            'ticker': ticker,
+            'timestamp': bucketedTimestamp,
+            'o': roundPrice((firstTick.bestBid + firstTick.bestAsk)/2),
+            'h': roundPrice((maxBid + maxAsk)/2), // To obtain less biased estimates we avg
+            'l': roundPrice((minBid + minAsk)/2),
+            'c': roundPrice((lastTick.bestBid + lastTick.bestAsk)/2),
+            'buyerInitiatedVol': bidVol,
+            'sellerInitiatedVol': askVol,
+            'vol': bidVol + askVol,
+        }
+
+        if(idx >= 0) {
+          state.ohlc.splice(idx, 1, candle)
+        } else {
+          state.ohlc.push(candle)
+        }
+
       }
     },
     UPDATE_TRADERS(state, payload) {

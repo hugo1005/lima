@@ -16,7 +16,8 @@
             "prevent_self_trades": 0,
             "simulation_notional_timestep": 3600,
             "market_agents": {
-                "giveaway_trader": 30
+                "giveaway_trader": 40,
+                "liquidity_taker": 20
             },
             "securities": {
                 "RITC": {
@@ -36,7 +37,7 @@
                         },
                         "institutional_orders": {
                             "enabled": true,
-                            "avg_num_tenders_per_second": 20,
+                            "avg_num_tenders_per_second": 10,
                             "prob_of_bad_tender_price": 0.05,
                             "tender_price_mean": 1,
                             "tender_price_deviation": 3,
@@ -56,12 +57,18 @@
                     "quote_currency": "CAD",
                     "market_dynamics": {
                         "price_path": {
-                            "expected_return": 0.5,
-                            "volatility": 0.75,
+                            "expected_return": 0.08,
+                            "volatility": 0.4,
                             "updates_per_second": 4
                         },
                         "institutional_orders": {
-                            "enabled": false
+                            "enabled": true,
+                            "avg_num_tenders_per_second": 10,
+                            "prob_of_bad_tender_price": 0.05,
+                            "tender_price_mean": 1,
+                            "tender_price_deviation": 2,
+                            "expected_tender_qty": 250,
+                            "expires_after": 10
                         } 
                     }
                 },
@@ -76,12 +83,18 @@
                     "quote_currency": "CAD",
                     "market_dynamics": {
                         "price_path": {
-                            "expected_return": 0.5,
-                            "volatility": 0.75,
+                            "expected_return": 0.12,
+                            "volatility": 0.5,
                             "updates_per_second": 4
                         },
                         "institutional_orders": {
-                            "enabled": false
+                            "enabled": true,
+                            "avg_num_tenders_per_second": 10,
+                            "prob_of_bad_tender_price": 0.05,
+                            "tender_price_mean": 1,
+                            "tender_price_deviation": 1.5,
+                            "expected_tender_qty": 250,
+                            "expires_after": 10
                         } 
                     }
                 }, 
