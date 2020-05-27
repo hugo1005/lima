@@ -548,7 +548,7 @@ class Exchange:
         # /observer (read only) Web socket gets registered to _observers
         # /traders both read and write gets registered to _observers
         
-        is_trader, is_observer = path == '/trader', path == '/observer'
+        is_trader = path == '/trader'
 
         # Register Trader
         if is_trader:
@@ -576,31 +576,12 @@ class Exchange:
                 await ws.send(json.dumps({'type': 'tape', 'data': self.get_tape()}))
                 await asyncio.gather(self.handle_msgs(ws), self.broadcast_active_traders(ws))
 
-            # if is_observer:
-            #     await ws.send(json.dumps(setup_msg)) # Send the trader their oid and exchange settings
-            #     await ws.send(json.dumps({'type': 'LOBS', 'data': self.get_books()}))
-            #     # MBS stands for Market Order Books; really will only be busy if market is illiquid
-            #     await ws.send(json.dumps({'type': 'MBS', 'data': self.get_books(order_type='MKT')}))
-            #     await ws.send(json.dumps({'type': 'tape', 'data': self.get_tape()}))
-                
-            #     # Deprecated broadcast
-            #     while True:
-            #         await asyncio.sleep(1)
-                # await asyncio.gather(self.broadcast_current_time(ws))  
-        # except websockets.ConnectionClosed:
-        #     print("Connection with [%s] [%s] closed" % (('trader', tid) if is_trader else ('observer', oid))) 
-        except websockets.ConnectionClosedError:
-            print("Connection with [%s] [%s] closed" % (('trader', tid) if is_trader else ('observer', oid))) 
-        except websockets.ConnectionClosedOK:
-            print("Connection with [%s] [%s] closed" % (('trader', tid) if is_trader else ('observer', oid))) 
+        except websockets.ConnectionClosed:
+            print("Connection with [%s] [%s] closed" % (('trader', tid)))
         finally:
-            print("Connection with [%s] [%s] closed" % (('trader', tid) if is_trader else ('observer', oid))) 
-
             if is_trader:
                 del(self._traders[tid])
-                # await self.broadcast_active_traders(ws)
-            # elif is_observer:
-            #     del(self._observers[oid])
+                await self.broadcast_active_traders(ws)
 
     async def handle_msgs(self, ws):
         async for msg in ws:
@@ -746,7 +727,7 @@ class Exchange:
         """
         Initialises the trades pnl, risk and transaction records and transmits to the trader
         """
-
+        print("Initialising Trader Account [%s]" % tid)
         self._pnls[tid] = {} 
         self._risk[tid] = TraderRisk(0,0,0,0,0,[])
         self._transaction_records[tid] = {}
@@ -761,7 +742,7 @@ class Exchange:
             
             # NOTE Right now i can't see any reason to need this for client to need this
             # it already has this in its own form that it needs
-            self._transaction_records[tid][ticker] = {'BUY':[],'SELL':[]}  
+            self._transaction_records[tid][ticker] = {'BUY':{'sum_qty':0, 'sum_qty_price':0,'transactions':[]},'SELL':{'sum_qty':0, 'sum_qty_price':0,'transactions':[]}}
   
     async def update_pnls(self, transaction_pair):
         """
@@ -807,7 +788,13 @@ class Exchange:
         trader_record = self._transaction_records[tid]
         ticker_record = trader_record[ticker]
         side_record = ticker_record[action] # Buy or sell transaction record
-        side_record.append(transaction)
+        transactions = side_record['transactions']
+
+        transactions.append(transaction)
+
+        # Saves on expensive computations later in recompute_trader_pnl
+        side_record['sum_qty'] += transaction.qty
+        side_record['sum_qty_price'] += transaction.qty * transaction.price
 
     async def recompute_trader_pnl(self, tid, ticker):
         """
@@ -827,17 +814,23 @@ class Exchange:
 
         best_bid, best_ask = self._books[ticker]._bids.best_price, self._books[ticker]._asks.best_price, 
 
-        total_buy_qty = sum([transaction.qty for transaction in ticker_record['BUY']])
-        total_sell_qty = sum([transaction.qty for transaction in ticker_record['SELL']])
+        # total_buy_qty = sum([transaction.qty for transaction in ticker_record['BUY']['transactions']])
+        # total_sell_qty = sum([transaction.qty for transaction in ticker_record['SELL']['transactions']])
+        total_buy_qty = ticker_record['BUY']['sum_qty']
+        total_sell_qty = ticker_record['SELL']['sum_qty']
+        total_buy_qty_price =  ticker_record['BUY']['sum_qty_price']
+        total_sell_qty_price =  ticker_record['SELL']['sum_qty_price']
 
         # This is fine as then there will be no realised 
         if total_buy_qty > 0:
-            avg_buy_price = sum([transaction.price * transaction.qty for transaction in ticker_record['BUY']]) / total_buy_qty
+            # avg_buy_price = sum([transaction.price * transaction.qty for transaction in ticker_record['BUY']['transactions']]) / total_buy_qty
+            avg_buy_price = total_buy_qty_price / total_buy_qty
         else:
             avg_buy_price = 0
         
         if total_sell_qty > 0:
-            avg_sell_price = sum([transaction.price * transaction.qty for transaction in ticker_record['SELL']]) / total_sell_qty
+            # avg_sell_price = sum([transaction.price * transaction.qty for transaction in ticker_record['SELL']['transactions']]) / total_sell_qty
+            avg_sell_price = total_sell_qty_price / total_sell_qty
         else:
             avg_sell_price = 0
 

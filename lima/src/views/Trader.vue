@@ -4,20 +4,22 @@
     <p>Trader View {{getTID}}</p>
 
     <!-- <h1>Books</h1> -->
-    <div >
-      <div id='book-pair' style='max-height: 500px;'>
-        <Book :ticker="ticker" orderType="LMT" v-for="ticker in tickers" v-bind:key="ticker"></Book>
-      </div>
-      <div id='book-pair' style='max-height: 450px;'>
-        <Book :ticker="ticker" orderType="MKT" v-for="ticker in tickers" v-bind:key="ticker"></Book>
-      </div>
-      
+    <div id='book-pair' style='max-height: 500px;'>
+      <Book :ticker="ticker" orderType="LMT" v-for="ticker in tickers" v-bind:key="ticker"></Book>
+    </div>
+    <div id='book-pair'>
+      <TechnicalChart :ticker="ticker" v-for="ticker in tickers" v-bind:key="ticker" :resolution='5'></TechnicalChart> 
     </div>
     <div id='book-pair' style='max-height: 450px;'>
-        <Tape></Tape>
-        <OpenOrders></OpenOrders>
-        <RiskMonitor></RiskMonitor>
+      <Tape></Tape>
+      <OpenOrders></OpenOrders>
+      <RiskMonitor></RiskMonitor>
     </div>
+    <div id='book-pair' style='max-height: 450px;'>
+      <Book :ticker="ticker" orderType="MKT" v-for="ticker in tickers" v-bind:key="ticker"></Book>
+    </div>
+      
+    
     
     <!-- <img alt="Vue logo" src="../assets/logo.png"> -->
     <!-- <HelloWorld msg="Welcome to Your Vue.js App"/> -->
@@ -30,12 +32,13 @@ import Book from '../components/Book.vue'
 import Tape from '../components/Tape.vue'
 import OpenOrders from '../components/OpenOrders.vue'
 import RiskMonitor from '../components/RiskMonitor.vue'
+import TechnicalChart from '../components/TechnicalChart.vue'
 import { mapGetters } from 'vuex'
 
 export default {
   name: 'Trader',
   components: {
-    Book, Tape, OpenOrders, RiskMonitor
+    Book, Tape, OpenOrders, RiskMonitor, TechnicalChart
   },
   computed: {
     ...mapGetters({

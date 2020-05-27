@@ -106,7 +106,10 @@ class WebServer:
                 both_connected = type(self.backend_app) != type(None) and type(self.backend) != type(None)
                 
                 if is_backend:
-                    self.backend_to_app_cache.append(data)
+                    # Temporary solution to store the configuration 
+                    # TODO Fix this better later
+                    if len(self.backend_to_app_cache) < 10:
+                        self.backend_to_app_cache.append(data)
 
                     if both_connected:
                         await self.backend_app.send(data)

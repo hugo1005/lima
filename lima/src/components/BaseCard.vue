@@ -106,7 +106,7 @@ export default {
 
     .scrollable {
         width: 100%;
-        max-height: 300px; 
+        height: 300px;  /* NOTE This was a max height elem but i changed it cause it was getting annoying */
         overflow-y: scroll;
         overflow-x: hidden;
     }

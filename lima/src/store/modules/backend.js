@@ -27,7 +27,8 @@ const state = {
     marketBooks: {},
     traders: [],
     // Tick data will be irregular intervals and at maximum possible resolution timestamp
-    tickData: {} // {ticker:[{Timestamp:, BestBid:, BestAsk:, BuyerInitiatedVol:, SellerInitiatedVol:}]}
+    tickData: [], // {[{ticker:, Timestamp:, BestBid:, BestAsk:, BuyerInitiatedVol:, SellerInitiatedVol:}]}
+    securityParams: {}, // {ticker:{resolution:}}
     // risk: {},
     // pnl: {}
 }
@@ -37,8 +38,9 @@ const getters = {
     displayLimitBook: state => ticker => state.limitBooks[ticker],
     displayMarketBook: state => ticker => state.marketBooks[ticker],
     getTickers: state =>  Object.keys(state.limitBooks),
-    getTickData: state => ticker => state.tickData[ticker],
+    getTickData: state => ticker => state.tickData.filter(tick => tick.ticker == ticker),
     getTraders: state => state.traders,
+    getSecurityParams: state => ticker => state.securityParams[ticker],
     displayLimitBooks: function(state, getters) {
       return getters.getTickers.map(ticker => getters.displayLimitBook(ticker))
     },
@@ -79,10 +81,11 @@ const mutations = {
         let qty = transaction.qty
         let action = transaction.action
         let book = state.limitBooks[ticker]
-        let bestBid = book.bid_book.length > 0? book.bid_book[0]: transaction.price
-        let bestAsk = book.ask_book.length > 0? book.ask_book[0]: transaction.price
+        let bestBid = book.bid_book.length > 0? book.bid_book[0].price: transaction.price
+        let bestAsk = book.ask_book.length > 0? book.ask_book[0].price: transaction.price
 
-        state.tickData[ticker].push({
+        state.tickData.push({
+          'ticker': ticker,
           'timestamp': transaction.timestamp, 
           'bestBid': bestBid, 
           'bestAsk': bestAsk, 
@@ -112,10 +115,19 @@ const mutations = {
     SET_EXCHANGE_OPEN_TIME(state, payload) {
       state.exchangeOpenTime = payload
     },
-    CONFIGURE_TICK_DATA(state, payload) {
-      for(let ticker of payload) {
+    CONFIGURE_SECUIRTY_PARAMETERS(state, payload) {
+      let tickers = Object.keys(payload)
+      
+      // CONFIGURE TICK DATA
+      for(let ticker of tickers) {
         state.tickData[ticker] = []
       }
+
+      // CONFIGURE PARAMATERS
+      state.securityParams = tickers.reduce((params, ticker) => {
+        params[ticker] = {resolution: payload[ticker].resolution}
+        return params
+      }, {})
     }
 }
 
@@ -123,7 +135,7 @@ const actions = {
     configBackend({ commit }, payload) {
       // There is more information in this payload but we don't need it for now
       commit('SET_EXCHANGE_OPEN_TIME', payload.exchange_open_time)
-      commit('CONFIGURE_TICK_DATA', Object.keys(payload.exchange.securities))
+      commit('CONFIGURE_SECUIRTY_PARAMETERS', payload.exchange.securities)
     },
     updateLimitBook({ commit }, payload) {
       commit('UPDATE_LIMIT_BOOK', payload)
