@@ -1,46 +1,53 @@
-const client = new WebSocket(process.env.VUE_APP_BACKEND_WEBSOCKET_URL)
-
 export default function createWebSocketPlugin() {
     return store => {
-        client.onopen = function() {
-            store.dispatch('backend/connectionOpened')
-        }
+        function connect() {
+            let client = new WebSocket(process.env.VUE_APP_BACKEND_WEBSOCKET_URL);
+            
+            client.onopen = function() {
+                store.dispatch('backend/connectionOpened')
+            }
+    
+            client.onerror = function(event) {
+                store.dispatch('backend/connectionError', event)
+            }
+    
+            client.onclose = function() {
+                console.log("Connection with backend closed...")
+                store.dispatch('backend/connectionClosed')
+    
+                setTimeout(function() {
+                    connect();
+                }, 500);
+            };
 
-        client.onerror = function(event) {
-            store.dispatch('backend/connectionError', event)
-        }
-
-        client.onclose = function() {
-            store.dispatch('backend/connectionClosed')
-        };
-        
-        client.onmessage = function(event) {  
-            let msg = JSON.parse(event.data)
-            if(msg.type == 'config') {
-                store.dispatch('backend/configBackend', msg.data)
+            client.onmessage = function(event) {  
+                let msg = JSON.parse(event.data)
+                if(msg.type == 'config') {
+                    store.dispatch('backend/configBackend', msg.data)
+                }
+                if(msg.type == 'LOBS') {
+                    store.dispatch('backend/updateLimitBook', msg.data)
+                }
+                if(msg.type == 'MBS') {
+                    store.dispatch('backend/updateMarketBook', msg.data)
+                }
+                else if(msg.type == 'tape') {
+                    store.dispatch('backend/updateTape', msg.data)
+                }
+                else if(msg.type == 'traders') {
+                    store.dispatch('backend/updateTraders', msg.data)
+                }
+                else if(msg.type == 'current_time') {
+                    store.dispatch('backend/updateTime', msg.data)
+                } 
+                // TODO: Implement the overall admin dashboard
+                // else if(msg.type == 'risk') {
+                //     store.dispatch('backend/updateRisk', msg.data)
+                // }
+                // else if(msg.type == 'pnl') {
+                //     store.dispatch('backend/updatePnL', msg.data)
+                // }
             }
-            if(msg.type == 'LOBS') {
-                store.dispatch('backend/updateLimitBook', msg.data)
-            }
-            if(msg.type == 'MBS') {
-                store.dispatch('backend/updateMarketBook', msg.data)
-            }
-            else if(msg.type == 'tape') {
-                store.dispatch('backend/updateTape', msg.data)
-            }
-            else if(msg.type == 'traders') {
-                store.dispatch('backend/updateTraders', msg.data)
-            }
-            else if(msg.type == 'current_time') {
-                store.dispatch('backend/updateTime', msg.data)
-            } 
-            // TODO: Implement the overall admin dashboard
-            // else if(msg.type == 'risk') {
-            //     store.dispatch('backend/updateRisk', msg.data)
-            // }
-            // else if(msg.type == 'pnl') {
-            //     store.dispatch('backend/updatePnL', msg.data)
-            // }
         }
 
         // An example for communicating back:
@@ -50,5 +57,10 @@ export default function createWebSocketPlugin() {
         //     if (state.chat.connected && mutation.type === 'chat/SEND_MESSAGE')
         //       client.invoke('SendMessage', null, message);
         //   });
+        
+        // Actually open the new socket!
+        connect()
     }
+
+    
 }

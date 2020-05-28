@@ -16,6 +16,9 @@ from shared import to_named_tuple, update_named_tuple, named_tuple_to_dict
 # from traders import GiveawayTrader
 
 from aiodebug import log_slow_callbacks
+import logging
+
+# logging.basicConfig(filename='./profiles/backend.log', level=logging.INFO)
 
 # Profiling command line prompts
 # python3 -m cProfile -s filename -o profiles/backend_long_run.cprof backend.py
@@ -526,9 +529,10 @@ class Exchange:
         dynamics = asyncio.gather(*[md.create_dynamics() for ticker, md in self._market_dynamics.items()])
 
         # Communications to web app intermediary
+        # NOTE Lets disable the webserver and see if the bug persists...
         webserver = self.connect_to_web_server()
 
-        # NOTE Something may be causing this to cut out on web reload...
+        # core = asyncio.gather(handler, dynamics)
         core = asyncio.gather(webserver, handler, dynamics)
 
         server, _ = loop.run_until_complete(core)
@@ -546,6 +550,8 @@ class Exchange:
             self._observers[oid] = ws
 
             try:
+                print("Connected to vuejs middleware...")
+
                 setup_msg = {
                     'type':'config', 
                     'data':{
@@ -564,9 +570,14 @@ class Exchange:
                 while True:
                     # NOTE: This is probably not reccomended
                     await asyncio.sleep(1) # Holds the connection open
-            except:
-                # This will hopefully never be called but just to be clear
+            except Exception as e:
+                print(e)
+                print("Closing connection with vuejs middleware...")
                 del(self._observers[oid])
+            finally:
+                print("Closed connection with vuejs middleware...")
+                # This will hopefully never be called but just to be clear
+                
 
     async def exchange_handler(self, ws, path):
         # Paths
@@ -600,13 +611,13 @@ class Exchange:
                 await ws.send(json.dumps({'type': 'LOBS', 'data': self.get_books()}))
                 await ws.send(json.dumps({'type': 'tape', 'data': self.get_tape()}))
                 await asyncio.gather(self.handle_msgs(ws), self.broadcast_active_traders(ws))
-
-        except websockets.ConnectionClosed:
-            print("Connection with [%s] [%s] closed" % (('trader', tid)))
         finally:
             if is_trader:
+                print("Connection with [%s] [%s] closed" % (('trader', tid)))
                 del(self._traders[tid])
                 await self.broadcast_active_traders(ws)
+            else:
+                print("Connection closed with unkown connection...")
 
     async def handle_msgs(self, ws):
         self._sum_x = 0 
@@ -615,11 +626,14 @@ class Exchange:
         async for msg in ws:
             START_TIME = time.time()
             await self.route_msg(ws, msg)
+            
             TIME_TAKEN = time.time() - START_TIME
             self._sum_x += TIME_TAKEN
             self._sum_x2 += TIME_TAKEN ** 2
             self._n += 1
-            print("MSG HANDLED IN: ", round(self._sum_x/self._n, 3), 'STD: ', round((1/self._n) * (self._sum_x2 - (self._sum_x**2) / self._n),4))
+
+            if self._sum_x/self._n > 0.2:
+                print("MSG HANDLED IN: ", round(self._sum_x/self._n, 3), 'STD: ', round((1/self._n) * (self._sum_x2 - (self._sum_x**2) / self._n),4))
 
     async def broadcast_current_time(self, ws):
         while True:
@@ -761,7 +775,7 @@ class Exchange:
         """
         Initialises the trades pnl, risk and transaction records and transmits to the trader
         """
-        print("Initialising Trader Account [%s]" % tid)
+        print("Initialising Trader Account [%s]", tid)
         self._pnls[tid] = {} 
         # self._risk[tid] = TraderRisk(0,0,0,0,0,[])
         self._risk[tid] = TraderRisk(0,0,0,0,0)

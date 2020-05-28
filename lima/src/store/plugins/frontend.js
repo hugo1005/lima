@@ -10,6 +10,11 @@ export default function createWebSocketPlugin() {
             store.dispatch('frontend/connectionError', event)
         }
         
+        client.onclose = function() {
+            console.log("Connection with frontend closed...")
+            store.dispatch('frontend/connectionClosed')
+        };
+
         client.onmessage = function(event) {
             let msg = JSON.parse(event.data)
 

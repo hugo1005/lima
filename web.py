@@ -1,6 +1,7 @@
 import websockets
 import json
 import asyncio
+import time
 
 class WebServer:
     def __init__(self, backend_config_dir = './configs/backend_config.json', frontend_config_dir = './configs/frontend_config.json', ):
@@ -14,12 +15,13 @@ class WebServer:
         self._port_backend = self.backend_config['app-websocket']['port']
         self._ip_frontend = self.frontend_config['app-websocket']['ip']
         self._ip_backend = self.backend_config['app-websocket']['ip']
+       
         self.frontend_app = None
-        self.backend_app = None
+        self.frontend = None
+        
         self.frontend_to_app_cache = []
         self.backend_to_app_cache = []
-        self.frontend = None
-        self.backend = None
+        self.backend_has_updates = asyncio.Event()
 
         self.setup_websocket_server()
 
@@ -44,6 +46,7 @@ class WebServer:
 
         loop.run_until_complete(server.wait_closed())
     
+    # TODO: Decouple the bridge_frontend like backend
     async def bridge_frontend(self, ws, path):
         is_frontend, is_app = path == '/frontend', path == '/app'
 
@@ -86,44 +89,48 @@ class WebServer:
     async def bridge_backend(self, ws, path):
         is_backend, is_app = path == '/backend', path == '/app'
 
-        # Register connection
-        if is_backend:
-            print("Backend connection established")
-            self.backend = ws
-        elif is_app:
-            print("App [Backend State Management] connection established")
-            self.backend_app = ws
-        else:
-            print("Websocket path unkown: %s" % path)
-        
         try:
-            if is_app: # Replay all messages to catch up
-                print("Replaying backend data..")
-                for data in self.backend_to_app_cache:
-                    await self.backend_app.send(data)
+            if is_app: 
+                print("App [Backend State Management] connection established")
 
-            async for data in ws:
-                both_connected = type(self.backend_app) != type(None) and type(self.backend) != type(None)
-                
-                if is_backend:
-                    # Temporary solution to store the configuration 
-                    # TODO Fix this better later
-                    if len(self.backend_to_app_cache) < 10:
-                        self.backend_to_app_cache.append(data)
+                # Pass messages from backend to frontend
+                while True:
+                    await self.backend_has_updates.wait()
+                    self.backend_has_updates.clear()
 
-                    if both_connected:
-                        await self.backend_app.send(data)
+                    while len(self.backend_to_app_cache) > 0:
+                        # Send in time order
+                        dispatch = self.backend_to_app_cache.pop(0)
+                        await ws.send(dispatch)
+
+            if is_backend:
+                print("Backend connection established")
+                # Store the data for sending to the server.
+                while True:
+                    data = await ws.recv()
+                    self.backend_to_app_cache.append(data)
+                    self.backend_has_updates.set()
+
+            # async for data in ws:
+            #     both_connected = type(self.backend_app) != type(None) and type(self.backend) != type(None)
                 
-                if is_app and both_connected:
-                    await self.backend.send(data)
+            #     if is_backend:
+            #         # Temporary solution to store the configuration 
+            #         # TODO Fix this better later
+            #         if len(self.backend_to_app_cache) < 10:
+            #             self.backend_to_app_cache.append(data)
+
+            #         if both_connected:
+            #             await self.backend_app.send(data)
+                
+            #     if is_app and both_connected:
+            #         await self.backend.send(data)
 
         except websockets.ConnectionClosed:
-            print("Connection with [%s] closed" % path) 
+            print("Connection with [%s] closed: [%s]" % (path, time.time())) 
         finally:
-            if is_backend: 
-                self.backend = None
+            if is_backend:
                 self.backend_to_app_cache = []
-            if is_app: self.backend_app = None
 
 """Start the webserver"""
 WebServer()

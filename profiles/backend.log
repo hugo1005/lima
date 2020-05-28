@@ -1,0 +1,2720 @@
+INFO:root:Initialising book for ticker [RITC] ...
+INFO:root:Initialising book for ticker [BEAR] ...
+INFO:root:Initialising book for ticker [BULL] ...
+INFO:root:Initialising book for ticker [USD] ...
+INFO:root:Initialising websocket...
+INFO:root:Connected to vuejs middleware...
+INFO:root:Creating Market Dynamics...
+INFO:root:Creating Market Dynamics...
+INFO:root:Creating Market Dynamics...
+INFO:root:Creating Market Dynamics...
+INFO:root:Initialising Trader Account [306383409]
+INFO:root:Initialising Trader Account [306380273]
+INFO:root:Initialising Trader Account [306383373]
+INFO:root:Initialising Trader Account [306383379]
+INFO:root:Initialising Trader Account [306383448]
+INFO:root:Initialising Trader Account [306383451]
+INFO:root:Initialising Trader Account [306383493]
+INFO:root:Initialising Trader Account [306383529]
+INFO:root:Initialising Trader Account [306383532]
+INFO:root:Initialising Trader Account [306654175]
+INFO:root:Initialising Trader Account [306383535]
+INFO:root:Initialising Trader Account [306654148]
+INFO:root:Initialising Trader Account [306767228]
+INFO:root:Initialising Trader Account [306654172]
+INFO:root:Initialising Trader Account [306767237]
+INFO:root:Initialising Trader Account [306767240]
+INFO:root:Initialising Trader Account [306767243]
+INFO:root:Initialising Trader Account [306767246]
+INFO:root:Initialising Trader Account [306767249]
+INFO:root:Initialising Trader Account [306767252]
+INFO:root:Initialising Trader Account [306767255]
+INFO:root:Initialising Trader Account [306767258]
+INFO:root:Initialising Trader Account [306767261]
+INFO:root:Initialising Trader Account [306767264]
+INFO:root:Initialising Trader Account [306767267]
+INFO:root:Initialising Trader Account [306767270]
+INFO:root:Initialising Trader Account [306767273]
+INFO:root:Initialising Trader Account [306767276]
+INFO:root:Initialising Trader Account [306767279]
+INFO:root:Initialising Trader Account [306767282]
+INFO:root:Initialising Trader Account [306767285]
+INFO:root:Initialising Trader Account [306767288]
+INFO:root:Initialising Trader Account [306767291]
+INFO:root:Initialising Trader Account [306767294]
+INFO:root:Initialising Trader Account [306767297]
+INFO:root:Initialising Trader Account [306767300]
+INFO:root:Initialising Trader Account [306767303]
+INFO:root:Initialising Trader Account [306767306]
+INFO:root:Initialising Trader Account [306767309]
+INFO:root:Initialising Trader Account [306767312]
+INFO:root:Initialising Trader Account [306767315]
+INFO:root:Initialising Trader Account [306767318]
+INFO:root:Initialising Trader Account [306767321]
+INFO:root:Initialising Trader Account [306767324]
+INFO:root:Initialising Trader Account [306767327]
+INFO:root:Initialising Trader Account [306767330]
+INFO:root:Initialising Trader Account [306767333]
+INFO:root:Initialising Trader Account [306767336]
+INFO:root:Initialising Trader Account [306767339]
+INFO:root:Initialising Trader Account [306767342]
+INFO:root:Initialising Trader Account [306767345]
+INFO:root:Initialising Trader Account [306767348]
+INFO:root:Initialising Trader Account [306767351]
+INFO:root:Initialising Trader Account [306767354]
+INFO:root:Initialising Trader Account [306767357]
+INFO:root:Initialising Trader Account [306771972]
+INFO:root:Initialising Trader Account [306771975]
+INFO:root:Initialising Trader Account [306771978]
+INFO:root:Initialising Trader Account [306771981]
+INFO:root:Initialising Trader Account [306771984]
+WARNING:aiodebug.log_slow_callbacks:Executing <Task pending name='Task-419' coro=<Exchange.handle_msgs() running at backend.py:628> wait_for=<_GatheringFuture pending cb=[<TaskWakeupMethWrapper object at 0x124ada310>()]> cb=[gather.<locals>._done_callback() at /Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/asyncio/tasks.py:751]> took 0.055 seconds
+WARNING:aiodebug.log_slow_callbacks:Executing <Task pending name='Task-259' coro=<Exchange.handle_msgs() running at backend.py:628> wait_for=<_GatheringFuture pending cb=[<TaskWakeupMethWrapper object at 0x124b37d60>()]> cb=[gather.<locals>._done_callback() at /Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/asyncio/tasks.py:751]> took 0.051 seconds
+WARNING:aiodebug.log_slow_callbacks:Executing <Task pending name='Task-379' coro=<Exchange.handle_msgs() running at backend.py:628> wait_for=<_GatheringFuture pending cb=[<TaskWakeupMethWrapper object at 0x124c96370>()]> cb=[gather.<locals>._done_callback() at /Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/asyncio/tasks.py:751]> took 0.064 seconds
+WARNING:aiodebug.log_slow_callbacks:Executing <Task pending name='Task-444' coro=<Exchange.handle_msgs() running at backend.py:628> wait_for=<_GatheringFuture pending cb=[<TaskWakeupMethWrapper object at 0x124c2ebb0>()]> cb=[gather.<locals>._done_callback() at /Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/asyncio/tasks.py:751]> took 0.061 seconds
+WARNING:aiodebug.log_slow_callbacks:Executing <Task pending name='Task-364' coro=<Exchange.handle_msgs() running at backend.py:628> wait_for=<_GatheringFuture pending cb=[<TaskWakeupMethWrapper object at 0x1248dac40>()]> cb=[gather.<locals>._done_callback() at /Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/asyncio/tasks.py:751]> took 0.050 seconds
+WARNING:aiodebug.log_slow_callbacks:Executing <Task pending name='Task-53' coro=<Exchange.handle_msgs() running at backend.py:628> wait_for=<_GatheringFuture pending cb=[<TaskWakeupMethWrapper object at 0x124cf2340>()]> cb=[gather.<locals>._done_callback() at /Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/asyncio/tasks.py:751]> took 0.054 seconds
+WARNING:aiodebug.log_slow_callbacks:Executing <Task pending name='Task-209' coro=<Exchange.handle_msgs() running at backend.py:628> wait_for=<_GatheringFuture pending cb=[<TaskWakeupMethWrapper object at 0x124b04cd0>()]> cb=[gather.<locals>._done_callback() at /Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/asyncio/tasks.py:751]> took 0.076 seconds
+WARNING:aiodebug.log_slow_callbacks:Executing <Task pending name='Task-269' coro=<Exchange.handle_msgs() running at backend.py:628> wait_for=<_GatheringFuture pending cb=[<TaskWakeupMethWrapper object at 0x1249fc1f0>()]> cb=[gather.<locals>._done_callback() at /Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/asyncio/tasks.py:751]> took 0.053 seconds
+WARNING:aiodebug.log_slow_callbacks:Executing <Task pending name='Task-309' coro=<Exchange.handle_msgs() running at backend.py:628> wait_for=<_GatheringFuture pending cb=[<TaskWakeupMethWrapper object at 0x124a93b20>()]> cb=[gather.<locals>._done_callback() at /Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/asyncio/tasks.py:751]> took 0.100 seconds
+WARNING:aiodebug.log_slow_callbacks:Executing <Task pending name='Task-389' coro=<Exchange.handle_msgs() running at backend.py:628> wait_for=<_GatheringFuture pending cb=[<TaskWakeupMethWrapper object at 0x124ca1100>()]> cb=[gather.<locals>._done_callback() at /Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/asyncio/tasks.py:751]> took 0.081 seconds
+WARNING:aiodebug.log_slow_callbacks:Executing <Task pending name='Task-304' coro=<Exchange.handle_msgs() running at backend.py:628> wait_for=<_GatheringFuture pending cb=[<TaskWakeupMethWrapper object at 0x124a85b80>()]> cb=[gather.<locals>._done_callback() at /Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/asyncio/tasks.py:751]> took 0.118 seconds
+WARNING:aiodebug.log_slow_callbacks:Executing <Task finished name='Task-626133' coro=<Exchange.recompute_trader_pnl() done, defined at backend.py:848> result=None> took 0.062 seconds
+WARNING:aiodebug.log_slow_callbacks:Executing <Task pending name='Task-53' coro=<Exchange.handle_msgs() running at backend.py:628> wait_for=<_GatheringFuture pending cb=[<TaskWakeupMethWrapper object at 0x124a93c10>()]> cb=[gather.<locals>._done_callback() at /Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/asyncio/tasks.py:751]> took 0.057 seconds
+WARNING:aiodebug.log_slow_callbacks:Executing <Task pending name='Task-73' coro=<Exchange.handle_msgs() running at backend.py:628> wait_for=<_GatheringFuture pending cb=[<TaskWakeupMethWrapper object at 0x124c8f430>()]> cb=[gather.<locals>._done_callback() at /Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/asyncio/tasks.py:751]> took 0.072 seconds
+WARNING:aiodebug.log_slow_callbacks:Executing <Task pending name='Task-304' coro=<Exchange.handle_msgs() running at backend.py:628> wait_for=<_GatheringFuture pending cb=[<TaskWakeupMethWrapper object at 0x124a93400>()]> cb=[gather.<locals>._done_callback() at /Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/asyncio/tasks.py:751]> took 0.068 seconds
+WARNING:aiodebug.log_slow_callbacks:Executing <Task pending name='Task-379' coro=<Exchange.handle_msgs() running at backend.py:628> wait_for=<_GatheringFuture pending cb=[<TaskWakeupMethWrapper object at 0x124cf2130>()]> cb=[gather.<locals>._done_callback() at /Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/asyncio/tasks.py:751]> took 0.094 seconds
+INFO:root:Connection with [trader] [306767336] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306767294] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306767303] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306767342] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306767321] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306771978] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306767276] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306767330] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306767273] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306771981] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306767333] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306383379] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306383448] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306383532] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306767285] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306767246] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306767267] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306767348] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306767345] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306767261] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306767354] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306767339] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306767357] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306767258] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306771984] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306767252] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306767255] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306767309] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306767297] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306767327] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306767315] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306383373] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306654172] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306383529] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306383409] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306767324] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306767270] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306380273] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306767240] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306767282] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306767318] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306383451] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306383535] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306767351] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306767306] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306767279] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306767249] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306767291] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306767288] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306767243] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306767300] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306654175] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306383493] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306654148] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306767237] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306767312] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306771975] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306767228] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306767264] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Connection with [trader] [306771972] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedOK: code = 1000 (OK), no reason
+INFO:root:Initialising book for ticker [RITC] ...
+INFO:root:Initialising book for ticker [BEAR] ...
+INFO:root:Initialising book for ticker [BULL] ...
+INFO:root:Initialising book for ticker [USD] ...
+INFO:root:Initialising websocket...
+INFO:root:Connected to vuejs middleware...
+INFO:root:Creating Market Dynamics...
+INFO:root:Creating Market Dynamics...
+INFO:root:Creating Market Dynamics...
+INFO:root:Creating Market Dynamics...
+INFO:root:Initialising Trader Account [294569009]
+INFO:root:Initialising Trader Account [294569012]
+INFO:root:Initialising Trader Account [294569015]
+INFO:root:Initialising Trader Account [294569090]
+INFO:root:Initialising Trader Account [294569138]
+INFO:root:Initialising Trader Account [294569147]
+INFO:root:Initialising Trader Account [294569144]
+INFO:root:Initialising Trader Account [294569153]
+INFO:root:Initialising Trader Account [294569150]
+INFO:root:Initialising Trader Account [294839739]
+INFO:root:Initialising Trader Account [294839760]
+INFO:root:Initialising Trader Account [294839766]
+INFO:root:Initialising Trader Account [294956849]
+INFO:root:Initialising Trader Account [294950190]
+INFO:root:Initialising Trader Account [294952867]
+INFO:root:Initialising Trader Account [294952873]
+INFO:root:Initialising Trader Account [294952864]
+INFO:root:Initialising Trader Account [294952870]
+INFO:root:Initialising Trader Account [294952876]
+INFO:root:Initialising Trader Account [294952879]
+INFO:root:Initialising Trader Account [294952882]
+INFO:root:Initialising Trader Account [294952885]
+INFO:root:Initialising Trader Account [294952888]
+INFO:root:Initialising Trader Account [294952891]
+INFO:root:Initialising Trader Account [294952894]
+INFO:root:Initialising Trader Account [294952897]
+INFO:root:Initialising Trader Account [294952900]
+INFO:root:Initialising Trader Account [294952903]
+INFO:root:Initialising Trader Account [294952906]
+INFO:root:Initialising Trader Account [294952909]
+INFO:root:Initialising Trader Account [294952912]
+INFO:root:Initialising Trader Account [294952915]
+INFO:root:Initialising Trader Account [294952918]
+INFO:root:Initialising Trader Account [294952921]
+INFO:root:Initialising Trader Account [294952924]
+INFO:root:Initialising Trader Account [294952927]
+INFO:root:Initialising Trader Account [294952930]
+INFO:root:Initialising Trader Account [294952933]
+INFO:root:Initialising Trader Account [294952936]
+INFO:root:Initialising Trader Account [294952939]
+INFO:root:Initialising Trader Account [294952942]
+INFO:root:Initialising Trader Account [294952945]
+INFO:root:Initialising Trader Account [294952948]
+INFO:root:Initialising Trader Account [294952951]
+INFO:root:Initialising Trader Account [294952954]
+INFO:root:Initialising Trader Account [294952957]
+INFO:root:Initialising Trader Account [294956804]
+INFO:root:Initialising Trader Account [294956807]
+INFO:root:Initialising Trader Account [294956810]
+INFO:root:Initialising Trader Account [294956813]
+INFO:root:Initialising Trader Account [294956816]
+INFO:root:Initialising Trader Account [294956819]
+INFO:root:Initialising Trader Account [294956822]
+INFO:root:Initialising Trader Account [294956825]
+INFO:root:Initialising Trader Account [294956828]
+INFO:root:Initialising Trader Account [294956831]
+INFO:root:Initialising Trader Account [294956834]
+INFO:root:Initialising Trader Account [294956837]
+INFO:root:Initialising Trader Account [294956840]
+INFO:root:Initialising Trader Account [294956843]
+WARNING:aiodebug.log_slow_callbacks:Executing <Task pending name='Task-264' coro=<Exchange.handle_msgs() running at backend.py:628> wait_for=<_GatheringFuture pending cb=[<TaskWakeupMethWrapper object at 0x1196c8670>()]> cb=[gather.<locals>._done_callback() at /Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/asyncio/tasks.py:751]> took 0.052 seconds
+WARNING:aiodebug.log_slow_callbacks:Executing <Task pending name='Task-53' coro=<Exchange.handle_msgs() running at backend.py:628> wait_for=<_GatheringFuture pending cb=[<TaskWakeupMethWrapper object at 0x119666ca0>()]> cb=[gather.<locals>._done_callback() at /Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/asyncio/tasks.py:751]> took 0.103 seconds
+WARNING:aiodebug.log_slow_callbacks:Executing <Task pending name='Task-199' coro=<Exchange.handle_msgs() running at backend.py:628> wait_for=<_GatheringFuture pending cb=[<TaskWakeupMethWrapper object at 0x1197b60a0>()]> cb=[gather.<locals>._done_callback() at /Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/asyncio/tasks.py:751]> took 0.053 seconds
+WARNING:aiodebug.log_slow_callbacks:Executing <Task pending name='Task-314' coro=<Exchange.handle_msgs() running at backend.py:628> wait_for=<_GatheringFuture pending cb=[<TaskWakeupMethWrapper object at 0x1196d5be0>()]> cb=[gather.<locals>._done_callback() at /Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/asyncio/tasks.py:751]> took 0.081 seconds
+WARNING:aiodebug.log_slow_callbacks:Executing <Task finished name='Task-289345' coro=<Exchange.route_msg.<locals>.broadcast_to_trader() done, defined at backend.py:696> result=None> took 0.051 seconds
+WARNING:aiodebug.log_slow_callbacks:Executing <Task pending name='Task-274' coro=<Exchange.handle_msgs() running at backend.py:628> wait_for=<_GatheringFuture pending cb=[<TaskWakeupMethWrapper object at 0x11949f910>()]> cb=[gather.<locals>._done_callback() at /Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/asyncio/tasks.py:751]> took 0.087 seconds
+INFO:root:Connection with [trader] [294839766] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294952906] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294952876] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294569009] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294569012] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294569015] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294569090] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294569138] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294569147] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294569144] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294569153] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294569150] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294839739] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294839760] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294956849] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294950190] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294952867] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294952873] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294952864] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294952870] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294952879] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294952882] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294952885] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294952888] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294952891] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294952894] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294952897] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294952900] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294952903] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294952909] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294952912] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294952915] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294952918] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294952921] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294952924] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294952927] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294952930] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294952933] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294952936] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294952939] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294952942] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294952945] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294952948] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294952951] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294952954] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294952957] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294956804] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294956807] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294956810] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294956813] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294956816] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294956819] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294956822] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294956825] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294956828] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294956831] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294956834] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294956837] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294956840] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294956843] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+WARNING:aiodebug.log_slow_callbacks:Executing <Handle BaseSelectorEventLoop._accept_connection(functools.par...protocol=None), <socket.socke..., 5678, 0, 0)>, None, <Server socke...5678, 0, 0)>)>, 100, None)> took 0.066 seconds
+INFO:root:Initialising Trader Account [294959954]
+INFO:root:Initialising Trader Account [294960122]
+INFO:root:Initialising Trader Account [294960035]
+INFO:root:Initialising Trader Account [294959909]
+INFO:root:Initialising Trader Account [294960101]
+INFO:root:Initialising Trader Account [294960014]
+INFO:root:Initialising Trader Account [294959888]
+INFO:root:Initialising Trader Account [294960038]
+INFO:root:Initialising Trader Account [294959993]
+INFO:root:Initialising Trader Account [294959912]
+INFO:root:Initialising Trader Account [294959951]
+INFO:root:Initialising Trader Account [294959930]
+INFO:root:Initialising Trader Account [294957050]
+INFO:root:Initialising Trader Account [294956993]
+INFO:root:Initialising Trader Account [294956852]
+INFO:root:Initialising Trader Account [294957029]
+INFO:root:Initialising Trader Account [294956921]
+INFO:root:Initialising Trader Account [294957047]
+WARNING:aiodebug.log_slow_callbacks:Executing <Task pending name='Task-524461' coro=<WebSocketServerProtocol.handler() running at /Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py:191> wait_for=<_GatheringFuture pending cb=[<TaskWakeupMethWrapper object at 0x1195e8370>()]>> took 0.185 seconds
+INFO:root:Connection with [trader] [294956867] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294956903] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294956846] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294957011] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294956885] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294956975] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294956939] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [295021047] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [295021050] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [295020831] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [295021044] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [295021029] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [295021020] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [295021002] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [295020987] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [295020978] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [295020960] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [295020945] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [295020936] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [295020918] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [295020903] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [295020894] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [295020876] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [295020861] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [295020852] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [295020816] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [295020807] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [295020957] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [295021014] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [295021005] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [295020975] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [295020999] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [295020963] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [295021041] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [295020966] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [295021017] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [295021008] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [295020972] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [295020930] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [295020933] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [295020921] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [295020915] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294959954] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294960122] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294960035] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294959909] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294960101] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294960014] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294959888] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294960038] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294959993] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294959912] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294959951] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294959930] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294957050] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294956993] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294956852] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294957029] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294956921] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Connection with [trader] [294957047] closed
+ERROR:websockets.server:Error in connection handler
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/server.py", line 191, in handler
+    await self.ws_handler(self, path)
+  File "backend.py", line 618, in exchange_handler
+    await self.broadcast_active_traders(ws)
+  File "backend.py", line 645, in broadcast_active_traders
+    await self._observers[oid].send(json.dumps({'type': 'traders', 'data': list(self._traders.keys())}))
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 555, in send
+    await self.ensure_open()
+  File "/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/websockets/protocol.py", line 803, in ensure_open
+    raise self.connection_closed_exc()
+websockets.exceptions.ConnectionClosedError: code = 1011 (unexpected error), no reason
+INFO:root:Initialising book for ticker [RITC] ...
+INFO:root:Initialising book for ticker [BEAR] ...
+INFO:root:Initialising book for ticker [BULL] ...
+INFO:root:Initialising book for ticker [USD] ...
+INFO:root:Initialising websocket...
+INFO:root:Creating Market Dynamics...
+INFO:root:Creating Market Dynamics...
+INFO:root:Creating Market Dynamics...
+INFO:root:Creating Market Dynamics...
+INFO:root:Initialising book for ticker [RITC] ...
+INFO:root:Initialising book for ticker [BEAR] ...
+INFO:root:Initialising book for ticker [BULL] ...
+INFO:root:Initialising book for ticker [USD] ...
+INFO:root:Initialising websocket...
+INFO:root:Creating Market Dynamics...
+INFO:root:Creating Market Dynamics...
+INFO:root:Creating Market Dynamics...
+INFO:root:Creating Market Dynamics...

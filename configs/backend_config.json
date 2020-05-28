@@ -16,8 +16,7 @@
             "prevent_self_trades": 0,
             "simulation_notional_timestep": 3600,
             "market_agents": {
-                "giveaway_trader": 40,
-                "liquidity_taker": 20
+                "giveaway_trader": 30
             },
             "securities": {
                 "RITC": {

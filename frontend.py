@@ -286,6 +286,12 @@ class Security:
         # # Filters any tenders which don't have enough time to respond
         # return [tender for tender in self._exchange._tenders[self._ticker] if current_time + self._tender_rejection_window < tender.expiration_time]
 
+    def register_product(self):
+        """
+        Registers a product with the frontend client so that a chart can be drawn of the compound price.
+        """
+        pass
+
     # def new_from_state(self, kwarg_mods={}):
     #     """
     #     :param kwarg_mods: a dictionary of keyword arguments of Security.__init__ to replace.

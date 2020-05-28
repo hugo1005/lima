@@ -12,8 +12,6 @@ class MarketAgentsManager():
         self._market_agents_config = self._config['exchanges'][self._exchange_name]["market_agents"]
         self._agents = []
 
-        self.create_agents()
-
     async def create_agents(self):
         
         for traderType, count in self._market_agents_config.items():
