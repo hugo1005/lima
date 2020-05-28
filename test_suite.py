@@ -66,6 +66,7 @@ class UnitTest():
         ORDER = SPREAD.to_order(qty=100, order_type='MKT', group_name='MKT')
         SIGNED_ORDER = ORDER.inv_sign() * ORDER
         SIGNED_ORDER.group_name = 'SIGNED'
+        
         await self.assert_order_execution(ORDER, SIGNED_ORDER)
         print("[TEST] Market - Market Order Transaction: Success!")
 
@@ -302,6 +303,10 @@ class UnitTest():
         print('[TEST] Visual Tests Complete!') # Obviously not going to get called :)
         # As we didnt square the position above
     
+    def validate_product_display(self):
+        SPREAD = self.RITC - self.USD * self.BEAR * self.BULL
+        self.trader.register_product(SPREAD)
+
     async def connect_traders(self):
         await asyncio.gather(self.trader.connect_to_server(), *[bot.connect_to_server() for bot in self.bots], self.mopup_bot.connect_to_server())
 
@@ -316,7 +321,8 @@ class UnitTest():
         self.configure_securities()
 
         print('[Tests] Starting...')
-        await asyncio.gather(self.validate_graph_pricing(),self.validate_pricing_functions(), self.validate_mkt_order_execution())
+        self.validate_product_display()
+        # await asyncio.gather(self.validate_graph_pricing(),self.validate_pricing_functions(), self.validate_mkt_order_execution())
         # await asyncio.gather(self.visual_inspection_test())
         
         # NOTE the validate_mkt_order_execution will mess up
@@ -324,10 +330,9 @@ class UnitTest():
         # invert which is not going to produce expected results :)
         # TODO: Implement prevent self trades [This will be incompatible with validate_mkt_order_execution] but in real trading environment we should stop this from happening
         # We will need to decide how best to catch these double sided entries...
-        await self.validate_risk_monitor()
+        # await self.validate_risk_monitor()
 
     async def run_script(self):
-        
         await asyncio.gather(self.connect_traders(), self.run_tests())
 
 

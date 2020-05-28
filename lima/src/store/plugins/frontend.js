@@ -36,6 +36,9 @@ export default function createWebSocketPlugin() {
             else if(msg.type == 'pnl') {
                 store.dispatch('frontend/updatePnL', msg.data)
             }
+            else if(msg.type == 'product_update') {
+                store.dispatch('frontend/updateProduct', msg.data)
+            }
         }
 
         // An example for communicating back:

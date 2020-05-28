@@ -10,6 +10,7 @@ import re
 from collections import namedtuple
 from threading import Thread
 from time import sleep, time
+from math import floor
 import warnings
 
 from shared import LOB, OrderSpec, ExchangeOrder, Transaction, to_named_tuple, CompositionMeta, ComplexEvent, OrderKey, TickerPnL, TraderRisk, TenderOrder
@@ -277,20 +278,6 @@ class Security:
     
     def get_tenders(self):
         return self._exchange._tenders[self._ticker]
-        # new_tender_event = self._exchange._has_new_tender[self._ticker]
-        # await new_tender_event.wait()
-        # new_tender_event.clear() # Reset the flag
-
-        # current_time = self._exchange.get_exchange_time()
-
-        # # Filters any tenders which don't have enough time to respond
-        # return [tender for tender in self._exchange._tenders[self._ticker] if current_time + self._tender_rejection_window < tender.expiration_time]
-
-    def register_product(self):
-        """
-        Registers a product with the frontend client so that a chart can be drawn of the compound price.
-        """
-        pass
 
     # def new_from_state(self, kwarg_mods={}):
     #     """
@@ -345,6 +332,7 @@ class ExchangeConnection:
         # VueJs App
         self._app_uri = app_uri
         self._enable_app = enable_app
+        self._products = []
 
         # Time tracking
         self._exchange_open_time = 0
@@ -383,7 +371,7 @@ class ExchangeConnection:
 
                     # We need the update state to be on a seperate loop as it has 
                     # to wait on messages from the server indefinitely
-                    await asyncio.gather(self.update_state(ws, ws_app), self.dispatch_messages(ws))
+                    await asyncio.gather(self.update_state(ws, ws_app), self.dispatch_messages(ws), self.dispatch_products_to_app(ws_app))
                     # while True:
                     #     print("Start frontend loop")
                     #     await asyncio.gather(self.update_state(ws, ws_app), self.dispatch_orders(ws), self.dispatch_tenders(ws), self.dispatch_cancellations(ws))
@@ -448,6 +436,19 @@ class ExchangeConnection:
     async def dispatch_messages(self, ws):
         while True:
             await asyncio.gather(self.dispatch_orders(ws), self.dispatch_tenders(ws), self.dispatch_cancellations(ws))
+
+    async def dispatch_products_to_app(self, ws_app, update_delay = 1):
+         while True:
+            for security in self._products:
+                best_bid = security.evaluate(1)
+                best_ask = security.evaluate(-1)
+                ticker = security._ticker
+
+                # Updates every second.
+                data = {'ticker': ticker, 'timestamp': floor(time() - self._exchange_open_time), 'best_bid': best_bid, 'best_ask': best_ask}
+                await self.pass_to_app(ws_app, 'product_update', data)
+
+            await asyncio.sleep(update_delay)
 
     async def update_state(self, ws, ws_app = None):
         while True:
@@ -542,6 +543,13 @@ class ExchangeConnection:
                 tender = to_named_tuple(data, TenderOrder)
                 warnings.warn('Tender [%s] for ticker [%s] was rejected, this is an anti-tamper mechanism warning. You must accept a tender before it expires. Note your code will likely fail now as it will be still waiting for the tender complete flag. To fix this you should allow a greater buffer between a tender\'s expiration and your acceptance' % (tender.tender_id, tender.ticker))
 
+    def register_product(self, security):
+        """
+        Registers a product with the frontend client so that a chart can be drawn of the compound price.
+        """
+        if self._enable_app:
+            self._products.append(security)
+           
     # ------ Helper Methods -----
     
     # def clearout_old_tenders(self):

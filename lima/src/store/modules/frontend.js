@@ -26,7 +26,9 @@ const state = {
     traderFills: [],
     risk: {},
     pnl: [],
-    pnlTickers: {}
+    pnlTickers: {},
+    productData: [],
+    products: new Set()
 }
 
 const getters = {
@@ -34,6 +36,8 @@ const getters = {
     getTraderOpenOrderKeys: state => state.traderOpenOrderKeys,
     getTraderCompletedOrders: state => state.traderCompletedOrders,
     getTraderFills: state => state.traderFills,
+    getProducts: state => state.products,
+    getProduct: state => ticker => state.productData.filter(tick => tick.ticker == ticker),
     getRisk: state => state.risk,
     getPnL: state => state.pnl,
 }
@@ -68,6 +72,12 @@ const mutations = {
       }
       
     },
+    UPDATE_PRODUCT(state, payload) {
+      // Registers the product if necessary
+      state.products.add(payload.ticker)
+      // Updates the list of product data
+      state.productData.push(payload)
+    },
     SET_TID(state, payload) {
         state.tid = payload
     },
@@ -99,6 +109,9 @@ const actions = {
     },
     updatePnL({ commit }, payload) { // Recieves pnl update for a single ticker
         commit('UPDATE_PNL', payload) 
+    },
+    updateProduct({ commit }, payload) {
+      commit('UPDATE_PRODUCT', payload)
     },
     connectionOpened({ commit }) {
       commit('SET_CONNECTION', true)
