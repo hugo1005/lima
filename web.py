@@ -24,6 +24,11 @@ class WebServer:
         self.backend_has_updates = asyncio.Event()
         self.frontend_has_updates = asyncio.Event()
 
+        # Debounce LOB messages to every 300 ms
+        self._debounce = 0.3
+        # Simple hack to ensure the first LOBs always sent
+        self.last_posts = {s_type: time.time() - (self._debounce + 0.2) for s_type in ['LOBS','pnl','risk','MBS']}
+
         self.setup_websocket_server()
 
     def setup_websocket_server(self):
@@ -47,45 +52,6 @@ class WebServer:
 
         loop.run_until_complete(server.wait_closed())
 
-    # async def bridge_frontend(self, ws, path):
-    #     is_frontend, is_app = path == '/frontend', path == '/app'
-
-    #     # Register connection
-    #     if is_frontend:
-    #         print("Frontend connection established")
-    #         self.frontend = ws
-    #     elif is_app:
-    #         print("App [Frontend State Management] connection established")
-    #         self.frontend_app = ws
-    #     else:
-    #         print("Websocket path unkown: %s" % path)
-        
-    #     try:
-    #         if is_app: # Replay all messages to catch up
-    #             print("Replaying frontend data..")
-    #             for data in self.frontend_to_app_cache:
-    #                 await self.frontend_app.send(data)
-
-    #         async for data in ws:
-    #             both_connected = type(self.frontend_app) != type(None) and type(self.frontend) != type(None)
-                
-    #             if is_frontend:
-    #                 self.frontend_to_app_cache.append(data)
-                    
-    #                 if both_connected:
-    #                     await self.frontend_app.send(data)
-                
-    #             if is_app and both_connected:
-    #                 await self.frontend.send(data)
-
-    #     except websockets.ConnectionClosed:
-    #         print("Connection with [%s] closed" % path) 
-    #     finally:
-    #         if is_frontend: 
-    #             self.frontend = None
-    #             self.frontend_to_app_cache = [] # Clear the message cache
-    #         if is_app: self.frontend_app = None
-
     async def bridge_backend(self, ws, path):
         is_backend, is_app = path == '/backend', path == '/app'
 
@@ -108,8 +74,17 @@ class WebServer:
                 # Store the data for sending to the server.
                 while True:
                     data = await ws.recv()
-                    self.backend_to_app_cache.append(data)
-                    self.backend_has_updates.set()
+                    msg = json.loads(data)
+                    msg_type = msg['type']
+
+                    if msg_type in self.last_posts:
+                        if self.last_posts[msg_type] < time.time() - self._debounce:
+                            self.backend_to_app_cache.append(data)
+                            self.backend_has_updates.set()
+                            self.last_posts[msg_type] = time.time() 
+                    else:
+                        self.backend_to_app_cache.append(data)
+                        self.backend_has_updates.set()
 
         except websockets.ConnectionClosed:
             print("Connection with [%s] closed: [%s]" % (path, time.time())) 
