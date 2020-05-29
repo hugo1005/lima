@@ -16,12 +16,13 @@ class WebServer:
         self._ip_frontend = self.frontend_config['app-websocket']['ip']
         self._ip_backend = self.backend_config['app-websocket']['ip']
        
-        self.frontend_app = None
-        self.frontend = None
+        # self.frontend_app = None
+        # self.frontend = None
         
         self.frontend_to_app_cache = []
         self.backend_to_app_cache = []
         self.backend_has_updates = asyncio.Event()
+        self.frontend_has_updates = asyncio.Event()
 
         self.setup_websocket_server()
 
@@ -45,46 +46,45 @@ class WebServer:
             server.close()
 
         loop.run_until_complete(server.wait_closed())
-    
-    # TODO: Decouple the bridge_frontend like backend
-    async def bridge_frontend(self, ws, path):
-        is_frontend, is_app = path == '/frontend', path == '/app'
 
-        # Register connection
-        if is_frontend:
-            print("Frontend connection established")
-            self.frontend = ws
-        elif is_app:
-            print("App [Frontend State Management] connection established")
-            self.frontend_app = ws
-        else:
-            print("Websocket path unkown: %s" % path)
+    # async def bridge_frontend(self, ws, path):
+    #     is_frontend, is_app = path == '/frontend', path == '/app'
+
+    #     # Register connection
+    #     if is_frontend:
+    #         print("Frontend connection established")
+    #         self.frontend = ws
+    #     elif is_app:
+    #         print("App [Frontend State Management] connection established")
+    #         self.frontend_app = ws
+    #     else:
+    #         print("Websocket path unkown: %s" % path)
         
-        try:
-            if is_app: # Replay all messages to catch up
-                print("Replaying frontend data..")
-                for data in self.frontend_to_app_cache:
-                    await self.frontend_app.send(data)
+    #     try:
+    #         if is_app: # Replay all messages to catch up
+    #             print("Replaying frontend data..")
+    #             for data in self.frontend_to_app_cache:
+    #                 await self.frontend_app.send(data)
 
-            async for data in ws:
-                both_connected = type(self.frontend_app) != type(None) and type(self.frontend) != type(None)
+    #         async for data in ws:
+    #             both_connected = type(self.frontend_app) != type(None) and type(self.frontend) != type(None)
                 
-                if is_frontend:
-                    self.frontend_to_app_cache.append(data)
+    #             if is_frontend:
+    #                 self.frontend_to_app_cache.append(data)
                     
-                    if both_connected:
-                        await self.frontend_app.send(data)
+    #                 if both_connected:
+    #                     await self.frontend_app.send(data)
                 
-                if is_app and both_connected:
-                    await self.frontend.send(data)
+    #             if is_app and both_connected:
+    #                 await self.frontend.send(data)
 
-        except websockets.ConnectionClosed:
-            print("Connection with [%s] closed" % path) 
-        finally:
-            if is_frontend: 
-                self.frontend = None
-                self.frontend_to_app_cache = [] # Clear the message cache
-            if is_app: self.frontend_app = None
+    #     except websockets.ConnectionClosed:
+    #         print("Connection with [%s] closed" % path) 
+    #     finally:
+    #         if is_frontend: 
+    #             self.frontend = None
+    #             self.frontend_to_app_cache = [] # Clear the message cache
+    #         if is_app: self.frontend_app = None
 
     async def bridge_backend(self, ws, path):
         is_backend, is_app = path == '/backend', path == '/app'
@@ -111,26 +111,42 @@ class WebServer:
                     self.backend_to_app_cache.append(data)
                     self.backend_has_updates.set()
 
-            # async for data in ws:
-            #     both_connected = type(self.backend_app) != type(None) and type(self.backend) != type(None)
-                
-            #     if is_backend:
-            #         # Temporary solution to store the configuration 
-            #         # TODO Fix this better later
-            #         if len(self.backend_to_app_cache) < 10:
-            #             self.backend_to_app_cache.append(data)
-
-            #         if both_connected:
-            #             await self.backend_app.send(data)
-                
-            #     if is_app and both_connected:
-            #         await self.backend.send(data)
-
         except websockets.ConnectionClosed:
             print("Connection with [%s] closed: [%s]" % (path, time.time())) 
         finally:
             if is_backend:
                 self.backend_to_app_cache = []
+
+    async def bridge_frontend(self, ws, path):
+        is_frontend, is_app = path == '/frontend', path == '/app'
+
+        try:
+            if is_app: 
+                print("App [Frontend State Management] connection established")
+
+                # Pass messages from backend to frontend
+                while True:
+                    await self.frontend_has_updates.wait()
+                    self.frontend_has_updates.clear()
+
+                    while len(self.frontend_to_app_cache) > 0:
+                        # Send in time order
+                        dispatch = self.frontend_to_app_cache.pop(0)
+                        await ws.send(dispatch)
+
+            if is_frontend:
+                print("Frontend connection established")
+                # Store the data for sending to the server.
+                while True:
+                    data = await ws.recv()
+                    self.frontend_to_app_cache.append(data)
+                    self.frontend_has_updates.set()
+                    
+        except websockets.ConnectionClosed:
+            print("Connection with [%s] closed: [%s]" % (path, time.time())) 
+        finally:
+            if is_frontend:
+                self.frontend_to_app_cache = []
 
 """Start the webserver"""
 WebServer()

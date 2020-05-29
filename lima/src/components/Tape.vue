@@ -42,7 +42,8 @@ export default {
         traderFills: 'frontend/getTraderFills'
     }),
     tapeReverse: function() {
-      return this.tape.slice().reverse()
+      let sliceFrom = this.tape.length - Math.min(this.tape.length, 10)
+      return this.tape.slice(sliceFrom).reverse()
     }
   }, 
   methods: {
