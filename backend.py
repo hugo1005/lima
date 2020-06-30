@@ -11,8 +11,8 @@ from numpy.random import poisson
 from scipy.stats import gamma
 from math import log10, floor
 
-from shared import LOB, OrderSpec, ExchangeOrder, Transaction, TransactionPair, ExchangeOrderAnon, TapeTransaction, MarketBook, TickerPnL, TraderRisk, TenderOrder
-from shared import to_named_tuple, update_named_tuple, named_tuple_to_dict
+from shared import LOB, OrderSpec, ExchangeOrder, Transaction, TransactionPair, ExchangeOrderAnon, TapeTransaction, MarketBook, TickerPnL, TraderRisk, TenderOrder, RiskLimits
+from shared import to_named_tuple, update_named_tuple, named_tuple_to_dict, LunaToExchangeOrder
 # from traders import GiveawayTrader
 
 from aiodebug import log_slow_callbacks
@@ -346,6 +346,340 @@ class Orderbook:
     def get_market_book(self):
         return MarketBook(self._bids.anonymised_market_order_q, self._asks.anonymised_market_order_q)
 
+class LunaHalfOrderbook:
+    def __init__(self, book_side, starting_best_price):
+        self.anonymised_lob = {}
+        self.lob = {}
+
+        self.book_side = book_side # bids or asks
+        self.book_depth = 0 # Number of different prices
+        self.num_orders = 0
+        self.book_volume = 0 # Limit order book volume only
+        self.best_price = starting_best_price
+        self._market_order_q = []
+        self.anonymised_market_order_q = []
+
+    def anonymise(self, order):
+        order_dict = dict(order._asdict())
+        return dict(to_named_tuple(order_dict, ExchangeOrderAnon)._asdict())
+
+    def add_order(self, order):
+        # Update Best Quote
+        if order.order_type == "MKT":
+            self._market_order_q.append(order)
+            self.anonymised_market_order_q.append(self.anonymise(order))
+
+        elif order.order_type == "LMT":
+            if order.price not in self.lob:
+                self.lob[order.price] = [] 
+                self.anonymised_lob[order.price] = []
+
+            self.lob[order.price].append(order)
+            self.anonymised_lob[order.price].append(self.anonymise(order))
+            self.book_volume += order.qty
+        else: 
+            warnings.warn('An unkown order type [%s] was used and could not be executed' % order.action, UserWarning)
+
+        self.recompute_stats()
+
+    def get_order(order_id, order_type, price = -1):
+
+        if order_type == 'LMT':
+            if price > 0:
+                order_match = list(filter(lambda x: x.order_id == order_id, self.lob[price]))
+            else:
+                order_match = list(filter(lambda x: x.order_id == order_id, [*self.lob[price] for price in self.lob]))
+        else:
+            order_match = list(filter(lambda x: x.order_id == order_id, self._market_order_q))
+
+        return order_match[0] if len(order_match) > 0 else None
+
+    def cancel_order(self, order_spec):
+        order_id = order_spec.order_id
+        price = order_spec.price
+
+        if order_spec.order_type == 'LMT':
+            # Edge case (Order already processed)
+            if price not in self.lob:
+                return False
+
+            # Remove the order
+            order = self.get_order(order_id, 'LMT', price)
+            if type(order) != type(None):
+                self.lob[price] = list(filter(lambda x: x.order_id != order_id, self.lob[price]))
+                self.anonymised_lob[price] = list(filter(lambda x: x['order_id'] != order_id, self.anonymised_lob[price]))
+                
+                self.book_volume -= (order.qty - order.qty_filled) # Remove remainining liquidity
+
+                # Remove the price if there is nothing available
+                self.update_price(price)
+                return True
+            else:
+                # Edge case (Order already processed)
+                return False
+        elif order_spec.order_type == 'MKT':
+            order = self.get_order(order_id, 'MKT')
+
+            if type(order) != type(None):
+                self._market_order_q = list(filter(lambda x: x.order_id != order_id, self._market_order_q))
+                self.anonymised_market_order_q = list(filter(lambda x: x['order_id'] != order_id, self.anonymised_market_order_q))
+                self.recompute_stats()
+                return True
+            else:
+                return False
+
+        return False
+
+    def has_market_orders(self):
+        return len(self._market_order_q) > 0
+
+    def recompute_stats(self):
+        # Prices in ascending order
+        available_prices = sorted(self.lob)
+
+        # Compute best price
+        # Note: If there is no current prices we leave it unchanged as the 'last' best price
+        if len(available_prices) > 0:
+            self.best_price = available_prices[-1] if self.book_side == 'bids' else available_prices[0]
+        
+        # compute num orders
+        self.num_orders = sum([len(self.lob[price]) for price in self.lob]) + len(self._market_order_q)
+        self.book_depth = len(available_prices)
+
+    def update_price(self, price):
+        if len(self.lob[price]) == 0:
+            del(self.lob[price])
+            del(self.anonymised_lob[price])
+
+        self.recompute_stats()
+
+    def update_best_quote(self, quote):
+        if quote.order_type == "MKT":
+            if quote.qty - quote.qty_filled > 0:
+                # Update the quote
+                self._market_order_q[0] = quote
+                self.anonymised_market_order_q[0] = self.anonymise(quote)
+            else:
+                # Remove the quote if it is filled entirely
+                self._market_order_q.pop(0)
+                self.anonymised_market_order_q.pop(0)
+
+            # Update the statistics of the halfbook
+            self.recompute_stats() 
+        elif quote.order_type == "LMT":
+            increase_in_filled_qty = quote.qty_filled - self.lob[self.best_price][0].qty_filled
+
+            if quote.qty - quote.qty_filled > 0:
+                # Update the quote
+                self.lob[self.best_price][0] = quote
+                self.anonymised_lob[self.best_price][0] = self.anonymise(quote)
+            else:
+                # Remove the quote if it is filled entirely
+                self.lob[self.best_price].pop(0)
+                self.anonymised_lob[self.best_price].pop(0)
+        
+            # Remove the price if there is nothing available
+            # And implicity recomputes the stats
+        
+            self.update_price(self.best_price)    
+
+            # Remove the filled amount - Note we are only tracking limit volume
+            # id %s qty %s filled %s incre %s vol %s
+            self.book_volume -= increase_in_filled_qty
+            assert(self.book_volume >= 0)
+
+    def get_best_quote(self):
+        """
+        Gets the best available quote from the halfbook using the
+        price time priority queue protocol.
+        :return quote: an ExchangeOrder or None if none available
+        """
+
+        # Implements a price time priority queue
+        has_limit_order = self.best_price in self.lob
+        has_market_order = len(self._market_order_q) > 0
+
+        if has_limit_order and has_market_order:
+            best_limit_order = self.lob[self.best_price][0] 
+            best_market_order = self._market_order_q[0]
+
+            limit_arrived_before_market = best_limit_order.submission_time < best_market_order.submission_time
+
+            if limit_arrived_before_market:
+                return best_limit_order
+            else:
+                return best_market_order
+
+        elif has_limit_order:
+            return self.lob[self.best_price][0] 
+        elif has_market_order:
+            return self._market_order_q[0]
+        else:
+            return None
+
+class LunaOrderbook:
+    def __init__(self, config, time_fn, ticker, tape, traders, observers, trader_orders, mark_traders_to_market, get_book, get_tape, broadcast_to_trader, broadcast_to_observer, update_pnls, trader_still_connected):
+        # TODO: Everything here is good we just need to configure the endpoint parameters for LUNA
+
+        self._bids = LunaHalfOrderbook('bids', round(starting_price - starting_spread/2, resolution))
+        self._asks = LunaHalfOrderbook('asks',  round(starting_price + starting_spread/2, resolution))
+        self.get_time = time_fn # Exchange time function
+        self.ws_uri = config['ws_uri']
+        self.ticker = ticker
+        self.credentials = config['credentials']
+
+        # Forwarded from exhcange
+        self._tape = tape
+        self._traders = traders
+        self._observers = observers
+        self.mark_traders_to_market = mark_traders_to_market
+        self.get_book =  get_book
+        self.get_tape = get_tape
+        self.broadcast_to_trader = broadcast_to_trader
+        self.broadcast_to_observer = broadcast_to_observer
+        self.update_pnls = update_pnls
+        self.trader_still_connected = trader_still_connected
+        self.trader_orders = trader_orders
+
+    async def connect():
+        while True: # For reconnection
+            async with websockets.connect(self._uri) as ws:
+                await ws.send(json.dumps(credentials))
+                self.build_book(json.loads(await ws.recv()))
+                seq = -1
+
+                while True:
+                    updates = json.loads(await ws.recv())
+
+                    # Reconnect if out of sequence
+                    if updates['sequence'] < seq:
+                        break
+                    else:
+                        seq = updates['sequence']
+
+                        # Trade Updates
+                        if updates['create_update']:
+                            self.add_order(LunaToExchangeOrder(self.ticker, updates['create_update'], self.get_time()))
+                        if updates['delete_update']:
+                            self.cancel_order_with_id(updates['delete_update']['order_id'])
+                        if updates['trade_update']:
+                            # Internal Server Side Auction
+                            transaction_pair, maker_order, taker_order = LunaToExchangeTransactionPair(self.ticker, updates['trade_update'], self.get_time(), self.get_order_by_id, self.get_trader_id)
+                            
+                            # Update Internal Order States
+                            maker_order = update_named_tuple(maker_order, {'qty_filled': maker_order.qty_filled + transaction_pair.maker_transaction.qty_filled})
+                            maker_order_hafbook = self._asks if maker_order.action == "SELL" else self._bids
+                            maker_order_hafbook.update_best_quote(maker_order)
+
+                            # Update taker_order (if it was also a limit order - we don't have access to the market book)
+                            if taker_order.order_type == 'LMT': 
+                                taker_order = update_named_tuple(taker_order, {'qty_filled': taker_order.qty_filled + transaction_pair.maker_transaction.qty_filled})
+                                taker_order_hafbook = self._asks if taker_order.action == "SELL" else self._bids
+                                taker_order_hafbook.update_best_quote(taker_order)
+
+                            # Perform Accounting Operations
+                            # It makes sense to do them on the back end so we keep all the PnL Code for all traders in the one place
+                            # Otherwise we need the backend to request from all traders and then pass from backend to frontend
+                            # which is unecessary and more error prone and more prone to user meddling.
+                            
+                            # Note we make sure to update the pnls first and then notify the fills
+                            # otherwise when we assert an order has been executed there will be a network delay
+                            # in assessing risk which would lead to messy sleep statement workarounds
+                            # Note all traders will have their pnl marked to market by this function
+                            await self.update_pnls(transaction_pair)
+                            maker_id, taker_id = transaction_pair.maker.tid, transaction_pair.taker.tid
+
+                            # Distribute the transaction confirmations to the 2 parties
+                            if self.trader_still_connected(maker_id):
+                                maker_ws = self._traders[maker_id]
+                                await maker_ws.send(json.dumps({'type': 'order_fill', 'data': named_tuple_to_dict(transaction_pair.maker)}))
+
+                            if self.trader_still_connected(taker_id):
+                                taker_ws = self._traders[taker_id]
+                                await taker_ws.send(json.dumps({'type': 'order_fill', 'data': named_tuple_to_dict(transaction_pair.taker)}))
+
+                            # Broadcast transaction to our traders
+                            latest_transactions = [transaction_pair]
+                            self._tape += latest_transactions
+
+                            # Broadcast new limit order books
+                            async def broadcast_to_trader(tid):
+                                # Optimised to not send back everything
+                                await self._traders[tid].send(json.dumps({'type': 'LOBS', 'data': self.get_books(tickers = [self.ticker])}))
+                                await self._traders[tid].send(json.dumps({'type': 'tape', 'data': self.get_tape(transactions = latest_transactions)}))
+
+                            await asyncio.gather(*[broadcast_to_trader(tid) for tid in self._traders])
+
+                            # Broadcast new book and tape to observers
+                            async def broadcast_to_observer(oid):
+                                await self._observers[oid].send(json.dumps({'type': 'LOBS', 'data': self.get_books(tickers = [self.ticker], order_type='LMT')}))
+                                # Only observers may recieve the market book for debug purposes
+                                await self._observers[oid].send(json.dumps({'type': 'MBS', 'data': self.get_books(tickers = [self.ticker], order_type='MKT')}))
+                                await self._observers[oid].send(json.dumps({'type': 'tape', 'data': self.get_tape(transactions = latest_transactions)}))
+
+                            await asyncio.gather(*[broadcast_to_observer(oid) for oid in self._observers])
+
+                            # We call mark to market again at to make sure 
+                            # we have caught any no transacted market moving limits
+                            await self.mark_traders_to_market(order_spec.ticker)
+                            
+                            # TODO In route_msgs we need to record our order id's and then implement get trader id
+
+
+    def build_book(self, book):
+        for order_data in book['bids']:
+            order_data_mod = {**order_data, 'type': 'BID'}
+            self.add_order(LunaToExchangeOrder(self.ticker, order_data_mod, self.get_time()))
+
+        for order_data in book['asks']:
+            order_data_mod = {**order_data, 'type': 'ASK'}
+            self.add_order(LunaToExchangeOrder(self.ticker, order_data_mod, self.get_time()))
+
+
+    def add_order(self, exchange_order):
+        halfbook = self._bids if exchange_order.action == "BUY" else self._asks
+        halfbook.add_order(exchange_order)
+    
+    def get_order_by_id(self, order_id):
+        buy_order = self._bids.get_order(order_id, 'LMT')
+
+        if type(buy_order) == type(None):
+            sell_order = self._asks.get_order(order_id, 'LMT')
+            return sell_order
+        else:
+            return buy_order
+
+    def get_trader_id(order_id):
+        # TODO: Implement the list tracking our orders!
+        if order_id in self.trader_orders:
+            return self.trader_orders[order_id]
+        else:
+            return -1
+
+    def cancel_order_with_id(order_id):
+        buy_order = self._bids.get_order(order_id, 'LMT')
+        
+        if type(buy_order) != type(None):
+            self._bids.cancel_order(buy_order)
+        else:
+            sell_order = self._asks.get_order(order_id, 'LMT')
+
+            if type(sell_order) != type(None):
+                self._asks.cancel_order(sell_order)
+            else:
+                warnings.warn('Order of type LMT is not a cancellable as it does not exist in the book', UserWarning)
+
+    def cancel_order(self, order_spec):
+        if order_spec.order_type == "LMT" or order_spec.order_type == "MKT":
+            halfbook = self._bids if order_spec.action == "BUY" else self._asks
+            return halfbook.cancel_order(order_spec)
+        else:
+            warnings.warn('Order of type [%s] is not a cancellable type' % order_spec.action, UserWarning)
+            return False
+    
+    def get_LOB(self):
+        return LOB(self._bids.anonymised_lob, self._asks.anonymised_lob, self._bids.best_price, self._asks.best_price, self._bids.book_depth, self._asks.book_depth, self._bids.num_orders, self._asks.num_orders, self._bids.book_volume, self._asks.book_volume)
+
 # This is only a temporary version to get a working market
 class MarketDynamics:
     def __init__(self, traders, ticker, book, case_config, time_fn):
@@ -492,6 +826,7 @@ class Exchange:
             self._config = json.load(config_file)
         
         self._exchange_name = self._config['exchanges']['active_case']
+        self._case_config = self._config['exchanges'][self._exchange_name]
         self._books = self.init_books()
         self._port = self._config['websocket']['port']
         self._ip = self._config['websocket']['ip']
@@ -501,6 +836,7 @@ class Exchange:
         self._observers = {} # Front End Web Apps Observers
         self._pnls = {} # key is tid
         self._risk = {} # key is tid
+        self._risk_limits = to_named_tuple(self._case_config['risk_limits'], RiskLimits)
         self._transaction_records = {} # key is tid
         self._suspect_trade_records = {} # key is tid
         self._tape = [] 
@@ -552,20 +888,27 @@ class Exchange:
             try:
                 print("Connected to vuejs middleware...")
 
+                config_messages = [
+                    {'type': 'LOBS', 'data': self.get_books()},
+                    {'type': 'MBS', 'data': self.get_books(order_type='MKT')},
+                    {'type': 'tape', 'data': self.get_tape()}
+                ]
+
                 setup_msg = {
                     'type':'config', 
                     'data':{
                         'oid': oid,
                         'exchange': self._config['exchanges'][self._exchange_name],
                         'exchange_open_time': self._initial_time
-                    }
+                    },
+                    'n_config_messages': 1 + len(config_messages)
                 }
 
                 await ws.send(json.dumps(setup_msg)) # Send the trader their oid and exchange settings
-                await ws.send(json.dumps({'type': 'LOBS', 'data': self.get_books()}))
-                # MBS stands for Market Order Books; really will only be busy if market is illiquid
-                await ws.send(json.dumps({'type': 'MBS', 'data': self.get_books(order_type='MKT')}))
-                await ws.send(json.dumps({'type': 'tape', 'data': self.get_tape()}))
+
+                # Send initial messages required to render the viewport
+                for msg in config_messages:
+                    await ws.send(json.dumps(msg))
 
                 while True:
                     # NOTE: This is probably not reccomended
@@ -578,7 +921,6 @@ class Exchange:
                 print("Closed connection with vuejs middleware...")
                 # This will hopefully never be called but just to be clear
                 
-
     async def exchange_handler(self, ws, path):
         # Paths
         # /observer (read only) Web socket gets registered to _observers
@@ -620,21 +962,9 @@ class Exchange:
                 print("Connection closed with unkown connection...")
 
     async def handle_msgs(self, ws):
-        self._sum_x = 0 
-        self._sum_x2 = 0
-        self._n = 0
         async for msg in ws:
-            START_TIME = time.time()
             await self.route_msg(ws, msg)
             
-            TIME_TAKEN = time.time() - START_TIME
-            self._sum_x += TIME_TAKEN
-            self._sum_x2 += TIME_TAKEN ** 2
-            self._n += 1
-
-            if self._sum_x/self._n > 0.2:
-                print("MSG HANDLED IN: ", round(self._sum_x/self._n, 3), 'STD: ', round((1/self._n) * (self._sum_x2 - (self._sum_x**2) / self._n),4))
-
     async def broadcast_current_time(self, ws):
         while True:
             await ws.send(json.dumps({'type': 'current_time', 'data': self.get_time()}))
@@ -651,67 +981,55 @@ class Exchange:
 
         if s_type == 'add_order':
             order_spec = to_named_tuple(data, OrderSpec)
-            book = self._books[order_spec.ticker]
-            exchange_order = self.to_exchange_order(order_spec)
-            book.add_order(exchange_order)
-
-            # Respond to user to confirm order dispatch
-            await ws.send(json.dumps({'type': 'order_opened', 'data': named_tuple_to_dict(exchange_order)}))
             
-            # Recomputes the book / performs transactions where possible:
-            # Note this is necessary as it may provide additional liquidity to execute market orders
-            # which could not be previously executed and are queued.
-            transaction_pairs = book.auction()
-            latest_transactions = []
+            if self.order_conforms_to_trader_risk_limits(order_spec): 
 
-            for transaction_pair in transaction_pairs:
-                maker_id, taker_id = transaction_pair.maker.tid, transaction_pair.taker.tid
+                book = self._books[order_spec.ticker]
+                exchange_order = self.to_exchange_order(order_spec)
+                book.add_order(exchange_order)
 
-                # Perform Accounting Operations
-                # It makes sense to do them on the back end so we keep all the PnL Code for all traders in the one place
-                # Otherwise we need the backend to request from all traders and then pass from backend to frontend
-                # which is unecessary and more error prone and more prone to user meddling.
+                # TODO : (LUNA)
+                # IF EXTERNAL API USED WE NEED TO ENSURE THE BOOK IS ACTUALLY JUST 
+                # A ROUTER TO THE TRUE EXCHANGE
+
+                # Respond to user to confirm order dispatch
+                await ws.send(json.dumps({'type': 'order_opened', 'data': named_tuple_to_dict(exchange_order)}))
                 
-                # Note we make sure to update the pnls first and then notify the fills
-                # otherwise when we assert an order has been executed there will be a network delay
-                # in assessing risk which would lead to messy sleep statement workarounds
-                # Note all traders will have their pnl marked to market by this function
-                await self.update_pnls(transaction_pair)
-                
-                # Distribute the transaction confirmations to the 2 parties
-                if self.trader_still_connected(maker_id):
-                    maker_ws = self._traders[maker_id]
-                    await maker_ws.send(json.dumps({'type': 'order_fill', 'data': named_tuple_to_dict(transaction_pair.maker)}))
+                # Recomputes the book / performs transactions where possible:
+                # Note this is necessary as it may provide additional liquidity to execute market orders
+                # which could not be previously executed and are queued.
+                transaction_pairs = book.auction()
+                latest_transactions = await self.process_new_transactions(ws, transaction_pairs)
 
-                if self.trader_still_connected(taker_id):
-                    taker_ws = self._traders[taker_id]
-                    await taker_ws.send(json.dumps({'type': 'order_fill', 'data': named_tuple_to_dict(transaction_pair.taker)}))
+                # TODO : (LUNA)
+                # WE NEED TO AGAIN ENSURE THAT THE PROCESSING OF NEW TRANSACTIONS 
+                # IS HANDLED BY THE API 
 
-                tape_transaction = TapeTransaction(transaction_pair.ticker, transaction_pair.action, transaction_pair.maker.qty, transaction_pair.maker.price, transaction_pair.timestamp)
-                latest_transactions.append(tape_transaction)
+                self._tape += latest_transactions
 
-            self._tape += latest_transactions
+                # Broadcast new limit order books
+                async def broadcast_to_trader(tid):
+                    # Optimised to not send back everything
+                    await self._traders[tid].send(json.dumps({'type': 'LOBS', 'data': self.get_books(tickers = [order_spec.ticker])}))
+                    await self._traders[tid].send(json.dumps({'type': 'tape', 'data': self.get_tape(transactions = latest_transactions)}))
 
-            # Broadcast new limit order books
-            async def broadcast_to_trader(tid):
-                # Optimised to not send back everything
-                await self._traders[tid].send(json.dumps({'type': 'LOBS', 'data': self.get_books(tickers = [order_spec.ticker])}))
-                await self._traders[tid].send(json.dumps({'type': 'tape', 'data': self.get_tape(transactions = latest_transactions)}))
+                await asyncio.gather(*[broadcast_to_trader(tid) for tid in self._traders])
 
-            await asyncio.gather(*[broadcast_to_trader(tid) for tid in self._traders])
+                # Broadcast new book and tape to observers
+                async def broadcast_to_observer(oid):
+                    await self._observers[oid].send(json.dumps({'type': 'LOBS', 'data': self.get_books(tickers = [order_spec.ticker], order_type='LMT')}))
+                    # Only observers may recieve the market book for debug purposes
+                    await self._observers[oid].send(json.dumps({'type': 'MBS', 'data': self.get_books(tickers = [order_spec.ticker], order_type='MKT')}))
+                    await self._observers[oid].send(json.dumps({'type': 'tape', 'data': self.get_tape(transactions = latest_transactions)}))
 
-            # Broadcast new book and tape to observers
-            async def broadcast_to_observer(oid):
-                await self._observers[oid].send(json.dumps({'type': 'LOBS', 'data': self.get_books(tickers = [order_spec.ticker], order_type='LMT')}))
-                # Only observers may recieve the market book for debug purposes
-                await self._observers[oid].send(json.dumps({'type': 'MBS', 'data': self.get_books(tickers = [order_spec.ticker], order_type='MKT')}))
-                await self._observers[oid].send(json.dumps({'type': 'tape', 'data': self.get_tape(transactions = latest_transactions)}))
+                await asyncio.gather(*[broadcast_to_observer(oid) for oid in self._observers])
 
-            await asyncio.gather(*[broadcast_to_observer(oid) for oid in self._observers])
-
-            # We call mark to market again at to make sure 
-            # we have caught any no transacted market moving limits
-            await self.mark_traders_to_market(order_spec.ticker)
+                # We call mark to market again at to make sure 
+                # we have caught any no transacted market moving limits
+                await self.mark_traders_to_market(order_spec.ticker)
+            else:
+                # Breaches risk limits
+                await ws.send(json.dumps({'type': 'order_failed', 'data': data}))
     
         elif s_type == 'cancel_order':
             # TODO: Frontend implementation of cancellation still needs to be worked out
@@ -752,6 +1070,54 @@ class Exchange:
                 # Tender Ok
                 await ws.send(json.dumps({'type': 'tender_fill', 'data': data}))
 
+    def order_conforms_to_trader_risk_limits(self, order_spec):
+        trader_risk = self._risk[order_spec.tid]
+        multiplier = self._case_config['securities'][order_spec.ticker]['risk_limit_multiplier']
+        weighted_qty = multiplier * order_spec.qty
+        signed_qty = weighted_qty if order_spec.action == 'BUY' else -1 * weighted_qty
+        
+        security_positions = self._transaction_records[order_spec.tid][order_spec.ticker]
+        security_net_pos = security_positions['BUY']['sum_qty'] - security_positions['SELL']['sum_qty']
+
+        new_security_net_pos = security_net_pos + signed_qty
+        gross_change = abs(new_security_net_pos) - abs(security_net_pos)
+
+        is_within_net_limit = abs(trader_risk.net_position + signed_qty) < self._risk_limits.net_position
+        is_within_gross_limit = abs(trader_risk.gross_position + gross_change) < self._risk_limits.gross_position
+
+        return is_within_net_limit and is_within_gross_limit
+
+    async def process_new_transactions(self, ws, transaction_pairs):
+        latest_transactions = []
+
+        for transaction_pair in transaction_pairs:
+            maker_id, taker_id = transaction_pair.maker.tid, transaction_pair.taker.tid
+
+            # Perform Accounting Operations
+            # It makes sense to do them on the back end so we keep all the PnL Code for all traders in the one place
+            # Otherwise we need the backend to request from all traders and then pass from backend to frontend
+            # which is unecessary and more error prone and more prone to user meddling.
+            
+            # Note we make sure to update the pnls first and then notify the fills
+            # otherwise when we assert an order has been executed there will be a network delay
+            # in assessing risk which would lead to messy sleep statement workarounds
+            # Note all traders will have their pnl marked to market by this function
+            await self.update_pnls(transaction_pair)
+            
+            # Distribute the transaction confirmations to the 2 parties
+            if self.trader_still_connected(maker_id):
+                maker_ws = self._traders[maker_id]
+                await maker_ws.send(json.dumps({'type': 'order_fill', 'data': named_tuple_to_dict(transaction_pair.maker)}))
+
+            if self.trader_still_connected(taker_id):
+                taker_ws = self._traders[taker_id]
+                await taker_ws.send(json.dumps({'type': 'order_fill', 'data': named_tuple_to_dict(transaction_pair.taker)}))
+
+            tape_transaction = TapeTransaction(transaction_pair.ticker, transaction_pair.action, transaction_pair.maker.qty, transaction_pair.maker.price, transaction_pair.timestamp)
+            latest_transactions.append(tape_transaction)
+
+        return latest_transactions
+    
     def init_books(self):
         books = {}
         securities_config = self._config['exchanges'][self._exchange_name]['securities']
@@ -863,8 +1229,6 @@ class Exchange:
 
         best_bid, best_ask = self._books[ticker]._bids.best_price, self._books[ticker]._asks.best_price, 
 
-        # total_buy_qty = sum([transaction.qty for transaction in ticker_record['BUY']['transactions']])
-        # total_sell_qty = sum([transaction.qty for transaction in ticker_record['SELL']['transactions']])
         total_buy_qty = ticker_record['BUY']['sum_qty']
         total_sell_qty = ticker_record['SELL']['sum_qty']
         total_buy_qty_price =  ticker_record['BUY']['sum_qty_price']

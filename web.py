@@ -21,6 +21,7 @@ class WebServer:
         
         self.frontend_to_app_cache = []
         self.backend_to_app_cache = []
+        self.backend_to_app_config_cache = []
         self.backend_has_updates = asyncio.Event()
         self.frontend_has_updates = asyncio.Event()
 
@@ -56,8 +57,39 @@ class WebServer:
         is_backend, is_app = path == '/backend', path == '/app'
 
         try:
-            if is_app: 
+            if is_backend:
+                print("Backend connection established")
+                # Store the data for sending to the server.
+                while True:
+                    data = await ws.recv()
+                    msg = json.loads(data)
+                    msg_type = msg['type']
+
+                    # This must always be the first message sent from the server
+                    if msg_type == 'config':
+                        self.backend_to_app_cache.append(data)
+                        self.backend_to_app_config_cache.append(data)
+                        self.n_config_messages = msg['n_config_messages']
+                    # Handles caching of key setup information
+                    elif len(self.backend_to_app_config_cache) < self.n_config_messages:
+                        self.backend_to_app_config_cache.append(data)
+
+
+                    if msg_type in self.last_posts:
+                        if self.last_posts[msg_type] < time.time() - self._debounce:
+                            self.backend_to_app_cache.append(data)
+                            self.backend_has_updates.set()
+                            self.last_posts[msg_type] = time.time() 
+                    else:
+                        self.backend_to_app_cache.append(data)
+                        self.backend_has_updates.set()
+            
+            elif is_app: 
                 print("App [Backend State Management] connection established")
+
+                # Send any critical setup information once off
+                for data in self.backend_to_app_config_cache:
+                    await ws.send(data)
 
                 # Pass messages from backend to frontend
                 while True:
@@ -68,23 +100,6 @@ class WebServer:
                         # Send in time order
                         dispatch = self.backend_to_app_cache.pop(0)
                         await ws.send(dispatch)
-
-            if is_backend:
-                print("Backend connection established")
-                # Store the data for sending to the server.
-                while True:
-                    data = await ws.recv()
-                    msg = json.loads(data)
-                    msg_type = msg['type']
-
-                    if msg_type in self.last_posts:
-                        if self.last_posts[msg_type] < time.time() - self._debounce:
-                            self.backend_to_app_cache.append(data)
-                            self.backend_has_updates.set()
-                            self.last_posts[msg_type] = time.time() 
-                    else:
-                        self.backend_to_app_cache.append(data)
-                        self.backend_has_updates.set()
 
         except websockets.ConnectionClosed:
             print("Connection with [%s] closed: [%s]" % (path, time.time())) 

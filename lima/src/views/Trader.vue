@@ -18,9 +18,9 @@
       <OpenOrders></OpenOrders>
       <RiskMonitor></RiskMonitor>
     </div>
-    <!-- <div id='book-pair' style='max-height: 450px;'>
+    <div id='book-pair' style='max-height: 450px;'>
       <Book :ticker="ticker" orderType="MKT" v-for="ticker in tickers" v-bind:key="ticker"></Book>
-    </div> -->
+    </div>
       
     
     

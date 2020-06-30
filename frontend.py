@@ -13,7 +13,7 @@ from time import sleep, time
 from math import floor
 import warnings
 
-from shared import LOB, OrderSpec, ExchangeOrder, Transaction, to_named_tuple, CompositionMeta, ComplexEvent, OrderKey, TickerPnL, TraderRisk, TenderOrder
+from shared import LOB, OrderSpec, ExchangeOrder, Transaction, to_named_tuple, CompositionMeta, ComplexEvent, OrderKey, TickerPnL, TraderRisk, TenderOrder, RiskLimits
 from shared import to_named_tuple, cast_named_tuple_to_dict, named_tuple_to_dict
 
 class Security:
@@ -323,11 +323,19 @@ class ExchangeConnection:
         self._cancelled_orders = {}
         
         self._tid = None # trader id
-        self._securities = None
+        self._securities = [] # Ticker ids
+        self._security_objects = {} # Dict of Secuirty's
         self._risk = None
         self._pnl = {} # key is ticker
         self._uri = uri # backend web sockect address
         self._internal_next_order_id = 0 # Yields the next order id
+
+        # Internal premeptive risk management
+        # Assumes full and instantaneous execution of trades
+        # without slippage - works as an internal risk limit safe guard
+        self._theoretical_transaction_reccords = {}
+        self._theoretical_pnls = {}
+        self._theoretical_risk = TraderRisk(0,0,0,0,0)
 
         # VueJs App
         self._app_uri = app_uri
@@ -353,13 +361,23 @@ class ExchangeConnection:
             # As you will not be able to rejoin with the same id.
             # TODO: THINK ABOUT THIS
             config = json.loads(await ws.recv())
-            
-            self._tid = config['data']['tid']
-            self._exchange_open_time = config['data']['exchange_open_time']
-            self._securities = config['data']['exchange']['securities']
+            self._config = config['data']
+            self._tid = self._config['tid']
+            self._exchange_open_time = self._config['exchange_open_time']
+            self._securities = self._config['exchange']['securities']
+            self._security_objects = {ticker: Security(ticker, self) for ticker in self._securities}
+
             self._tenders = {ticker: asyncio.Queue() for ticker in self._securities}
             self._has_new_tender = {ticker: asyncio.Event() for ticker in self._securities}
             
+            # Init risk management
+            for ticker in self._securities:
+                self._theoretical_pnls[ticker] = TickerPnL(ticker,0,0,0,0)
+                self._theoretical_transaction_reccords[ticker] = {'BUY':{'sum_qty':0, 'sum_qty_price':0,'transactions':[]},'SELL':{'sum_qty':0, 'sum_qty_price':0,'transactions':[]}}
+
+            risk_limits = self._config['exchange']['risk_limits']
+            self._risk_limits = to_named_tuple(risk_limits, RiskLimits)
+
             # Tell the trader using this connection that the connection is ready
             if self._setup_event: self._setup_event.set() 
 
@@ -388,10 +406,13 @@ class ExchangeConnection:
                 #     await asyncio.gather(self.update_state(ws), self.dispatch_orders(ws), self.dispatch_tenders(ws), self.dispatch_cancellations(ws))            
     
      # TODO: Refactor this pattern its getting repetitive
-    
+
     def add_order_batch(self, orders, events):
         self._order_completed_events = {**self._order_completed_events, **events}
         self._orders_to_dispatch = self._orders_to_dispatch + orders
+        
+        for order_spec in orders:
+            self.update_pnls_after_order(order_spec) 
 
     def cancel_orders(self, orders, events):
         # A list of orderSpecs is accepted
@@ -401,6 +422,7 @@ class ExchangeConnection:
     def accept_tender(self, tender_order, event):
         self._tender_completed_events[tender_order.tender_id] = event
         self._tenders_to_dispatch.append(tender_order)
+        self.update_pnls_after_tender_accept(self._tid, tender_order)
 
     async def dispatch_orders(self, ws):
         while len(self._orders_to_dispatch) > 0:
@@ -459,10 +481,8 @@ class ExchangeConnection:
                 # Overwrites old limit order books where they already exist
                 self._LOBS = {**self._LOBS, **data}
                 self.update_complex_lob_events() # Updates price based triggers
-
             elif s_type == 'tape':
                 self._tape = self._tape + data
-
             elif s_type == 'order_opened':
                 order_id = data['order_id']
                 new_order = to_named_tuple(data, ExchangeOrder)
@@ -471,7 +491,6 @@ class ExchangeConnection:
                 
                 order_key = cast_named_tuple_to_dict(new_order, OrderKey)
                 await self.pass_to_app(ws_app, 'order_opened', order_key)
-
             elif s_type == 'order_cancelled':
                 success = data['success']
                 order_id = data['order_spec']['order_id']
@@ -487,8 +506,7 @@ class ExchangeConnection:
                     # TODO We will still keep it in open orders for the moment
                     # Until we can figure out how to handle out of sequence fills
                     # and cancellations
-                    # del(self._open_orders[order_id])
-                
+                    # del(self._open_orders[order_id])              
             elif s_type == 'order_fill':
                 # 1. Get the qty, price of fill, order id [x]
                 # 2. update the open order [x]
@@ -517,6 +535,8 @@ class ExchangeConnection:
                 msg_type = 'order_fill' if partial_fill else 'order_completed'
                 pass_data ={'order':completed_order, 'transaction': data}
                 await self.pass_to_app(ws_app, msg_type, pass_data)
+            elif s_type == 'order_failed':
+                warnings.warn("Order %s failed to be processed as it exceeded risk limits fix your broken code :) we don't do any nice handling of this!", data)
             elif s_type == 'current_time':
                 print("Time since last current time update: %.3f" % (data - self.get_exchange_time()))
                 # self.get_exchange_time() = data
@@ -524,18 +544,12 @@ class ExchangeConnection:
                 ticker_pnl = to_named_tuple(data, TickerPnL)
                 self._pnl[ticker_pnl.ticker] = ticker_pnl
                 await self.pass_to_app(ws_app, s_type, data)
-
             elif s_type == 'risk':
                 self._risk = to_named_tuple(data, TraderRisk)
                 await self.pass_to_app(ws_app, s_type, data)
-
             elif s_type == 'tender':
                 tender = to_named_tuple(data, TenderOrder)
                 await self._tenders[tender.ticker].put(tender)
-                # self._tenders[tender.ticker].append(tender)
-                # self.clearout_old_tenders()
-                # self._has_new_tender[tender.ticker].set() # Flag new tender arrival
-
             elif s_type == 'tender_fill': # When your tender order acceptance has been processed
                 tender = to_named_tuple(data, TenderOrder)
                 self._tender_completed_events[tender.tender_id].set()
@@ -588,6 +602,153 @@ class ExchangeConnection:
     def get_next_id(self):
         self._internal_next_order_id += 1
         return int(str(self._tid) + str(self._internal_next_order_id))
+
+    def update_pnls_after_order(self, order_spec):
+        """
+        Updates pnl, risk, transaction records for traders on both sides of the trade
+        :param transaction_pair: of type TransactionPair
+        """
+        # action of the liquidity taker
+        notional_transaction = Transaction(order_spec.tid, order_spec.order_id, order_spec.qty, order_spec.price, time())
+        
+        self.update_trader_transaction_record(notional_transaction, order_spec.action, order_spec.ticker)
+        self.recompute_trader_pnl(order_spec.ticker)
+
+    def update_pnls_after_tender_accept(self, tid, tender_order):
+        current_time = self.get_exchange_time()
+        tender_transaction = Transaction(tid, tender_order.tender_id, tender_order.qty, tender_order.price, current_time)
+        self.update_trader_transaction_record(tender_transaction, tender_order.action, tender_order.ticker)
+        self.recompute_trader_pnl(tender_order.ticker)
+
+    def update_trader_transaction_record(self, transaction, action, ticker):
+        """
+        Updates trade risk, pnl and transaction records
+        :param transaction: A trader's transaction of type Transaction
+        :param action: Either BUY or SELL
+        :param ticker: A security ticker string
+        """
+        # Allocate the transaction so we can trace it later and perform computations
+        ticker_record = self._theoretical_transaction_reccords[ticker]
+        side_record = ticker_record[action] # Buy or sell transaction record
+        transactions = side_record['transactions']
+
+        transactions.append(transaction)
+
+        # Saves on expensive computations later in recompute_trader_pnl
+        side_record['sum_qty'] += transaction.qty
+        side_record['sum_qty_price'] += transaction.qty * transaction.price
+
+    def recompute_trader_pnl(self, ticker):
+        """
+        Recomputes the PNL and Risk metrics and notifies the trader of the change
+        :param tid: a trader id
+        """
+        ticker_record = self._theoretical_transaction_reccords[ticker]
+
+        # Now let us recompute the pnl
+        exchange_config = self._config['exchange']
+        securities_config = exchange_config['securities']
+        contract_config = securities_config[ticker]
+        contract_point_value = contract_config['contract_point_value']
+        contract_currency = contract_config['quote_currency']
+        base_currency = exchange_config['base_currency']
+
+        best_bid, best_ask = self._security_objects[ticker].evaluate(1), self._security_objects[ticker].evaluate(-1), 
+
+        total_buy_qty = ticker_record['BUY']['sum_qty']
+        total_sell_qty = ticker_record['SELL']['sum_qty']
+        total_buy_qty_price =  ticker_record['BUY']['sum_qty_price']
+        total_sell_qty_price =  ticker_record['SELL']['sum_qty_price']
+
+        # This is fine as then there will be no realised 
+        if total_buy_qty > 0:
+            # avg_buy_price = sum([transaction.price * transaction.qty for transaction in ticker_record['BUY']['transactions']]) / total_buy_qty
+            avg_buy_price = total_buy_qty_price / total_buy_qty
+        else:
+            avg_buy_price = 0
+        
+        if total_sell_qty > 0:
+            # avg_sell_price = sum([transaction.price * transaction.qty for transaction in ticker_record['SELL']['transactions']]) / total_sell_qty
+            avg_sell_price = total_sell_qty_price / total_sell_qty
+        else:
+            avg_sell_price = 0
+
+        if total_buy_qty == 0 or total_sell_qty == 0:
+            realised_pnl_points = 0 # Nothing has yet been realised
+            realised_pnl_contract_currency = 0
+        else:
+            realised_pnl_points = (avg_sell_price - avg_buy_price) * min(total_buy_qty, total_sell_qty)
+            realised_pnl_contract_currency = round(realised_pnl_points * contract_point_value, 2)
+        
+        # We assume that trades may be settled at market close at the midprice to avoid any spurious 
+        # edge cases
+        net_position = total_buy_qty - total_sell_qty
+        avg_open_price = avg_buy_price * int(net_position > 0) + avg_sell_price * int(net_position < 0)
+        theoretical_exit_price = (best_ask + best_bid) / 2 
+        
+        unrealised_pnl_points = (theoretical_exit_price - avg_open_price) * net_position
+        unrealised_pnl_contract_currency = round(unrealised_pnl_points * contract_point_value,2)
+        
+        total_pnl_points = unrealised_pnl_points + realised_pnl_points
+        total_pnl_contract_currency = round(total_pnl_points * contract_point_value,2) # Pnl only stated to 2d.p
+
+        # EX: PNL is in USD and Base is CAD
+        # Direct Quote of USD => best ask = # CAD Required to buy 1 USD
+        # Thus we are selling USD at market so we take the best bid
+
+        conversion = 1 if base_currency == contract_currency else self._security_objects[contract_currency].evaluate(1) # Best bid price
+        
+        unrealised_pnl_base_currency = unrealised_pnl_contract_currency * conversion
+        realised_pnl_base_currency = realised_pnl_contract_currency * conversion
+        pnl_total_base_currency = total_pnl_contract_currency * conversion
+
+        # PnL history by ticker
+
+        # Update ticker pnl
+        self._theoretical_pnls[ticker] = TickerPnL(ticker, net_position, unrealised_pnl_base_currency, realised_pnl_base_currency, pnl_total_base_currency)
+
+        # Recompute risk
+        overall_net_position = sum([pnl.net_position for ticker, pnl in self._theoretical_pnls.items()])
+        overall_gross_position = sum([abs(pnl.net_position) for ticker, pnl in self._theoretical_pnls.items()])
+        overall_unrealised = sum([pnl.unrealised for ticker, pnl in self._theoretical_pnls.items()])
+        overall_realised = sum([pnl.realised for ticker, pnl in self._theoretical_pnls.items()])
+        overall_pnl = sum([pnl.total_pnl for ticker, pnl in self._theoretical_pnls.items()])
+
+        # pnl_history = trader_risk.pnl_history
+        # # We avoid deeply nesting named tuples as this can be painful for data transfer
+        # pnl_history.append({'time':current_time,'value':overall_pnl})
+        
+        # self._risk[tid] = TraderRisk(overall_net_position, overall_gross_position,overall_unrealised, overall_realised, overall_pnl, pnl_history)
+
+        self._theoretical_risk = TraderRisk(overall_net_position, overall_gross_position,overall_unrealised, overall_realised, overall_pnl)
+
+        # TODO: Compute SHARPE, CALMAR, SORTINO, etc
+
+    def orders_conform_to_trader_risk_limits(self, order_specs):
+        change_in_net_positions = {ticker: 0 for ticker in self._securities}
+        
+        for order_spec in order_specs:
+            trader_risk = self._theoretical_risk
+            multiplier = self._securities[order_spec.ticker]['risk_limit_multiplier']
+            weighted_qty = multiplier * order_spec.qty
+            signed_qty = weighted_qty if order_spec.action == 'BUY' else -1 * weighted_qty
+            
+            change_in_net_positions[order_spec.ticker] += signed_qty
+
+        is_within_net_limit = True
+        is_within_gross_limit = True
+
+        for ticker in self._securities: 
+            security_positions = self._theoretical_transaction_reccords[ticker]
+            security_net_pos = security_positions['BUY']['sum_qty'] - security_positions['SELL']['sum_qty']
+
+            new_security_net_pos = security_net_pos + change_in_net_positions[ticker]
+            gross_change = abs(new_security_net_pos) - abs(security_net_pos)
+
+            is_within_net_limit = is_within_net_limit and abs(trader_risk.net_position + signed_qty) < self._risk_limits.net_position
+            is_within_gross_limit = is_within_gross_limit and abs(trader_risk.gross_position + gross_change) < self._risk_limits.gross_position
+
+        return is_within_net_limit and is_within_gross_limit
 
 class Order:
     def __init__(self, security, qty=1, order_type="MKT", can_execute = None, direction = 1, on_complete = None, price_fn = None, qty_fn = None, group_name="default", timeout=None, timeout_fn=None, await_fills=True):
@@ -815,8 +976,11 @@ class Order:
             events[order_id] = order_filled_event
             orders.append(spec)
         
+        # Check Risk Limits
+        if not self._security._exchange.orders_conform_to_trader_risk_limits(orders):
+            return False
+
         # Execute order
-        # TODO: Error handling 
         self._security._exchange.add_order_batch(orders, events)
         # Wait for completion of order and call the next order if applicable        
         try:

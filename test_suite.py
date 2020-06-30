@@ -256,8 +256,16 @@ class UnitTest():
             assert(bot_pnls == last_bots_pnl)
 
             print("[TEST] Realised and unrealised pnl working as expected: Success")
+            
+            MKT_SELL = -1 * self.RITC.to_order(qty=15, order_type='MKT')
+            MKT_BUY = self.RITC.assign_trader(self.mopup_bot).to_order(qty=15, order_type='MKT')
+      
+            await self.assert_order_execution(MKT_SELL, MKT_BUY) # now get rid of the traders remaining stock and close out position
+ 
 
         await asyncio.gather(self.assert_order_execution(LMT_BUY, LMT_SELL), check_pnls())
+
+        
         print("[TEST SUITE] Finished Risk Monitor Tests...")
 
     async def visual_inspection_test(self):
@@ -330,7 +338,7 @@ class UnitTest():
         # invert which is not going to produce expected results :)
         # TODO: Implement prevent self trades [This will be incompatible with validate_mkt_order_execution] but in real trading environment we should stop this from happening
         # We will need to decide how best to catch these double sided entries...
-        # await self.validate_risk_monitor()
+        await self.validate_risk_monitor()
 
     async def run_script(self):
         await asyncio.gather(self.connect_traders(), self.run_tests())

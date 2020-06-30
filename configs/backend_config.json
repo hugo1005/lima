@@ -18,11 +18,16 @@
             "market_agents": {
                 "giveaway_trader": 30
             },
+            "risk_limits": {
+                "net_position": 100000,
+                "gross_position": 100000
+            },
             "securities": {
                 "RITC": {
                     "trade_cost": 0.02,
                     "rebate": 0.01,
                     "max_order_size": 10000,
+                    "risk_limit_multiplier": 2,
                     "starting_price": 25,
                     "starting_spread": 1,
                     "resolution": 2,
@@ -49,6 +54,7 @@
                     "trade_cost": 0.02,
                     "rebate": 0.01,
                     "max_order_size": 10000,
+                    "risk_limit_multiplier": 1,
                     "starting_price": 15,
                     "starting_spread": 0.05,
                     "resolution": 2,
@@ -75,6 +81,7 @@
                     "trade_cost": 0.02,
                     "rebate": 0.01,
                     "max_order_size": 10000,
+                    "risk_limit_multiplier": 1,
                     "starting_price": 10,
                     "starting_spread": 0.05,
                     "resolution": 2,
@@ -101,6 +108,7 @@
                     "trade_cost": 0.02,
                     "rebate": 0.01,
                     "max_order_size": 10000,
+                    "risk_limit_multiplier": 0,
                     "starting_price": 0.71,
                     "starting_spread": 0.005,
                     "resolution": 6,

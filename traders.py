@@ -36,8 +36,8 @@ class Trader(ABC):
         await self.run()
 
     def init_secuirties(self):
-        self._securities = {ticker: Security(ticker, self._exchange_connection) for ticker in self._exchange_connection._securities}
-        
+        # Since the exchange connection is unique to the trader...
+        self._securities = self._exchange_connection._security_objects
 
     @abstractmethod
     async def run(self):
