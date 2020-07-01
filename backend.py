@@ -519,15 +519,15 @@ class LunaHalfOrderbook:
             return None
 
 class LunaOrderbook:
-    def __init__(self, config, time_fn, ticker, tape, traders, observers, mark_traders_to_market, get_books, get_tape, update_pnls, trader_still_connected, get_trader_id):
+    def __init__(self, credentials, config, time_fn, ticker, tape, traders, observers, mark_traders_to_market, get_books, get_tape, update_pnls, trader_still_connected, get_trader_id):
         # TODO: Everything here is good we just need to configure the endpoint parameters for LUNA
 
         self._bids = LunaHalfOrderbook('bids', round(starting_price - starting_spread/2, resolution))
         self._asks = LunaHalfOrderbook('asks',  round(starting_price + starting_spread/2, resolution))
         self.get_time = time_fn # Exchange time function
-        self.ws_uri = config['ws_uri']
+        self.ws_uri = 'wss://ws.luno.com/api/1/stream/' + ticker
         self.ticker = ticker
-        self.credentials = config['credentials']
+        self.credentials = credentials
 
         # Forwarded from exhcange
         self._tape = tape
@@ -539,11 +539,12 @@ class LunaOrderbook:
         self.update_pnls = update_pnls
         self.trader_still_connected = trader_still_connected
         self.get_trader_id = get_trader_id
+        self._credentials = credentials
 
     async def connect():
         while True: # For reconnection
             async with websockets.connect(self._uri) as ws:
-                await ws.send(json.dumps(credentials))
+                await ws.send(json.dumps(self._credentials))
                 self.build_book(json.loads(await ws.recv()))
                 seq = -1
 
@@ -1143,7 +1144,7 @@ class Exchange:
             print("Initialising book for ticker [%s] ..." % ticker)
 
             if self._exchange_name == 'luna':
-                books[ticker] = LunaOrderbook(securities_config[ticker], 
+                books[ticker] = LunaOrderbook(self._credentials, securities_config[ticker], 
                 self.get_time, ticker, self._tape, self._traders, self.observers, self.mark_traders_to_market,  self.get_books, self.get_tape, sel.update_pnls, self.trader_still_connected, self.get_trader_id)
             else:
                 books[ticker] = Orderbook(securities_config[ticker], time_fn=self.get_time)
