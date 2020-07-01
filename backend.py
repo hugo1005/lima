@@ -13,7 +13,7 @@ from scipy.stats import gamma
 from math import log10, floor
 
 from shared import LOB, OrderSpec, ExchangeOrder, Transaction, TransactionPair, ExchangeOrderAnon, TapeTransaction, MarketBook, TickerPnL, TraderRisk, TenderOrder, RiskLimits
-from shared import to_named_tuple, update_named_tuple, named_tuple_to_dict, LunaToExchangeOrder
+from shared import to_named_tuple, update_named_tuple, named_tuple_to_dict, LunaToExchangeOrder, LunaToExchangeTransactionPair
 # from traders import GiveawayTrader
 
 from aiodebug import log_slow_callbacks
@@ -348,7 +348,7 @@ class Orderbook:
         return MarketBook(self._bids.anonymised_market_order_q, self._asks.anonymised_market_order_q)
 
 class LunaHalfOrderbook:
-    def __init__(self, book_side, starting_best_price):
+    def __init__(self, book_side):
         self.anonymised_lob = {}
         self.lob = {}
 
@@ -356,7 +356,7 @@ class LunaHalfOrderbook:
         self.book_depth = 0 # Number of different prices
         self.num_orders = 0
         self.book_volume = 0 # Limit order book volume only
-        self.best_price = starting_best_price
+        self.best_price = 0
         self._market_order_q = []
         self.anonymised_market_order_q = []
 
@@ -383,13 +383,17 @@ class LunaHalfOrderbook:
 
         self.recompute_stats()
 
-    def get_order(order_id, order_type, price = -1):
+    def get_order(self, order_id, order_type, price = -1):
 
         if order_type == 'LMT':
             if price > 0:
                 order_match = list(filter(lambda x: x.order_id == order_id, self.lob[price]))
             else:
-                order_match = list(filter(lambda x: x.order_id == order_id, [*self.lob[price] for price in self.lob]))
+                all_orders = []
+                for price in self.lob:
+                    all_orders += self.lob[price]
+
+                order_match = list(filter(lambda x: x.order_id == order_id, all_orders))
         else:
             order_match = list(filter(lambda x: x.order_id == order_id, self._market_order_q))
 
@@ -522,10 +526,10 @@ class LunaOrderbook:
     def __init__(self, credentials, config, time_fn, ticker, tape, traders, observers, mark_traders_to_market, get_books, get_tape, update_pnls, trader_still_connected, get_trader_id):
         # TODO: Everything here is good we just need to configure the endpoint parameters for LUNA
 
-        self._bids = LunaHalfOrderbook('bids', round(starting_price - starting_spread/2, resolution))
-        self._asks = LunaHalfOrderbook('asks',  round(starting_price + starting_spread/2, resolution))
+        self._bids = LunaHalfOrderbook('bids')
+        self._asks = LunaHalfOrderbook('asks')
         self.get_time = time_fn # Exchange time function
-        self.ws_uri = 'wss://ws.luno.com/api/1/stream/' + ticker
+        self._ws_uri = 'wss://ws.luno.com/api/1/stream/' + ticker
         self.ticker = ticker
         self.credentials = credentials
 
@@ -541,9 +545,12 @@ class LunaOrderbook:
         self.get_trader_id = get_trader_id
         self._credentials = credentials
 
-    async def connect():
+    async def connect(self):
         while True: # For reconnection
-            async with websockets.connect(self._uri) as ws:
+            ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+            ssl_context.load_verify_locations(pathlib.Path("ssl_cert/cert.pem"))
+
+            async with websockets.connect(self._ws_uri, ssl = ssl_context) as ws:
                 await ws.send(json.dumps(self._credentials))
                 self.build_book(json.loads(await ws.recv()))
                 seq = -1
@@ -559,7 +566,7 @@ class LunaOrderbook:
 
                         # Trade Updates
                         if updates['create_update']:
-                            self.add_order(LunaToExchangeOrder(self.ticker, updates['create_update'], self.get_time()))
+                            self.add_order(LunaToExchangeOrder(self.ticker, updates['create_update'], self.get_time(), self.get_trader_id))
                         if updates['delete_update']:
                             self.cancel_order_with_id(updates['delete_update']['order_id'])
                         if updates['trade_update']:
@@ -645,14 +652,7 @@ class LunaOrderbook:
         else:
             return buy_order
 
-    def get_trader_id(order_id):
-        # TODO: Implement the list tracking our orders!
-        if order_id in self.trader_orders:
-            return self.trader_orders[order_id]
-        else:
-            return -1
-
-    def cancel_order_with_id(order_id):
+    def cancel_order_with_id(self, order_id):
         buy_order = self._bids.get_order(order_id, 'LMT')
         
         if type(buy_order) != type(None):
@@ -675,6 +675,9 @@ class LunaOrderbook:
     
     def get_LOB(self):
         return LOB(self._bids.anonymised_lob, self._asks.anonymised_lob, self._bids.best_price, self._asks.best_price, self._bids.book_depth, self._asks.book_depth, self._bids.num_orders, self._asks.num_orders, self._bids.book_volume, self._asks.book_volume)
+
+    def get_market_book(self):
+        return MarketBook(self._bids.anonymised_market_order_q, self._asks.anonymised_market_order_q)
 
 # This is only a temporary version to get a working market
 class MarketDynamics:
@@ -823,7 +826,12 @@ class Exchange:
         
         self._exchange_name = self._config['exchanges']['active_case']
         self._case_config = self._config['exchanges'][self._exchange_name]
-        self._books = self.init_books()
+
+        if self._exchange_name == 'luno':
+            self._credentials = self._case_config['credentials']
+            self._client = Client(api_key_id=self._credentials['api_key_id'], api_key_secret=self._credentials['api_key_secret'])
+
+        
         self._port = self._config['websocket']['port']
         self._ip = self._config['websocket']['ip']
         self._webserver_port = self._config['app-websocket']['port']
@@ -839,12 +847,10 @@ class Exchange:
         self._tape = [] 
         self._initial_time = time.time()
         
-        self._market_dynamics = self.init_market_dynamics()
+        self._books = self.init_books()
 
-        if self._exchange_name == 'luno':
-            self._credentials = self._case_config['credentials']
-            self._client = Client(api_key_id=self._credentials['api_key_id'], api_key_secret=self._credentials['api_key_secret'])
-
+        if self._exchange_name != 'luno':
+            self._market_dynamics = self.init_market_dynamics()
 
         self.setup_websocket_server()
 
@@ -864,14 +870,19 @@ class Exchange:
         handler = websockets.serve(self.exchange_handler, self._ip, self._port)
 
         # Creating Price Paths for securities
-        dynamics = asyncio.gather(*[md.create_dynamics() for ticker, md in self._market_dynamics.items()])
+        if self._exchange_name != 'luno':
+            dynamics = asyncio.gather(*[md.create_dynamics() for ticker, md in self._market_dynamics.items()])
 
         # Communications to web app intermediary
         # NOTE Lets disable the webserver and see if the bug persists...
         webserver = self.connect_to_web_server()
 
         # core = asyncio.gather(handler, dynamics)
-        core = asyncio.gather(webserver, handler, dynamics)
+        if self._exchange_name != 'luno':
+            core = asyncio.gather(webserver, handler, dynamics)
+        else:
+            book_monitors = asyncio.gather(*[book.connect() for ticker, book in self._books.items()])
+            core = asyncio.gather(book_monitors, webserver, handler)
 
         server, _ = loop.run_until_complete(core)
 
@@ -1143,9 +1154,9 @@ class Exchange:
         for ticker in securities_config:
             print("Initialising book for ticker [%s] ..." % ticker)
 
-            if self._exchange_name == 'luna':
+            if self._exchange_name == 'luno':
                 books[ticker] = LunaOrderbook(self._credentials, securities_config[ticker], 
-                self.get_time, ticker, self._tape, self._traders, self.observers, self.mark_traders_to_market,  self.get_books, self.get_tape, sel.update_pnls, self.trader_still_connected, self.get_trader_id)
+                self.get_time, ticker, self._tape, self._traders, self._observers, self.mark_traders_to_market,  self.get_books, self.get_tape, self.update_pnls, self.trader_still_connected, self.get_trader_id)
             else:
                 books[ticker] = Orderbook(securities_config[ticker], time_fn=self.get_time)
         
