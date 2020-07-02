@@ -355,7 +355,7 @@ class ExchangeConnection:
         # ssl_context.load_verify_locations(pathlib.Path("ssl_cert/cert.pem"))
         # async with websockets.connect(self._uri, ssl = ssl_context) as ws:
         
-        async with websockets.connect(self._uri) as ws:
+        async with websockets.connect(self._uri, max_size= None) as ws:
             # First message recieved on connecting is your trader id
             # Note losing connection to the server will be fatal
             # As you will not be able to rejoin with the same id.
@@ -383,7 +383,7 @@ class ExchangeConnection:
 
             # Wrapper if using the vuejs app.
             if self._enable_app:
-                async with websockets.connect(self._app_uri) as ws_app:
+                async with websockets.connect(self._app_uri, max_size= None) as ws_app:
                     # Send tid to update trader window in app.
                     await ws_app.send(json.dumps({'type':'config', 'data':{'tid':self._tid}}))
 

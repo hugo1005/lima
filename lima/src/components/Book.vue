@@ -79,25 +79,39 @@ export default {
         return this.$store.getters[`backend/display${this.bookType}`](this.ticker)
     },
     bidBook: function() {
-        return this.book.bid_book.map(order => {
+        let book = this.book.bid_book.map(order => {
             order['qty_filled_and_qty'] = `${order.qty_filled} / ${order.qty}`
             return order
         })
+
+        if (book.length > 0) {
+            return book.slice(0,Math.min(book.length, 20))
+        }
+        else {  
+            return book
+        }
     },
     askBook: function() {
-        return this.book.ask_book.map(order => {
+        let book = this.book.ask_book.map(order => {
             order['qty_filled_and_qty'] = `${order.qty_filled} / ${order.qty}`
             return order
         })
+        
+        if (book.length > 0) {
+            return book.slice(0,Math.min(book.length, 20))
+        }
+        else {  
+            return book
+        }
     },
     isLimitBook: function() {
         return this.orderType == 'LMT'
     },
     contentHeaders: function() {
-        return this.isLimitBook ? ['Order ID', 'Price', 'Qty']: ['Order ID', 'Qty']
+        return this.isLimitBook ? [ 'Price', 'Qty']: ['Qty']
     },
     contentKeys: function() {
-        return this.isLimitBook ? ['order_id','price','qty_filled_and_qty']: ['order_id','qty_filled_and_qty']
+        return this.isLimitBook ? ['price','qty_filled_and_qty']: ['qty_filled_and_qty']
     }
   }
 }
