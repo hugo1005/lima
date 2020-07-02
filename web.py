@@ -38,8 +38,8 @@ class WebServer:
         # Initialises the server and ensures it winds down gracefully
         loop = asyncio.get_event_loop()
        
-        frontend_handler = websockets.serve(self.bridge_frontend, self._ip_frontend, self._port_frontend)
-        backend_handler = websockets.serve(self.bridge_backend, self._ip_backend, self._port_backend)
+        frontend_handler = websockets.serve(self.bridge_frontend, self._ip_frontend, self._port_frontend, max_size = None)
+        backend_handler = websockets.serve(self.bridge_backend, self._ip_backend, self._port_backend, max_size = None)
 
         handlers = asyncio.gather(frontend_handler, backend_handler)
 

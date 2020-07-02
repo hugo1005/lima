@@ -139,3 +139,16 @@ class GiveawayTrader(Trader):
         tender = Tender(security, can_execute=can_execute_tender, group_name='tender_%s' % ticker).then(hedge)
         
         await tender.execute() 
+
+class LunaTrader(Trader):
+    """
+    Does nothing
+    """
+
+    def __init__(self):
+        super().__init__(enable_app=True)
+
+    async def run(self):
+        # Waits for tenders (and executes where appropriate on all securities)
+        print("This bot does nothing yet...")
+        await asyncio.sleep(10)
