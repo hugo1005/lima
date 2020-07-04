@@ -55,6 +55,17 @@ def LunaToExchangeOrder(ticker, data, submission_time, get_trader_id):
     return ExchangeOrder(ticker, tid, luna_create_order.id, 'LMT', float(luna_create_order.volume), action, float(luna_create_order.price), 0, submission_time)
 
 # ------------------------------------------------------------------------------------------------------------------------
+# TODO: check the details of this to make sure it works with the api
+KrakenCreateOrder = namedtuple('KrakenCreateOrder', ['id','type','price','volume'])
+
+def KrakenToExchangeOrder(ticker, data, submission_time, get_trader_id):
+    kraken_create_order = to_named_tuple(data, KrakenCreateOrder)
+    action = 'BUY' if kraken_create_order.type == 'BID' else 'SELL'
+    tid = get_trader_id(kraken_create_order.id) # Either -1 or one of ours
+
+    return ExchangeOrder(ticker, tid, kraken_create_order.id, 'LMT', float(kraken_create_order.volume), action, float(kraken_create_order.price), 0, submission_time)
+
+# ------------------------------------------------------------------------------------------------------------------------
 
 ExchangeOrderAnon = namedtuple('ExchangeOrderAnonymised', ['ticker','order_id','order_type','qty','action','price', 'qty_filled'])
 
@@ -73,6 +84,36 @@ def LunaToExchangeTransactionPair(ticker, data, submission_time, get_order_by_id
     maker_oid = luna_transaction.marker_order_id
     taker_oid = luna_transaction.taker_order_id
     qty_filled = float(luna_transaction.base) # We will always want the base currency quantity cause we only care about how much we spent in the base eg. EUR/BTC with base = EUR
+
+    maker_order = get_order_by_id(maker_oid)
+    taker_order = get_order_by_id(taker_oid)
+
+    if type(maker_order) == type(None):
+        warnings.warn('Market maker order was not of type LMT or is missing from book, this is very unexpected behaviour!', UserWarning)
+        return None
+    else:
+        action = 'SELL' if maker_order.action == 'BUY' else 'BUY'
+
+        if type(taker_order) == type(None):
+            taker_order = ExchangeOrder(ticker, get_trader_id(taker_oid), taker_oid, 'MKT', qty_filled, float(maker_order.price), action, qty_filled, submission_time)
+
+        maker_transaction = Transaction(maker_order.tid, maker_order.order_id, qty_filled, maker_order.price, submission_time)
+        taker_transaction = Transaction(taker_order.tid, taker_order.order_id, qty_filled, maker_order.price, submission_time)
+        
+        transaction_pair =  TransactionPair(ticker, action, maker_transaction, taker_transaction, submission_time)
+
+        return transaction_pair, maker_order, taker_order
+
+# ------------------------------------------------------------------------------------------------------------------------
+# TODO: check the details of this to make sure it works with the api
+KrakenTransaction = namedtuple('KrakenTransaction', ['base','counter','marker_order_id','taker_order_id'])
+
+def KrakenToExchangeTransactionPair(ticker, data, submission_time, get_order_by_id, get_trader_id):
+    kraken_transaction = to_named_tuple(data, KrakenTransaction)
+    
+    maker_oid = kraken_transaction.marker_order_id
+    taker_oid = kraken_transaction.taker_order_id
+    qty_filled = float(kraken_transaction.base) # We will always want the base currency quantity cause we only care about how much we spent in the base eg. EUR/BTC with base = EUR
 
     maker_order = get_order_by_id(maker_oid)
     taker_order = get_order_by_id(taker_oid)
