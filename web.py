@@ -76,9 +76,7 @@ class Database:
                 sql = """INSERT OR REPLACE INTO prices (timestamp,ticker,best_bid,best_ask, bid_depth, ask_depth, bid_volume, ask_volume, n_bids, n_asks) VALUES (?,?,?,?,?,?,?,?,?,?)"""
 
                 c.execute(sql, (timestamp, ticker, best_bid, best_ask, bid_depth, ask_depth, bid_volume, ask_volume, n_bids, n_asks))
-
-                print((timestamp, ticker, best_bid, best_ask, bid_depth, ask_depth, bid_volume, ask_volume, n_bids, n_asks))
-
+                
             self.conn.commit()
         except Error as e:
             print('[Database] Error:')
