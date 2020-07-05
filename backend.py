@@ -522,7 +522,7 @@ class LunaHalfOrderbook:
         else:
             return None
 
-class LunaOrderbook:
+class LunaOrderbook: 
     def __init__(self, credentials, config, time_fn, ticker, tape, traders, observers, mark_traders_to_market, get_books, get_tape, update_pnls, trader_still_connected, get_trader_id):
         # TODO: Everything here is good we just need to configure the endpoint parameters for LUNA
 
@@ -894,7 +894,7 @@ class Exchange:
         handler = websockets.serve(self.exchange_handler, self._ip, self._port, max_size = None)
 
         # Creating Price Paths for securities
-        if self._exchange_name != 'luno':
+        if self._exchange_name != 'luno'':
             dynamics = asyncio.gather(*[md.create_dynamics() for ticker, md in self._market_dynamics.items()])
 
         # Communications to web app intermediary
