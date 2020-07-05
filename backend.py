@@ -883,9 +883,8 @@ class KrakenOrderbook:
         self._bids = KrakenHalfOrderbook('bids')
         self._asks = KrakenHalfOrderbook('asks')
         self.get_time = time_fn  # Exchange time function
-        self._ws_uri = 'wss://ws.kraken.com'  # there is a general uri and the ticker is sent in the request
+        self._ws_uri = 'wss://ws.kraken.com'
         # since we do not trade on Kraken, we do not need to use wss://ws-auth.kraken.com
-        # we need to be subscribed to a channel
         self.ticker = ticker
         self.credentials = credentials
 
@@ -902,12 +901,12 @@ class KrakenOrderbook:
         self._credentials = credentials
 
     async def connect(self):
-        # some of the messages may be for heartbeat
-        # subscribe to the channel for the specific ticker
-
         async with websockets.connect(self._ws_uri, ssl = True, max_size= None) as ws:
+            # initialization
+
             # subscribe to book channel
             # get the maximum depth
+            # the pair format is different than in Luno
             payload = {
                 "event": "subscribe",
                 "pair": [self.ticker[:3] + "/" + self.ticker[3:]],
@@ -917,9 +916,17 @@ class KrakenOrderbook:
                 }
             }
             await ws.send(json.dumps(payload))
-            # get an initial snapshot of the book
-            # TODO: continue changing build_book method to work for Kraken
-            self.build_book(json.loads(await ws.recv()))
+            # we should get a confirmation about subscription
+            subscription_status = json.loads(await ws.recv())
+            assert subscription_status['status'] == "subscribed" and subscription_status['channelName'] == "book", \
+                "Did not successfully subscribe to book channel. Response: " + \
+                str(subscription_status)
+            
+            # we should also get an initial snapshot of the book
+            book_snapshot = json.loads(await ws.recv())
+            assert book_snapshot['channelName'] == "book-1000", \
+                "Did not receive expected book snapshot. Response: " + str(book_snapshot)
+            self.build_book(book_snapshot)
 
             # subscribe to trade channel 
             payload = {
@@ -930,11 +937,18 @@ class KrakenOrderbook:
                 }
             }
             await ws.send(json.dumps(payload))
-            # TODO: handle responses
+            # we should get a confirmation about subscription
+            subscription_status = json.loads(await ws.recv())
+            assert subscription_status['status'] == "subscribed" and subscription_status['channelName'] == "trade", \
+                "Did not successfully subscribe to trade channel. Response: " + \
+                str(subscription_status)
 
         while True: # For reconnection
             async with websockets.connect(self._ws_uri, ssl = True, max_size= None) as ws:
+                # handle updates
+
                 # TODO: this whole part will need many changes
+                
                 await ws.send(json.dumps(self._credentials))
 
                 # modify this part to get the data for a ticker - for building a book
@@ -1044,11 +1058,15 @@ class KrakenOrderbook:
 
     def build_book(self, book):
         for order_data in book[1]['bs']:
-            order_data_mod = {**order_data, 'type': 'BID'}
+            # order_data is an array of price, volume, timestamp in this order
+            order_data_mod = {'id': "-1", 'type': 'BID', 'price': order_data[0], 'volume':, order_data[0]}
+            # TODO: what about the timestamp? Should we use the current time?
             self.add_order(KrakenToExchangeOrder(self.ticker, order_data_mod, self.get_time(), self.get_trader_id))
 
         for order_data in book[1]['as']:
-            order_data_mod = {**order_data, 'type': 'ASK'}
+            # order_data is an array of price, volume, timestamp in this order
+            order_data_mod = {'id': "-1", 'type': 'ASK', 'price': order_data[0], 'volume':, order_data[0]}
+            # TODO: what about the timestamp? Should we use the current time?
             self.add_order(KrakenToExchangeOrder(self.ticker, order_data_mod, self.get_time(), self.get_trader_id))
 
     def add_order(self, exchange_order):
