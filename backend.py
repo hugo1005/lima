@@ -633,7 +633,6 @@ class LunaOrderbook:
 
                             self._tape += latest_transactions
 
-                        if updates['create_update'] or updates['delete_update'] or updates['trade_updates']:
                             # Broadcast new limit order books
                             async def broadcast_to_trader(tid):
                                 # Optimised to not send back everything
@@ -860,57 +859,59 @@ class KrakenOrderbook:
         self._credentials = credentials
 
     async def connect(self):
-        # initialization
-        async with websockets.connect(self._ws_uri, ssl = True, max_size= None) as ws:
-            # subscribe to book channel
-            # get the maximum depth
-            # the pair format is different than in Luno
-            payload = {
-                "event": "subscribe",
-                "pair": [self.ticker[:3] + "/" + self.ticker[3:]],
-                "subscription": {
-                    "name": "book",
-                    "depth": 1000
-                }
-            }
-            await ws.send(json.dumps(payload))
-            # we should get a confirmation about subscription
-            subscription_status = json.loads(await ws.recv())
-            assert subscription_status['status'] == "subscribed" and subscription_status['channelName'] == "book", \
-                "Did not successfully subscribe to book channel. Response: " + \
-                str(subscription_status)
-            
-            # we should also get an initial snapshot of the book
-            book_snapshot = json.loads(await ws.recv())
-            assert book_snapshot['channelName'] == "book-" + str(payload["subscription"]["depth"]), \
-                "Did not receive expected book snapshot. Response: " + str(book_snapshot)
-            self.build_book(book_snapshot)
-
-            # broadcast the initial snapshot of the order book to the traders and observers
-            async def broadcast_to_trader_init(tid):
-                    # Optimised to not send back everything
-                await self._traders[tid].send(json.dumps({'type': 'LOBS', 'data': self.get_books()}))
-                await self._traders[tid].send(json.dumps({'type': 'tape', 'data': self.get_tape()}))
-
-            await asyncio.gather(*[broadcast_to_trader_init(tid) for tid in self._traders])
-
-            # Broadcast new book and tape to observers
-            async def broadcast_to_observer_init(oid):
-                await self._observers[oid].send(json.dumps({'type': 'LOBS', 'data': self.get_books(order_type='LMT')}))
-                # Only observers may recieve the market book for debug purposes
-                await self._observers[oid].send(json.dumps({'type': 'MBS', 'data': self.get_books(order_type='MKT')}))
-                await self._observers[oid].send(json.dumps({'type': 'tape', 'data': self.get_tape()}))
-
-            await asyncio.gather(*[broadcast_to_observer_init(oid) for oid in self._observers])
-
-        # receive updates
         while True:
-            # in case of failures with subscription, we could unsubscribe and subscribe again here
-            # we currently do not assume connection failures can happen
-            # this could be checked as lack of updates for some time, incorrect checksum, etc.
-
-            # we would return to the outer while loop in case of failures
             async with websockets.connect(self._ws_uri, ssl = True, max_size= None) as ws:
+                # initialization
+                # get system status info
+                system_status = json.loads(await ws.recv())
+                assert system_status['event'] == 'systemStatus' and system_status['status'] == 'online', \
+                    "Could not connect to the system. Response: " + str(system_status)
+
+                # subscribe to book channel
+                # get the maximum depth
+                # the pair format is different than in Luno
+                payload = {
+                    "event": "subscribe",
+                    "pair": [self.ticker[:3] + "/" + self.ticker[3:]],
+                    "subscription": {
+                        "name": "book",
+                        "depth": 1000
+                    }
+                }
+                await ws.send(json.dumps(payload))
+                # we should get a confirmation about subscription
+                subscription_status = json.loads(await ws.recv())
+                assert subscription_status['status'] == "subscribed" and subscription_status['channelName'][:4] == "book", \
+                    "Did not successfully subscribe to book channel. Response: " + \
+                    str(subscription_status)
+                
+                # we should also get an initial snapshot of the book
+                book_snapshot = json.loads(await ws.recv())
+                book_channel_name = "book-" + str(payload["subscription"]["depth"])
+                assert book_snapshot[2] == book_channel_name, \
+                    "Did not receive expected book snapshot. Response: " + str(book_snapshot)
+                self.build_book(book_snapshot)
+
+                # broadcast the initial snapshot of the order book to the traders and observers
+                async def broadcast_to_trader_init(tid):
+                    # Optimised to not send back everything
+                    await self._traders[tid].send(json.dumps({'type': 'LOBS', 'data': self.get_books()}))
+                    await self._traders[tid].send(json.dumps({'type': 'tape', 'data': self.get_tape()}))
+
+                await asyncio.gather(*[broadcast_to_trader_init(tid) for tid in self._traders])
+
+                # Broadcast new book and tape to observers
+                async def broadcast_to_observer_init(oid):
+                    await self._observers[oid].send(json.dumps({'type': 'LOBS', 'data': self.get_books(order_type='LMT')}))
+                    # Only observers may recieve the market book for debug purposes
+                    await self._observers[oid].send(json.dumps({'type': 'MBS', 'data': self.get_books(order_type='MKT')}))
+                    await self._observers[oid].send(json.dumps({'type': 'tape', 'data': self.get_tape()}))
+
+                await asyncio.gather(*[broadcast_to_observer_init(oid) for oid in self._observers])
+
+                # receive updates
+                # we do not check for failures such as incorrect checksum or no heartbeat for some time
+                # we return to the outer while loop if connection fails
                 while True:
                     updates = json.loads(await ws.recv())
 
@@ -923,7 +924,6 @@ class KrakenOrderbook:
                         async def broadcast_to_trader(tid):
                             # Optimised to not send back everything
                             await self._traders[tid].send(json.dumps({'type': 'LOBS', 'data': self.get_books(tickers = [self.ticker])}))
-                            await self._traders[tid].send(json.dumps({'type': 'tape', 'data': self.get_tape(transactions = latest_transactions)}))
 
                         await asyncio.gather(*[broadcast_to_trader(tid) for tid in self._traders])
 
@@ -932,7 +932,6 @@ class KrakenOrderbook:
                             await self._observers[oid].send(json.dumps({'type': 'LOBS', 'data': self.get_books(tickers = [self.ticker], order_type='LMT')}))
                             # Only observers may recieve the market book for debug purposes
                             await self._observers[oid].send(json.dumps({'type': 'MBS', 'data': self.get_books(tickers = [self.ticker], order_type='MKT')}))
-                            await self._observers[oid].send(json.dumps({'type': 'tape', 'data': self.get_tape(transactions = latest_transactions)}))
 
                         await asyncio.gather(*[broadcast_to_observer(oid) for oid in self._observers])
 
