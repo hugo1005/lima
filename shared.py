@@ -55,6 +55,16 @@ def LunaToExchangeOrder(ticker, data, submission_time, get_trader_id):
     return ExchangeOrder(ticker, tid, luna_create_order.id, 'LMT', float(luna_create_order.volume), action, float(luna_create_order.price), 0, submission_time)
 
 # ------------------------------------------------------------------------------------------------------------------------
+KrakenCreateOrder = namedtuple('KrakenCreateOrder', ['id','type','price','volume'])
+
+def KrakenToExchangeOrder(ticker, data, submission_time, get_trader_id):
+    kraken_create_order = to_named_tuple(data, KrakenCreateOrder)
+    action = 'BUY' if kraken_create_order.type == 'BID' else 'SELL'
+    tid = get_trader_id(kraken_create_order.id) # Either -1 or one of ours
+
+    return ExchangeOrder(ticker, tid, kraken_create_order.id, 'LMT', float(kraken_create_order.volume), action, float(kraken_create_order.price), 0, submission_time)
+
+# ------------------------------------------------------------------------------------------------------------------------
 
 ExchangeOrderAnon = namedtuple('ExchangeOrderAnonymised', ['ticker','order_id','order_type','qty','action','price', 'qty_filled'])
 
@@ -92,6 +102,7 @@ def LunaToExchangeTransactionPair(ticker, data, submission_time, get_order_by_id
         transaction_pair =  TransactionPair(ticker, action, maker_transaction, taker_transaction, submission_time)
 
         return transaction_pair, maker_order, taker_order
+
 # ------------------------------------------------------------------------------------------------------------------------
 
 # We avoid deeply nesting named tuples as this can be painful for data transfer
