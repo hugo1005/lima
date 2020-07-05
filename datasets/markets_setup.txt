@@ -1,0 +1,13 @@
+CREATE TABLE IF NOT EXISTS prices (
+    timestamp real,
+    ticker text,
+    best_bid real,
+    best_ask real, 
+    bid_depth integer, 
+    ask_depth integer, 
+    bid_volume real, 
+    ask_volume real, 
+    n_bids integer, 
+    n_asks integer,
+    PRIMARY KEY (timestamp, ticker)
+);
