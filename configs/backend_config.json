@@ -151,6 +151,31 @@
                     "market_dynamics": {}
                 }
             }
+        },
+        "kraken": {
+            "base_currency": "GBP", 
+            "prevent_self_trades": 0,
+            "market_agents": {},
+            "credentials": {
+                "api_key_id": "m9w952edzhqfr",
+                "api_key_secret": "OcpAf1m9ZbgLbsS9LjyzoccFZAmUtOwTgOwmufMbfDE"
+            },
+            "risk_limits": {
+                "net_position": 100000,
+                "gross_position": 100000
+            },
+            "securities": {
+                "XBTEUR": {
+                    "trade_cost": 0.0025,
+                    "rebate": 0,
+                    "max_order_size": 10000,
+                    "risk_limit_multiplier": 2,
+                    "resolution": 2,
+                    "contract_point_value": 1,
+                    "quote_currency": "GBP",
+                    "market_dynamics": {}
+                }
+            }
         }
     }
 }
