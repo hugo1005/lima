@@ -13,7 +13,7 @@ from scipy.stats import gamma
 from math import log10, floor
 
 from shared import LOB, OrderSpec, ExchangeOrder, Transaction, TransactionPair, ExchangeOrderAnon, TapeTransaction, MarketBook, TickerPnL, TraderRisk, TenderOrder, RiskLimits
-from shared import to_named_tuple, update_named_tuple, named_tuple_to_dict, LunaToExchangeOrder, LunaToExchangeTransactionPair, KrakenToExchangeOrder, KrakenToExchangeTransactionPair
+from shared import to_named_tuple, update_named_tuple, named_tuple_to_dict, LunaToExchangeOrder, LunaToExchangeTransactionPair, KrakenToExchangeOrder
 # from traders import GiveawayTrader
 
 from aiodebug import log_slow_callbacks
@@ -633,6 +633,7 @@ class LunaOrderbook:
 
                             self._tape += latest_transactions
 
+                        if updates['create_update'] or updates['delete_update'] or updates['trade_updates']:
                             # Broadcast new limit order books
                             async def broadcast_to_trader(tid):
                                 # Optimised to not send back everything
@@ -720,22 +721,25 @@ class KrakenHalfOrderbook:
         order_dict = dict(order._asdict())
         return dict(to_named_tuple(order_dict, ExchangeOrderAnon)._asdict())
 
-    def add_order(self, order):
-        # Update Best Quote
-        if order.order_type == "MKT":
-            self._market_order_q.append(order)
-            self.anonymised_market_order_q.append(self.anonymise(order))
-
-        elif order.order_type == "LMT":
+    def update_orders(self, order):
+        if order.order_type == "LMT":
             if order.price not in self.lob:
-                self.lob[order.price] = [] 
-                self.anonymised_lob[order.price] = []
+                self.book_volume += order.qty
+            else:
+                self.book_volume += order.qty - self.lob[order.price][0].qty
 
-            self.lob[order.price].append(order)
-            self.anonymised_lob[order.price].append(self.anonymise(order))
-            self.book_volume += order.qty
-        else: 
-            warnings.warn('An unkown order type [%s] was used and could not be executed' % order.action, UserWarning)
+            # if qty for a price is 0, remove the price level from the book
+            if order.qty == 0.0:
+                self.lob.pop(order.price, None)
+                self.anonymised_lob.pop(order.price, None)
+            else:
+                self.lob[order.price] = [order]
+                self.anonymised_lob[order.price] = [self.anonymise(order)]
+        else:
+            if order.order_type == "MKT":
+                warnings.warn('MKT order type is not supported for Kraken.', UserWarning)
+            else:
+                warnings.warn('An unknown order type [%s] was used and could not be executed' % order.action, UserWarning)
 
         self.recompute_stats()
 
@@ -754,42 +758,6 @@ class KrakenHalfOrderbook:
             order_match = list(filter(lambda x: x.order_id == order_id, self._market_order_q))
 
         return order_match[0] if len(order_match) > 0 else None
-
-    def cancel_order(self, order_spec):
-        order_id = order_spec.order_id
-        price = order_spec.price
-
-        if order_spec.order_type == 'LMT':
-            # Edge case (Order already processed)
-            if price not in self.lob:
-                return False
-
-            # Remove the order
-            order = self.get_order(order_id, 'LMT', price)
-            if type(order) != type(None):
-                self.lob[price] = list(filter(lambda x: x.order_id != order_id, self.lob[price]))
-                self.anonymised_lob[price] = list(filter(lambda x: x['order_id'] != order_id, self.anonymised_lob[price]))
-                
-                self.book_volume -= (order.qty - order.qty_filled) # Remove remainining liquidity
-
-                # Remove the price if there is nothing available
-                self.update_price(price)
-                return True
-            else:
-                # Edge case (Order already processed)
-                return False
-        elif order_spec.order_type == 'MKT':
-            order = self.get_order(order_id, 'MKT')
-
-            if type(order) != type(None):
-                self._market_order_q = list(filter(lambda x: x.order_id != order_id, self._market_order_q))
-                self.anonymised_market_order_q = list(filter(lambda x: x['order_id'] != order_id, self.anonymised_market_order_q))
-                self.recompute_stats()
-                return True
-            else:
-                return False
-
-        return False
 
     def has_market_orders(self):
         return len(self._market_order_q) > 0
@@ -816,17 +784,8 @@ class KrakenHalfOrderbook:
 
     def update_best_quote(self, quote):
         if quote.order_type == "MKT":
-            if quote.qty - quote.qty_filled > 0:
-                # Update the quote
-                self._market_order_q[0] = quote
-                self.anonymised_market_order_q[0] = self.anonymise(quote)
-            else:
-                # Remove the quote if it is filled entirely
-                self._market_order_q.pop(0)
-                self.anonymised_market_order_q.pop(0)
-
-            # Update the statistics of the halfbook
-            self.recompute_stats() 
+            warnings.warn(
+                'MKT order type is not supported for Kraken.', UserWarning)
         elif quote.order_type == "LMT":
             increase_in_filled_qty = quote.qty_filled - self.lob[self.best_price][0].qty_filled
 
@@ -883,8 +842,8 @@ class KrakenOrderbook:
         self._bids = KrakenHalfOrderbook('bids')
         self._asks = KrakenHalfOrderbook('asks')
         self.get_time = time_fn  # Exchange time function
-        self._ws_uri = 'wss://ws.kraken.com'
         # since we do not trade on Kraken, we do not need to use wss://ws-auth.kraken.com
+        self._ws_uri = 'wss://ws.kraken.com'
         self.ticker = ticker
         self.credentials = credentials
 
@@ -901,9 +860,8 @@ class KrakenOrderbook:
         self._credentials = credentials
 
     async def connect(self):
+        # initialization
         async with websockets.connect(self._ws_uri, ssl = True, max_size= None) as ws:
-            # initialization
-
             # subscribe to book channel
             # get the maximum depth
             # the pair format is different than in Luno
@@ -924,154 +882,94 @@ class KrakenOrderbook:
             
             # we should also get an initial snapshot of the book
             book_snapshot = json.loads(await ws.recv())
-            assert book_snapshot['channelName'] == "book-1000", \
+            assert book_snapshot['channelName'] == "book-" + str(payload["subscription"]["depth"]), \
                 "Did not receive expected book snapshot. Response: " + str(book_snapshot)
             self.build_book(book_snapshot)
 
-            # subscribe to trade channel 
-            payload = {
-                "event": "subscribe",
-                "pair": [self.ticker[:3] + "/" + self.ticker[3:]],
-                "subscription": {
-                    "name": "trade"
-                }
-            }
-            await ws.send(json.dumps(payload))
-            # we should get a confirmation about subscription
-            subscription_status = json.loads(await ws.recv())
-            assert subscription_status['status'] == "subscribed" and subscription_status['channelName'] == "trade", \
-                "Did not successfully subscribe to trade channel. Response: " + \
-                str(subscription_status)
+            # broadcast the initial snapshot of the order book to the traders and observers
+            async def broadcast_to_trader_init(tid):
+                    # Optimised to not send back everything
+                await self._traders[tid].send(json.dumps({'type': 'LOBS', 'data': self.get_books()}))
+                await self._traders[tid].send(json.dumps({'type': 'tape', 'data': self.get_tape()}))
 
-        while True: # For reconnection
+            await asyncio.gather(*[broadcast_to_trader_init(tid) for tid in self._traders])
+
+            # Broadcast new book and tape to observers
+            async def broadcast_to_observer_init(oid):
+                await self._observers[oid].send(json.dumps({'type': 'LOBS', 'data': self.get_books(order_type='LMT')}))
+                # Only observers may recieve the market book for debug purposes
+                await self._observers[oid].send(json.dumps({'type': 'MBS', 'data': self.get_books(order_type='MKT')}))
+                await self._observers[oid].send(json.dumps({'type': 'tape', 'data': self.get_tape()}))
+
+            await asyncio.gather(*[broadcast_to_observer_init(oid) for oid in self._observers])
+
+        # receive updates
+        while True:
+            # in case of failures with subscription, we could unsubscribe and subscribe again here
+            # we currently do not assume connection failures can happen
+            # this could be checked as lack of updates for some time, incorrect checksum, etc.
+
+            # we would return to the outer while loop in case of failures
             async with websockets.connect(self._ws_uri, ssl = True, max_size= None) as ws:
-                # handle updates
-
-                # TODO: this whole part will need many changes
-                
-                await ws.send(json.dumps(self._credentials))
-
-                # modify this part to get the data for a ticker - for building a book
-                await ws.send(json.dumps(self._credentials))
-                # ws.recv() returns the answer
-                self.build_book(json.loads(await ws.recv()))
-                
-                async def broadcast_to_trader_init(tid):
-                     # Optimised to not send back everything
-                    await self._traders[tid].send(json.dumps({'type': 'LOBS', 'data': self.get_books()}))
-                    await self._traders[tid].send(json.dumps({'type': 'tape', 'data': self.get_tape()}))
-
-                await asyncio.gather(*[broadcast_to_trader_init(tid) for tid in self._traders])
-
-                # Broadcast new book and tape to observers
-                async def broadcast_to_observer_init(oid):
-                    await self._observers[oid].send(json.dumps({'type': 'LOBS', 'data': self.get_books(order_type='LMT')}))
-                    # Only observers may recieve the market book for debug purposes
-                    await self._observers[oid].send(json.dumps({'type': 'MBS', 'data': self.get_books(order_type='MKT')}))
-                    await self._observers[oid].send(json.dumps({'type': 'tape', 'data': self.get_tape()}))
-
-                await asyncio.gather(*[broadcast_to_observer_init(oid) for oid in self._observers])
-
-                seq = -1
-
                 while True:
                     updates = json.loads(await ws.recv())
-                    
-                    if type(updates) == type(" "):
-                        continue
 
-                    # Reconnect if out of sequence
-                    if float(updates['sequence']) > seq:
-                        break
-                    else:
-                        seq = float(updates['sequence'])
+                    # make sure this is not a general message and that it relates to the book channel
+                    if "event" not in updates and if updates[2][:4] == "book":
+                        # update the book
+                        self.update_book(updates)
 
-                        # Trade Updates
-                        if updates['create_update']:
-                            self.add_order(KrakenToExchangeOrder(self.ticker, updates['create_update'], self.get_time(), self.get_trader_id))
-                        if updates['delete_update']:
-                            self.cancel_order_with_id(updates['delete_update']['order_id'])
-                        if updates['trade_updates']:
-                            latest_transactions = []
+                        # Broadcast new limit order books
+                        async def broadcast_to_trader(tid):
+                            # Optimised to not send back everything
+                            await self._traders[tid].send(json.dumps({'type': 'LOBS', 'data': self.get_books(tickers = [self.ticker])}))
+                            await self._traders[tid].send(json.dumps({'type': 'tape', 'data': self.get_tape(transactions = latest_transactions)}))
 
-                            for trade_update in updates['trade_updates']:
-                                # Internal Server Side Auction
-                                transaction_pair, maker_order, taker_order = KrakenToExchangeTransactionPair(self.ticker, updates['trade_update'], self.get_time(), self.get_order_by_id, self.get_trader_id)
-                                
-                                # Update Internal Order States
-                                maker_order = update_named_tuple(maker_order, {'qty_filled': maker_order.qty_filled + transaction_pair.maker_transaction.qty_filled})
-                                maker_order_hafbook = self._asks if maker_order.action == "SELL" else self._bids
-                                maker_order_hafbook.update_best_quote(maker_order)
+                        await asyncio.gather(*[broadcast_to_trader(tid) for tid in self._traders])
 
-                                # Update taker_order (if it was also a limit order - we don't have access to the market book)
-                                if taker_order.order_type == 'LMT': 
-                                    taker_order = update_named_tuple(taker_order, {'qty_filled': taker_order.qty_filled + transaction_pair.maker_transaction.qty_filled})
-                                    taker_order_hafbook = self._asks if taker_order.action == "SELL" else self._bids
-                                    taker_order_hafbook.update_best_quote(taker_order)
+                        # Broadcast new book and tape to observers
+                        async def broadcast_to_observer(oid):
+                            await self._observers[oid].send(json.dumps({'type': 'LOBS', 'data': self.get_books(tickers = [self.ticker], order_type='LMT')}))
+                            # Only observers may recieve the market book for debug purposes
+                            await self._observers[oid].send(json.dumps({'type': 'MBS', 'data': self.get_books(tickers = [self.ticker], order_type='MKT')}))
+                            await self._observers[oid].send(json.dumps({'type': 'tape', 'data': self.get_tape(transactions = latest_transactions)}))
 
-                                # Perform Accounting Operations
-                                # It makes sense to do them on the back end so we keep all the PnL Code for all traders in the one place
-                                # Otherwise we need the backend to request from all traders and then pass from backend to frontend
-                                # which is unecessary and more error prone and more prone to user meddling.
-                                
-                                # Note we make sure to update the pnls first and then notify the fills
-                                # otherwise when we assert an order has been executed there will be a network delay
-                                # in assessing risk which would lead to messy sleep statement workarounds
-                                # Note all traders will have their pnl marked to market by this function
-                                await self.update_pnls(transaction_pair)
-                                maker_id, taker_id = transaction_pair.maker.tid, transaction_pair.taker.tid
+                        await asyncio.gather(*[broadcast_to_observer(oid) for oid in self._observers])
 
-                                # Distribute the transaction confirmations to the 2 parties
-                                if self.trader_still_connected(maker_id):
-                                    maker_ws = self._traders[maker_id]
-                                    await maker_ws.send(json.dumps({'type': 'order_fill', 'data': named_tuple_to_dict(transaction_pair.maker)}))
+                        # We call mark to market again at to make sure 
+                        # we have caught any no transacted market moving limits
+                        await self.mark_traders_to_market(self.ticker)
 
-                                if self.trader_still_connected(taker_id):
-                                    taker_ws = self._traders[taker_id]
-                                    await taker_ws.send(json.dumps({'type': 'order_fill', 'data': named_tuple_to_dict(transaction_pair.taker)}))
-
-                                # Broadcast transaction to our traders
-                                latest_transactions.append(transaction_pair)
-
-                            self._tape += latest_transactions
-
-                            # Broadcast new limit order books
-                            async def broadcast_to_trader(tid):
-                                # Optimised to not send back everything
-                                await self._traders[tid].send(json.dumps({'type': 'LOBS', 'data': self.get_books(tickers = [self.ticker])}))
-                                await self._traders[tid].send(json.dumps({'type': 'tape', 'data': self.get_tape(transactions = latest_transactions)}))
-
-                            await asyncio.gather(*[broadcast_to_trader(tid) for tid in self._traders])
-
-                            # Broadcast new book and tape to observers
-                            async def broadcast_to_observer(oid):
-                                await self._observers[oid].send(json.dumps({'type': 'LOBS', 'data': self.get_books(tickers = [self.ticker], order_type='LMT')}))
-                                # Only observers may recieve the market book for debug purposes
-                                await self._observers[oid].send(json.dumps({'type': 'MBS', 'data': self.get_books(tickers = [self.ticker], order_type='MKT')}))
-                                await self._observers[oid].send(json.dumps({'type': 'tape', 'data': self.get_tape(transactions = latest_transactions)}))
-
-                            await asyncio.gather(*[broadcast_to_observer(oid) for oid in self._observers])
-
-                            # We call mark to market again at to make sure 
-                            # we have caught any no transacted market moving limits
-                            await self.mark_traders_to_market(self.ticker)
-
-    def build_book(self, book):
-        for order_data in book[1]['bs']:
+    def build_book(self, book_snapshot):
+        # we could use the provided timestamp - but then it would be inconsistent with Luno, so use self.get_time()
+        for order_data in book_snapshot[1]['bs']:
             # order_data is an array of price, volume, timestamp in this order
-            order_data_mod = {'id': "-1", 'type': 'BID', 'price': order_data[0], 'volume':, order_data[0]}
-            # TODO: what about the timestamp? Should we use the current time?
-            self.add_order(KrakenToExchangeOrder(self.ticker, order_data_mod, self.get_time(), self.get_trader_id))
+            # price is used as the id
+            order_data_mod = {'id': order_data[0], 'type': 'BID', 'price': order_data[0], 'volume':, order_data[1]}
+            self.update_orders(KrakenToExchangeOrder(self.ticker, order_data_mod, self.get_time(), self.get_trader_id))
 
-        for order_data in book[1]['as']:
+        for order_data in book_snapshot[1]['as']:
             # order_data is an array of price, volume, timestamp in this order
-            order_data_mod = {'id': "-1", 'type': 'ASK', 'price': order_data[0], 'volume':, order_data[0]}
-            # TODO: what about the timestamp? Should we use the current time?
-            self.add_order(KrakenToExchangeOrder(self.ticker, order_data_mod, self.get_time(), self.get_trader_id))
+            # price is used as the id
+            order_data_mod = {'id': order_data[0], 'type': 'ASK', 'price': order_data[0], 'volume':, order_data[1]}
+            self.update_orders(KrakenToExchangeOrder(self.ticker, order_data_mod, self.get_time(), self.get_trader_id))
 
-    def add_order(self, exchange_order):
+    def update_orders(self, exchange_order):
         halfbook = self._bids if exchange_order.action == "BUY" else self._asks
-        halfbook.add_order(exchange_order)
+        halfbook.update_orders(exchange_order)
+
+    def update_book(self, updates):
+        # some updates may be a republication - but that does not affect the result, so we do not check for it
+        if "a" in updates[1]:
+            for order_data in updates[1]['a']:
+                order_data_mod = {'id': order_data[0], 'type': 'ASK', 'price': order_data[0], 'volume': , order_data[1]}
+                self.update_orders(KrakenToExchangeOrder(
+                    self.ticker, order_data_mod, self.get_time(), self.get_trader_id))
+        if "b" in updates[1]:
+            for order_data in updates[1]['b']:
+                order_data_mod = {'id': order_data[0], 'type': 'BID', 'price': order_data[0], 'volume': , order_data[1]}
+                self.update_orders(KrakenToExchangeOrder(
+                    self.ticker, order_data_mod, self.get_time(), self.get_trader_id))
     
     def get_order_by_id(self, order_id):
         buy_order = self._bids.get_order(order_id, 'LMT')
@@ -1082,27 +980,6 @@ class KrakenOrderbook:
         else:
             return buy_order
 
-    def cancel_order_with_id(self, order_id):
-        buy_order = self._bids.get_order(order_id, 'LMT')
-        
-        if type(buy_order) != type(None):
-            self._bids.cancel_order(buy_order)
-        else:
-            sell_order = self._asks.get_order(order_id, 'LMT')
-
-            if type(sell_order) != type(None):
-                self._asks.cancel_order(sell_order)
-            else:
-                warnings.warn('Order of type LMT is not a cancellable as it does not exist in the book', UserWarning)
-
-    def cancel_order(self, order_spec):
-        if order_spec.order_type == "LMT" or order_spec.order_type == "MKT":
-            halfbook = self._bids if order_spec.action == "BUY" else self._asks
-            return halfbook.cancel_order(order_spec)
-        else:
-            warnings.warn('Order of type [%s] is not a cancellable type' % order_spec.action, UserWarning)
-            return False
-    
     def get_LOB(self):
         return LOB(self._bids.anonymised_lob, self._asks.anonymised_lob, self._bids.best_price, self._asks.best_price, self._bids.book_depth, self._asks.book_depth, self._bids.num_orders, self._asks.num_orders, round(self._bids.book_volume,2), round(self._asks.book_volume,2))
 
@@ -1313,7 +1190,7 @@ class Exchange:
         elif self._exchange_name == 'kraken':
             book_monitors = asyncio.gather(*[book.connect() for ticker, book in self._books.items()])
             core = asyncio.gather(book_monitors, webserver)
-            # TODO: do we need to use some handler here?
+            # do we want a handler here?
         else:
             book_monitors = asyncio.gather(*[book.connect() for ticker, book in self._books.items()])
             core = asyncio.gather(book_monitors, webserver, handler)
