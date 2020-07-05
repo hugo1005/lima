@@ -9,7 +9,7 @@
     },
     "exchanges": {
         "notes": "Base currency is a direct quote => USD will be the # CAD required to buy 1 USD",
-        "active_case": "luno",
+        "active_case": "kraken",
         "citadel_algo_case": {
             "base_currency": "CAD", 
             "simulation_end_time": 300,
