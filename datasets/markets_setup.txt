@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS prices (
     timestamp real,
+    exchange text,
     ticker text,
     best_bid real,
     best_ask real, 
@@ -9,5 +10,5 @@ CREATE TABLE IF NOT EXISTS prices (
     ask_volume real, 
     n_bids integer, 
     n_asks integer,
-    PRIMARY KEY (timestamp, ticker)
+    PRIMARY KEY (timestamp, exchange, ticker)
 );

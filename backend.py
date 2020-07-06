@@ -18,6 +18,7 @@ from shared import to_named_tuple, update_named_tuple, named_tuple_to_dict, Luna
 
 from aiodebug import log_slow_callbacks
 import logging
+import argparse
 
 # logging.basicConfig(filename='./profiles/backend.log', level=logging.INFO)
 
@@ -525,9 +526,6 @@ class LunaHalfOrderbook:
 class LunaOrderbook: 
     def __init__(self, credentials, config, time_fn, ticker, tape, traders, observers, mark_traders_to_market, get_books, get_tape, update_pnls, trader_still_connected, get_trader_id):
         # TODO: Everything here is good we just need to configure the endpoint parameters for LUNA
-
-        self._bids = LunaHalfOrderbook('bids')
-        self._asks = LunaHalfOrderbook('asks')
         self.get_time = time_fn # Exchange time function
         self._ws_uri = 'wss://ws.luno.com/api/1/stream/' + ticker
         self.ticker = ticker
@@ -549,8 +547,12 @@ class LunaOrderbook:
         while True: # For reconnection
             # ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
             # ssl_context.load_verify_locations(pathlib.Path("ssl_cert/cert.pem"))
+            self._bids = LunaHalfOrderbook('bids')
+            self._asks = LunaHalfOrderbook('asks')
 
             async with websockets.connect(self._ws_uri, ssl = True, max_size= None) as ws:
+                print("Reconnected to exchange!")
+
                 await ws.send(json.dumps(self._credentials))
                 self.build_book(json.loads(await ws.recv()))
                 
@@ -579,22 +581,23 @@ class LunaOrderbook:
                         continue
 
                     # Reconnect if out of sequence
-                    if float(updates['sequence']) > seq:
+                    if float(updates['sequence']) < seq:
+                        print(updates['sequence'], seq)
                         break
                     else:
                         seq = float(updates['sequence'])
+                        latest_transactions = []
 
+                        print('Updating LUNO...')
                         # Trade Updates
                         if updates['create_update']:
                             self.add_order(LunaToExchangeOrder(self.ticker, updates['create_update'], self.get_time(), self.get_trader_id))
                         if updates['delete_update']:
                             self.cancel_order_with_id(updates['delete_update']['order_id'])
                         if updates['trade_updates']:
-                            latest_transactions = []
-
                             for trade_update in updates['trade_updates']:
                                 # Internal Server Side Auction
-                                transaction_pair, maker_order, taker_order = LunaToExchangeTransactionPair(self.ticker, updates['trade_update'], self.get_time(), self.get_order_by_id, self.get_trader_id)
+                                transaction_pair, maker_order, taker_order = LunaToExchangeTransactionPair(self.ticker, trade_update, self.get_time(), self.get_order_by_id, self.get_trader_id)
                                 
                                 # Update Internal Order States
                                 maker_order = update_named_tuple(maker_order, {'qty_filled': maker_order.qty_filled + transaction_pair.maker_transaction.qty_filled})
@@ -633,6 +636,8 @@ class LunaOrderbook:
 
                             self._tape += latest_transactions
 
+                        if updates['trade_updates'] or updates['delete_update'] or updates['create_update']:
+                            
                             # Broadcast new limit order books
                             async def broadcast_to_trader(tid):
                                 # Optimised to not send back everything
@@ -914,9 +919,8 @@ class KrakenOrderbook:
                 # we return to the outer while loop if connection fails
                 while True:
                     updates = json.loads(await ws.recv())
-
                     # make sure this is not a general message and that it relates to the book channel
-                    if "event" not in updates and updates[2][:4] == "book":
+                    if "event" not in updates and updates[-2][:4] == "book":
                         # update the book
                         self.update_book(updates)
 
@@ -1125,12 +1129,13 @@ class MarketDynamics:
 
 class Exchange:
     # TODO: Implement Risk Rules / trade limits
-    def __init__(self, config_dir='./configs/backend_config.json'):
+    def __init__(self, exchange_name, config_dir='./configs/backend_config.json'):
         # read config dir
         with open(config_dir) as config_file:
             self._config = json.load(config_file)
         
-        self._exchange_name = self._config['exchanges']['active_case']
+        # self._exchange_name = self._config['exchanges']['active_case']
+        self._exchange_name = exchange_name
         self._case_config = self._config['exchanges'][self._exchange_name]
 
         if self._exchange_name == 'luno' or self._exchange_name == 'kraken':
@@ -1138,8 +1143,8 @@ class Exchange:
             self._client = Client(api_key_id=self._credentials['api_key_id'], api_key_secret=self._credentials['api_key_secret'])
 
         
-        self._port = self._config['websocket']['port']
-        self._ip = self._config['websocket']['ip']
+        self._port = self._case_config['websocket']['port']
+        self._ip = self._case_config['websocket']['ip']
         self._webserver_port = self._config['app-websocket']['port']
         self._webserver_ip = self._config['app-websocket']['ip']
         self._traders = {}
@@ -1222,7 +1227,8 @@ class Exchange:
                     'data':{
                         'oid': oid,
                         'exchange': self._config['exchanges'][self._exchange_name],
-                        'exchange_open_time': self._initial_time
+                        'exchange_open_time': self._initial_time,
+                        'exchange_name': self._exchange_name
                     },
                     'n_config_messages': 1 + len(config_messages)
                 }
@@ -1721,7 +1727,16 @@ class Exchange:
             return -1
                 
 
-"""
-Starts the server!
-"""
-exchange = Exchange() 
+def main():
+    parser = argparse.ArgumentParser(description='Runs exchange backend')
+    parser.add_argument("-e", '--exchange', help="select the exchange setup to run")
+
+    args = parser.parse_args()
+
+    if args.exchange:
+        exchange = Exchange(args.exchange) 
+    else:
+        print("Please specify an exchange name (--exchange or -e)")
+
+if __name__ == "__main__":
+    main()
