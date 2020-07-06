@@ -58,7 +58,7 @@ class Database:
             self.conn.commit()
             self.conn.close()
 
-    def update_prices(self, books):
+    def update_prices(self, books, exchange_name):
         try:
             c = self.conn.cursor()
             
@@ -73,9 +73,9 @@ class Database:
                 n_bids = book['n_bids']
                 n_asks = book['n_asks']
 
-                sql = """INSERT OR REPLACE INTO prices (timestamp,ticker,best_bid,best_ask, bid_depth, ask_depth, bid_volume, ask_volume, n_bids, n_asks) VALUES (?,?,?,?,?,?,?,?,?,?)"""
-
-                c.execute(sql, (timestamp, ticker, best_bid, best_ask, bid_depth, ask_depth, bid_volume, ask_volume, n_bids, n_asks))
+                sql = """INSERT OR REPLACE INTO prices (timestamp,exchange,ticker,best_bid,best_ask, bid_depth, ask_depth, bid_volume, ask_volume, n_bids, n_asks) VALUES (?,?,?,?,?,?,?,?,?,?,?)"""
+                
+                c.execute(sql, (timestamp, exchange_name, ticker, best_bid, best_ask, bid_depth, ask_depth, bid_volume, ask_volume, n_bids, n_asks))
                 
             self.conn.commit()
         except Error as e:
@@ -139,7 +139,7 @@ class WebServer:
             if is_backend:
                 print("Backend connection established")
                 # Store the data for sending to the server.
-
+                exchange_name = 'unkown'
                 # Create SQL Connection
                 with Database() as db:
                     while True:
@@ -147,18 +147,16 @@ class WebServer:
                         msg = json.loads(data)
                         msg_type = msg['type']
 
-                        if msg['type'] == 'LOBS':
-                            db.update_prices(msg['data'])
-
                         # This must always be the first message sent from the server
                         if msg_type == 'config':
                             self.backend_to_app_cache.append(data)
                             self.backend_to_app_config_cache.append(data)
                             self.n_config_messages = msg['n_config_messages']
+                            exchange_name = msg['data']['exchange_name']
+
                         # Handles caching of key setup information
                         elif len(self.backend_to_app_config_cache) < self.n_config_messages:
                             self.backend_to_app_config_cache.append(data)
-
 
                         if msg_type in self.last_posts:
                             if self.last_posts[msg_type] < time.time() - self._debounce:
@@ -168,6 +166,9 @@ class WebServer:
                         else:
                             self.backend_to_app_cache.append(data)
                             self.backend_has_updates.set()
+
+                        if msg_type == 'LOBS':
+                            db.update_prices(msg['data'], exchange_name)
             
             elif is_app: 
                 print("App [Backend State Management] connection established")

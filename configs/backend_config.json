@@ -11,6 +11,10 @@
         "notes": "Base currency is a direct quote => USD will be the # CAD required to buy 1 USD",
         "active_case": "kraken",
         "citadel_algo_case": {
+            "websocket": {
+                "port": 5678,
+                "ip": "localhost"
+            },
             "base_currency": "CAD", 
             "simulation_end_time": 300,
             "prevent_self_trades": 0,
@@ -128,6 +132,10 @@
             }
         },
         "luno": {
+            "websocket": {
+                "port": 5679,
+                "ip": "localhost"
+            },
             "base_currency": "GBP", 
             "prevent_self_trades": 0,
             "market_agents": {},
@@ -153,6 +161,10 @@
             }
         },
         "kraken": {
+            "websocket": {
+                "port": 5680,
+                "ip": "localhost"
+            },
             "base_currency": "GBP", 
             "prevent_self_trades": 0,
             "market_agents": {},
