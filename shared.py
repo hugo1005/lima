@@ -81,7 +81,7 @@ TransactionPair = namedtuple('TransactionPair', ['ticker','action','maker','take
 TapeTransaction = namedtuple('TapeTransaction', ['ticker','action', 'qty', 'price','timestamp'])
 
 # ------------------------------------------------------------------------------------------------------------------------
-LunaTransaction = namedtuple('LunaTransaction', ['base','counter','marker_order_id','taker_order_id'])
+LunaTransaction = namedtuple('LunaTransaction', ['base','counter','maker_order_id','taker_order_id'])
 
 def LunaToExchangeTransactionPair(ticker, data, submission_time, get_order_by_id, get_trader_id):
     luna_transaction = to_named_tuple(data, LunaTransaction)
