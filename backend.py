@@ -599,13 +599,13 @@ class LunaOrderbook:
                                 transaction_pair, maker_order, taker_order = LunaToExchangeTransactionPair(self.ticker, trade_update, self.get_time(), self.get_order_by_id, self.get_trader_id)
                                 
                                 # Update Internal Order States
-                                maker_order = update_named_tuple(maker_order, {'qty_filled': maker_order.qty_filled + transaction_pair.maker.qty_filled})
+                                maker_order = update_named_tuple(maker_order, {'qty_filled': maker_order.qty_filled + transaction_pair.maker.qty})
                                 maker_order_hafbook = self._asks if maker_order.action == "SELL" else self._bids
                                 maker_order_hafbook.update_best_quote(maker_order)
 
                                 # Update taker_order (if it was also a limit order - we don't have access to the market book)
                                 if taker_order.order_type == 'LMT': 
-                                    taker_order = update_named_tuple(taker_order, {'qty_filled': taker_order.qty_filled + transaction_pair.maker.qty_filled})
+                                    taker_order = update_named_tuple(taker_order, {'qty_filled': taker_order.qty_filled + transaction_pair.maker.qty})
                                     taker_order_hafbook = self._asks if taker_order.action == "SELL" else self._bids
                                     taker_order_hafbook.update_best_quote(taker_order)
 
