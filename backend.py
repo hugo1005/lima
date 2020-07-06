@@ -588,7 +588,6 @@ class LunaOrderbook:
                         seq = float(updates['sequence'])
                         latest_transactions = []
 
-                        print('Updating LUNO...')
                         # Trade Updates
                         if updates['create_update']:
                             self.add_order(LunaToExchangeOrder(self.ticker, updates['create_update'], self.get_time(), self.get_trader_id))
