@@ -949,6 +949,7 @@ class KrakenOrderbook:
                             await self.mark_traders_to_market(self.ticker)
             except:
                 print("Rebooting connection due to unexpected closure!")
+                time.sleep(10) # Wait for connection to be resetablished
 
     def build_book(self, book_snapshot):
         # we could use the provided timestamp - but then it would be inconsistent with Luno, so use self.get_time()
