@@ -599,13 +599,13 @@ class LunaOrderbook:
                                 transaction_pair, maker_order, taker_order = LunaToExchangeTransactionPair(self.ticker, trade_update, self.get_time(), self.get_order_by_id, self.get_trader_id)
                                 
                                 # Update Internal Order States
-                                maker_order = update_named_tuple(maker_order, {'qty_filled': maker_order.qty_filled + transaction_pair.maker_transaction.qty_filled})
+                                maker_order = update_named_tuple(maker_order, {'qty_filled': maker_order.qty_filled + transaction_pair.maker.qty})
                                 maker_order_hafbook = self._asks if maker_order.action == "SELL" else self._bids
                                 maker_order_hafbook.update_best_quote(maker_order)
 
                                 # Update taker_order (if it was also a limit order - we don't have access to the market book)
                                 if taker_order.order_type == 'LMT': 
-                                    taker_order = update_named_tuple(taker_order, {'qty_filled': taker_order.qty_filled + transaction_pair.maker_transaction.qty_filled})
+                                    taker_order = update_named_tuple(taker_order, {'qty_filled': taker_order.qty_filled + transaction_pair.maker.qty})
                                     taker_order_hafbook = self._asks if taker_order.action == "SELL" else self._bids
                                     taker_order_hafbook.update_best_quote(taker_order)
 
@@ -1520,14 +1520,16 @@ class Exchange:
         taker_action = transaction_pair.action
         maker_action = 'BUY' if taker_action == 'SELL' else 'SELL'
         
-        if transaction_pair.maker.tid == transaction_pair.taker.tid:
+        if transaction_pair.maker.tid == transaction_pair.taker.tid and transaction_pair.maker.tid != -1:
             # Trading with oneself is a way to maniupalte realised + unrealised pnls
             # and is a suspect transaction
             # These transactions are irrelevant and misleading and thus reccorded and omitted from calculations
             self._suspect_trade_records[transaction_pair.maker.tid].append(transaction_pair)
         else:
-            self.update_trader_transaction_record(transaction_pair.maker, maker_action, transaction_pair.ticker)
-            self.update_trader_transaction_record(transaction_pair.taker, taker_action, transaction_pair.ticker)
+            if transaction_pair.maker.tid != -1:
+                self.update_trader_transaction_record(transaction_pair.maker, maker_action, transaction_pair.ticker)
+            if transaction_pair.taker.tid != -1:
+                self.update_trader_transaction_record(transaction_pair.taker, taker_action, transaction_pair.ticker)
 
         # Now update the pnl's of every trader to ensure mark to market
         # I've placed this here to ensure robust timely reporting
