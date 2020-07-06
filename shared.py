@@ -86,7 +86,7 @@ LunaTransaction = namedtuple('LunaTransaction', ['base','counter','maker_order_i
 def LunaToExchangeTransactionPair(ticker, data, submission_time, get_order_by_id, get_trader_id):
     luna_transaction = to_named_tuple(data, LunaTransaction)
     
-    maker_oid = luna_transaction.marker_order_id
+    maker_oid = luna_transaction.maker_order_id
     taker_oid = luna_transaction.taker_order_id
     qty_filled = float(luna_transaction.base) # We will always want the base currency quantity cause we only care about how much we spent in the base eg. EUR/BTC with base = EUR
 
