@@ -61,14 +61,14 @@ def LunaToExchangeOrder(ticker, data, submission_time, get_trader_id):
         return ExchangeOrder(ticker, tid, luna_create_order.id, 'LMT', float(luna_create_order.volume), action, float(luna_create_order.price), 0, submission_time)
     
 # ------------------------------------------------------------------------------------------------------------------------
-KrakenCreateOrder = namedtuple('KrakenCreateOrder', ['id','type','price','volume'])
+KrakenCreateOrder = namedtuple('KrakenCreateOrder', ['order_id','type','price','volume'])
 
 def KrakenToExchangeOrder(ticker, data, submission_time, get_trader_id):
     kraken_create_order = to_named_tuple(data, KrakenCreateOrder)
     action = 'BUY' if kraken_create_order.type == 'BID' else 'SELL'
-    tid = get_trader_id(kraken_create_order.id) # Either -1 or one of ours
+    tid = get_trader_id(kraken_create_order.order_id) # Either -1 or one of ours
 
-    return ExchangeOrder(ticker, tid, kraken_create_order.id, 'LMT', float(kraken_create_order.volume), action, float(kraken_create_order.price), 0, submission_time)
+    return ExchangeOrder(ticker, tid, kraken_create_order.order_id, 'LMT', float(kraken_create_order.volume), action, float(kraken_create_order.price), 0, submission_time)
 
 # ------------------------------------------------------------------------------------------------------------------------
 
