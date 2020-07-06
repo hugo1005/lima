@@ -596,7 +596,12 @@ class LunaOrderbook:
                         if updates['trade_updates']:
                             for trade_update in updates['trade_updates']:
                                 # Internal Server Side Auction
-                                transaction_pair, maker_order, taker_order = LunaToExchangeTransactionPair(self.ticker, trade_update, self.get_time(), self.get_order_by_id, self.get_trader_id)
+                                result = LunaToExchangeTransactionPair(self.ticker, trade_update, self.get_time(), self.get_order_by_id, self.get_trader_id)
+
+                                if type(result) == type(None):
+                                    continue
+
+                                transaction_pair, maker_order, taker_order = result
                                 
                                 # Update Internal Order States
                                 maker_order = update_named_tuple(maker_order, {'qty_filled': maker_order.qty_filled + transaction_pair.maker.qty})
