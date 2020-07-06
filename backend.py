@@ -545,123 +545,127 @@ class LunaOrderbook:
 
     async def connect(self):
         while True: # For reconnection
-            # ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
-            # ssl_context.load_verify_locations(pathlib.Path("ssl_cert/cert.pem"))
-            self._bids = LunaHalfOrderbook('bids')
-            self._asks = LunaHalfOrderbook('asks')
+            try:
+                # ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+                # ssl_context.load_verify_locations(pathlib.Path("ssl_cert/cert.pem"))
+                self._bids = LunaHalfOrderbook('bids')
+                self._asks = LunaHalfOrderbook('asks')
 
-            async with websockets.connect(self._ws_uri, ssl = True, max_size= None) as ws:
-                print("Reconnected to exchange!")
+                async with websockets.connect(self._ws_uri, ssl = True, max_size= None) as ws:
+                    print("Reconnected to exchange!")
 
-                await ws.send(json.dumps(self._credentials))
-                self.build_book(json.loads(await ws.recv()))
-                
-                async def broadcast_to_trader_init(tid):
-                     # Optimised to not send back everything
-                    await self._traders[tid].send(json.dumps({'type': 'LOBS', 'data': self.get_books()}))
-                    await self._traders[tid].send(json.dumps({'type': 'tape', 'data': self.get_tape()}))
-
-                await asyncio.gather(*[broadcast_to_trader_init(tid) for tid in self._traders])
-
-                # Broadcast new book and tape to observers
-                async def broadcast_to_observer_init(oid):
-                    await self._observers[oid].send(json.dumps({'type': 'LOBS', 'data': self.get_books(order_type='LMT')}))
-                    # Only observers may recieve the market book for debug purposes
-                    await self._observers[oid].send(json.dumps({'type': 'MBS', 'data': self.get_books(order_type='MKT')}))
-                    await self._observers[oid].send(json.dumps({'type': 'tape', 'data': self.get_tape()}))
-
-                await asyncio.gather(*[broadcast_to_observer_init(oid) for oid in self._observers])
-
-                seq = -1
-
-                while True:
-                    updates = json.loads(await ws.recv())
+                    await ws.send(json.dumps(self._credentials))
+                    self.build_book(json.loads(await ws.recv()))
                     
-                    if type(updates) == type(" "):
-                        continue
+                    async def broadcast_to_trader_init(tid):
+                        # Optimised to not send back everything
+                        await self._traders[tid].send(json.dumps({'type': 'LOBS', 'data': self.get_books()}))
+                        await self._traders[tid].send(json.dumps({'type': 'tape', 'data': self.get_tape()}))
 
-                    # Reconnect if out of sequence
-                    if float(updates['sequence']) < seq:
-                        print(updates['sequence'], seq)
-                        break
-                    else:
-                        seq = float(updates['sequence'])
-                        latest_transactions = []
+                    await asyncio.gather(*[broadcast_to_trader_init(tid) for tid in self._traders])
 
-                        # Trade Updates
-                        if updates['create_update']:
-                            self.add_order(LunaToExchangeOrder(self.ticker, updates['create_update'], self.get_time(), self.get_trader_id))
-                        if updates['delete_update']:
-                            self.cancel_order_with_id(updates['delete_update']['order_id'])
-                        if updates['trade_updates']:
-                            for trade_update in updates['trade_updates']:
-                                # Internal Server Side Auction
-                                result = LunaToExchangeTransactionPair(self.ticker, trade_update, self.get_time(), self.get_order_by_id, self.get_trader_id)
+                    # Broadcast new book and tape to observers
+                    async def broadcast_to_observer_init(oid):
+                        await self._observers[oid].send(json.dumps({'type': 'LOBS', 'data': self.get_books(order_type='LMT')}))
+                        # Only observers may recieve the market book for debug purposes
+                        await self._observers[oid].send(json.dumps({'type': 'MBS', 'data': self.get_books(order_type='MKT')}))
+                        await self._observers[oid].send(json.dumps({'type': 'tape', 'data': self.get_tape()}))
 
-                                if type(result) == type(None):
-                                    continue
+                    await asyncio.gather(*[broadcast_to_observer_init(oid) for oid in self._observers])
 
-                                transaction_pair, maker_order, taker_order = result
+                    seq = -1
+
+                    while True:
+                        updates = json.loads(await ws.recv())
+                        
+                        if type(updates) == type(" "):
+                            continue
+
+                        # Reconnect if out of sequence
+                        if float(updates['sequence']) < seq:
+                            print(updates['sequence'], seq)
+                            break
+                        else:
+                            seq = float(updates['sequence'])
+                            latest_transactions = []
+
+                            # Trade Updates
+                            if updates['create_update']:
+                                self.add_order(LunaToExchangeOrder(self.ticker, updates['create_update'], self.get_time(), self.get_trader_id))
+                            if updates['delete_update']:
+                                self.cancel_order_with_id(updates['delete_update']['order_id'])
+                            if updates['trade_updates']:
+                                for trade_update in updates['trade_updates']:
+                                    # Internal Server Side Auction
+                                    result = LunaToExchangeTransactionPair(self.ticker, trade_update, self.get_time(), self.get_order_by_id, self.get_trader_id)
+
+                                    if type(result) == type(None):
+                                        continue
+
+                                    transaction_pair, maker_order, taker_order = result
+                                    
+                                    # Update Internal Order States
+                                    maker_order = update_named_tuple(maker_order, {'qty_filled': maker_order.qty_filled + transaction_pair.maker.qty})
+                                    maker_order_hafbook = self._asks if maker_order.action == "SELL" else self._bids
+                                    maker_order_hafbook.update_best_quote(maker_order)
+
+                                    # Update taker_order (if it was also a limit order - we don't have access to the market book)
+                                    if taker_order.order_type == 'LMT': 
+                                        taker_order = update_named_tuple(taker_order, {'qty_filled': taker_order.qty_filled + transaction_pair.maker.qty})
+                                        taker_order_hafbook = self._asks if taker_order.action == "SELL" else self._bids
+                                        taker_order_hafbook.update_best_quote(taker_order)
+
+                                    # Perform Accounting Operations
+                                    # It makes sense to do them on the back end so we keep all the PnL Code for all traders in the one place
+                                    # Otherwise we need the backend to request from all traders and then pass from backend to frontend
+                                    # which is unecessary and more error prone and more prone to user meddling.
+                                    
+                                    # Note we make sure to update the pnls first and then notify the fills
+                                    # otherwise when we assert an order has been executed there will be a network delay
+                                    # in assessing risk which would lead to messy sleep statement workarounds
+                                    # Note all traders will have their pnl marked to market by this function
+                                    await self.update_pnls(transaction_pair)
+                                    maker_id, taker_id = transaction_pair.maker.tid, transaction_pair.taker.tid
+
+                                    # Distribute the transaction confirmations to the 2 parties
+                                    if self.trader_still_connected(maker_id):
+                                        maker_ws = self._traders[maker_id]
+                                        await maker_ws.send(json.dumps({'type': 'order_fill', 'data': named_tuple_to_dict(transaction_pair.maker)}))
+
+                                    if self.trader_still_connected(taker_id):
+                                        taker_ws = self._traders[taker_id]
+                                        await taker_ws.send(json.dumps({'type': 'order_fill', 'data': named_tuple_to_dict(transaction_pair.taker)}))
+
+                                    # Broadcast transaction to our traders
+                                    latest_transactions.append(transaction_pair)
+
+                                self._tape += latest_transactions
+
+                            if updates['trade_updates'] or updates['delete_update'] or updates['create_update']:
                                 
-                                # Update Internal Order States
-                                maker_order = update_named_tuple(maker_order, {'qty_filled': maker_order.qty_filled + transaction_pair.maker.qty})
-                                maker_order_hafbook = self._asks if maker_order.action == "SELL" else self._bids
-                                maker_order_hafbook.update_best_quote(maker_order)
+                                # Broadcast new limit order books
+                                async def broadcast_to_trader(tid):
+                                    # Optimised to not send back everything
+                                    await self._traders[tid].send(json.dumps({'type': 'LOBS', 'data': self.get_books(tickers = [self.ticker])}))
+                                    await self._traders[tid].send(json.dumps({'type': 'tape', 'data': self.get_tape(transactions = latest_transactions)}))
 
-                                # Update taker_order (if it was also a limit order - we don't have access to the market book)
-                                if taker_order.order_type == 'LMT': 
-                                    taker_order = update_named_tuple(taker_order, {'qty_filled': taker_order.qty_filled + transaction_pair.maker.qty})
-                                    taker_order_hafbook = self._asks if taker_order.action == "SELL" else self._bids
-                                    taker_order_hafbook.update_best_quote(taker_order)
+                                await asyncio.gather(*[broadcast_to_trader(tid) for tid in self._traders])
 
-                                # Perform Accounting Operations
-                                # It makes sense to do them on the back end so we keep all the PnL Code for all traders in the one place
-                                # Otherwise we need the backend to request from all traders and then pass from backend to frontend
-                                # which is unecessary and more error prone and more prone to user meddling.
-                                
-                                # Note we make sure to update the pnls first and then notify the fills
-                                # otherwise when we assert an order has been executed there will be a network delay
-                                # in assessing risk which would lead to messy sleep statement workarounds
-                                # Note all traders will have their pnl marked to market by this function
-                                await self.update_pnls(transaction_pair)
-                                maker_id, taker_id = transaction_pair.maker.tid, transaction_pair.taker.tid
+                                # Broadcast new book and tape to observers
+                                async def broadcast_to_observer(oid):
+                                    await self._observers[oid].send(json.dumps({'type': 'LOBS', 'data': self.get_books(tickers = [self.ticker], order_type='LMT')}))
+                                    # Only observers may recieve the market book for debug purposes
+                                    await self._observers[oid].send(json.dumps({'type': 'MBS', 'data': self.get_books(tickers = [self.ticker], order_type='MKT')}))
+                                    await self._observers[oid].send(json.dumps({'type': 'tape', 'data': self.get_tape(transactions = latest_transactions)}))
 
-                                # Distribute the transaction confirmations to the 2 parties
-                                if self.trader_still_connected(maker_id):
-                                    maker_ws = self._traders[maker_id]
-                                    await maker_ws.send(json.dumps({'type': 'order_fill', 'data': named_tuple_to_dict(transaction_pair.maker)}))
+                                await asyncio.gather(*[broadcast_to_observer(oid) for oid in self._observers])
 
-                                if self.trader_still_connected(taker_id):
-                                    taker_ws = self._traders[taker_id]
-                                    await taker_ws.send(json.dumps({'type': 'order_fill', 'data': named_tuple_to_dict(transaction_pair.taker)}))
-
-                                # Broadcast transaction to our traders
-                                latest_transactions.append(transaction_pair)
-
-                            self._tape += latest_transactions
-
-                        if updates['trade_updates'] or updates['delete_update'] or updates['create_update']:
-                            
-                            # Broadcast new limit order books
-                            async def broadcast_to_trader(tid):
-                                # Optimised to not send back everything
-                                await self._traders[tid].send(json.dumps({'type': 'LOBS', 'data': self.get_books(tickers = [self.ticker])}))
-                                await self._traders[tid].send(json.dumps({'type': 'tape', 'data': self.get_tape(transactions = latest_transactions)}))
-
-                            await asyncio.gather(*[broadcast_to_trader(tid) for tid in self._traders])
-
-                            # Broadcast new book and tape to observers
-                            async def broadcast_to_observer(oid):
-                                await self._observers[oid].send(json.dumps({'type': 'LOBS', 'data': self.get_books(tickers = [self.ticker], order_type='LMT')}))
-                                # Only observers may recieve the market book for debug purposes
-                                await self._observers[oid].send(json.dumps({'type': 'MBS', 'data': self.get_books(tickers = [self.ticker], order_type='MKT')}))
-                                await self._observers[oid].send(json.dumps({'type': 'tape', 'data': self.get_tape(transactions = latest_transactions)}))
-
-                            await asyncio.gather(*[broadcast_to_observer(oid) for oid in self._observers])
-
-                            # We call mark to market again at to make sure 
-                            # we have caught any no transacted market moving limits
-                            await self.mark_traders_to_market(self.ticker)
+                                # We call mark to market again at to make sure 
+                                # we have caught any no transacted market moving limits
+                                await self.mark_traders_to_market(self.ticker)
+            except:
+                print("Rebooting connection due to unexpected closure!")
+                time.sleep(10) # Wait for connection to be resetablished
 
     def build_book(self, book):
         for order_data in book['bids']:
