@@ -73,9 +73,30 @@ class Database:
                 n_bids = book['n_bids']
                 n_asks = book['n_asks']
 
-                sql = """INSERT OR REPLACE INTO prices (timestamp,exchange,ticker,best_bid,best_ask, bid_depth, ask_depth, bid_volume, ask_volume, n_bids, n_asks) VALUES (?,?,?,?,?,?,?,?,?,?,?)"""
+                sql = """INSERT OR REPLACE INTO prices (timestamp,exchange,ticker,best_bid,best_ask, bid_depth, ask_depth, bid_volume, ask_volume, n_bids, n_asks, l2_ask, l3_ask, l4_ask, l5_ask, l2_bid, l3_bid, l4_bid, l5_bid,l2_ask_vol, l3_ask_vol, l4_ask_vol, l5_ask_vol, l2_bid_vol, l3_bid_vol, l4_bid_vol, l5_bid_vol) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"""
                 
-                c.execute(sql, (timestamp, exchange_name, ticker, best_bid, best_ask, bid_depth, ask_depth, bid_volume, ask_volume, n_bids, n_asks))
+                bid_prices = list(sorted(book['bids'].keys()))
+                ask_prices = list(reversed(sorted(book['asks'].keys())))
+
+                l2_ask = ask_prices[1]
+                l3_ask = ask_prices[2]
+                l4_ask = ask_prices[3]
+                l5_ask = ask_prices[4]
+                l2_bid = bid_prices[1]
+                l3_bid = bid_prices[2]
+                l4_bid = bid_prices[3]
+                l5_bid = bid_prices[4]
+
+                l2_ask_vol = sum([order['qty'] - order['qty_filled'] for order in book['asks'][l2_ask]])
+                l3_ask_vol = sum([order['qty'] - order['qty_filled'] for order in book['asks'][l3_ask]])
+                l4_ask_vol = sum([order['qty'] - order['qty_filled'] for order in book['asks'][l4_ask]])
+                l5_ask_vol = sum([order['qty'] - order['qty_filled'] for order in book['asks'][l5_ask]])
+                l2_bid_vol = sum([order['qty'] - order['qty_filled'] for order in book['bids'][l2_bid]]) 
+                l3_bid_vol = sum([order['qty'] - order['qty_filled'] for order in book['bids'][l3_bid]])
+                l4_bid_vol = sum([order['qty'] - order['qty_filled'] for order in book['bids'][l4_bid]])
+                l5_bid_vol = sum([order['qty'] - order['qty_filled'] for order in book['bids'][l5_bid]])
+
+                c.execute(sql, (timestamp, exchange_name, ticker, best_bid, best_ask, bid_depth, ask_depth, bid_volume, ask_volume, n_bids, n_asks,l2_ask, l3_ask, l4_ask, l5_ask, l2_bid, l3_bid, l4_bid, l5_bid,l2_ask_vol, l3_ask_vol, l4_ask_vol, l5_ask_vol, l2_bid_vol, l3_bid_vol, l4_bid_vol, l5_bid_vol))
                 
             self.conn.commit()
         except Error as e:
