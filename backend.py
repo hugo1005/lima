@@ -1520,14 +1520,16 @@ class Exchange:
         taker_action = transaction_pair.action
         maker_action = 'BUY' if taker_action == 'SELL' else 'SELL'
         
-        if transaction_pair.maker.tid == transaction_pair.taker.tid:
+        if transaction_pair.maker.tid == transaction_pair.taker.tid and transaction_pair.maker.tid != -1:
             # Trading with oneself is a way to maniupalte realised + unrealised pnls
             # and is a suspect transaction
             # These transactions are irrelevant and misleading and thus reccorded and omitted from calculations
             self._suspect_trade_records[transaction_pair.maker.tid].append(transaction_pair)
         else:
-            self.update_trader_transaction_record(transaction_pair.maker, maker_action, transaction_pair.ticker)
-            self.update_trader_transaction_record(transaction_pair.taker, taker_action, transaction_pair.ticker)
+            if transaction_pair.maker.tid != -1:
+                self.update_trader_transaction_record(transaction_pair.maker, maker_action, transaction_pair.ticker)
+            if transaction_pair.taker.tid != -1:
+                self.update_trader_transaction_record(transaction_pair.taker, taker_action, transaction_pair.ticker)
 
         # Now update the pnl's of every trader to ensure mark to market
         # I've placed this here to ensure robust timely reporting
