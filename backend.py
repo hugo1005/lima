@@ -948,13 +948,13 @@ class KrakenOrderbook:
         for order_data in book_snapshot[1]['bs']:
             # order_data is an array of price, volume, timestamp in this order
             # price is used as the id
-            order_data_mod = {'id': order_data[0], 'type': 'BID', 'price': order_data[0], 'volume': order_data[1]}
+            order_data_mod = {'order_id': order_data[0], 'type': 'BID', 'price': order_data[0], 'volume': order_data[1]}
             self.update_orders(KrakenToExchangeOrder(self.ticker, order_data_mod, self.get_time(), self.get_trader_id))
 
         for order_data in book_snapshot[1]['as']:
             # order_data is an array of price, volume, timestamp in this order
             # price is used as the id
-            order_data_mod = {'id': order_data[0], 'type': 'ASK', 'price': order_data[0], 'volume': order_data[1]}
+            order_data_mod = {'order_id': order_data[0], 'type': 'ASK', 'price': order_data[0], 'volume': order_data[1]}
             self.update_orders(KrakenToExchangeOrder(self.ticker, order_data_mod, self.get_time(), self.get_trader_id))
 
     def update_orders(self, exchange_order):
@@ -965,12 +965,12 @@ class KrakenOrderbook:
         # some updates may be a republication - but that does not affect the result, so we do not check for it
         if "a" in updates[1]:
             for order_data in updates[1]['a']:
-                order_data_mod = {'id': order_data[0], 'type': 'ASK', 'price': order_data[0], 'volume': order_data[1]}
+                order_data_mod = {'order_id': order_data[0], 'type': 'ASK', 'price': order_data[0], 'volume': order_data[1]}
                 self.update_orders(KrakenToExchangeOrder(
                     self.ticker, order_data_mod, self.get_time(), self.get_trader_id))
         if "b" in updates[1]:
             for order_data in updates[1]['b']:
-                order_data_mod = {'id': order_data[0], 'type': 'BID', 'price': order_data[0], 'volume': order_data[1]}
+                order_data_mod = {'order_id': order_data[0], 'type': 'BID', 'price': order_data[0], 'volume': order_data[1]}
                 self.update_orders(KrakenToExchangeOrder(
                     self.ticker, order_data_mod, self.get_time(), self.get_trader_id))
     
