@@ -76,8 +76,8 @@ class Database:
                 sql = """INSERT OR REPLACE INTO prices (timestamp,exchange,ticker,best_bid,best_ask, bid_depth, ask_depth, bid_volume, ask_volume, n_bids, n_asks, l2_ask, l3_ask, l4_ask, l5_ask, l2_bid, l3_bid, l4_bid, l5_bid,l2_ask_vol, l3_ask_vol, l4_ask_vol, l5_ask_vol, l2_bid_vol, l3_bid_vol, l4_bid_vol, l5_bid_vol) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"""
                 
                 # TODO: Refactor this!
-                bid_prices = list(sorted(book['bid_book'].keys()))
-                ask_prices = list(reversed(sorted(book['ask_book'].keys())))
+                bid_prices = list(reversed(sorted(book['bid_book'].keys())))
+                ask_prices = list(sorted(book['ask_book'].keys()))
 
                 ask_levels = [0 for i in range(1,5)]
                 ask_vol_levels = [0 for i in range(1,5)]
