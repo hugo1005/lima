@@ -742,8 +742,7 @@ class KrakenHalfOrderbook:
 
             # if qty for a price is 0, remove the price level from the book
             if order.qty == 0.0:
-                self.lob.pop(order.price, None)
-                self.anonymised_lob.pop(order.price, None)
+                self.cancel_order(order_spec)
             else:
                 self.lob[order.price] = [order]
                 self.anonymised_lob[order.price] = [self.anonymise(order)]
@@ -770,6 +769,42 @@ class KrakenHalfOrderbook:
             order_match = list(filter(lambda x: x.order_id == order_id, self._market_order_q))
 
         return order_match[0] if len(order_match) > 0 else None
+
+    def cancel_order(self, order_spec):
+        order_id = order_spec.order_id
+        price = order_spec.price
+
+        if order_spec.order_type == 'LMT':
+            # Edge case (Order already processed)
+            if price not in self.lob:
+                return False
+
+            # Remove the order
+            order = self.get_order(order_id, 'LMT', price)
+            if type(order) != type(None):
+                self.lob[price] = list(filter(lambda x: x.order_id != order_id, self.lob[price]))
+                self.anonymised_lob[price] = list(filter(lambda x: x['order_id'] != order_id, self.anonymised_lob[price]))
+                
+                self.book_volume -= (order.qty - order.qty_filled) # Remove remainining liquidity
+
+                # Remove the price if there is nothing available
+                self.update_price(price)
+                return True
+            else:
+                # Edge case (Order already processed)
+                return False
+        elif order_spec.order_type == 'MKT':
+            order = self.get_order(order_id, 'MKT')
+
+            if type(order) != type(None):
+                self._market_order_q = list(filter(lambda x: x.order_id != order_id, self._market_order_q))
+                self.anonymised_market_order_q = list(filter(lambda x: x['order_id'] != order_id, self.anonymised_market_order_q))
+                self.recompute_stats()
+                return True
+            else:
+                return False
+
+        return False
 
     def has_market_orders(self):
         return len(self._market_order_q) > 0
