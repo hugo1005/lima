@@ -87,14 +87,14 @@ class Database:
                 for i in range(1,min(5, len(ask_prices))):
                     ask = ask_prices[i]
                     ask_vol = sum([order['qty'] - order['qty_filled'] for order in book['ask_book'][ask]])
-                    ask_levels[i-1].append(ask)
-                    ask_vol_levels[i-1].append(ask_vol)
+                    ask_levels[i-1] = ask
+                    ask_vol_levels[i-1] = ask_vol
 
                 for i in range(1,min(5, len(bid_prices))):
                     bid = bid_prices[i]
                     bid_vol = sum([order['qty'] - order['qty_filled'] for order in book['bid_book'][bid]]) 
-                    bid_levels[i-1].append(bid)
-                    bid_vol_levels[i-1].append(bid_vol)
+                    bid_levels[i-1] = bid
+                    bid_vol_levels[i-1] = bid_vol
             
                 c.execute(sql, (timestamp, exchange_name, ticker, best_bid, best_ask, bid_depth, ask_depth, bid_volume, ask_volume, n_bids, n_asks,*ask_levels, *bid_levels, *ask_vol_levels, *bid_vol_levels))
                 
