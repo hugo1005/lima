@@ -742,7 +742,7 @@ class KrakenHalfOrderbook:
 
             # if qty for a price is 0, remove the price level from the book
             if order.qty == 0.0:
-                self.cancel_order(order_spec)
+                self.cancel_order(order)
             else:
                 self.lob[order.price] = [order]
                 self.anonymised_lob[order.price] = [self.anonymise(order)]
