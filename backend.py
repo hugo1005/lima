@@ -770,7 +770,7 @@ class KrakenHalfOrderbook:
 
         return order_match[0] if len(order_match) > 0 else None
 
-    def cancel_order(self, order_spec):
+    def cancel_order(self, order_spec, update_volume = False):
         order_id = order_spec.order_id
         price = order_spec.price
 
@@ -785,7 +785,9 @@ class KrakenHalfOrderbook:
                 self.lob[price] = list(filter(lambda x: x.order_id != order_id, self.lob[price]))
                 self.anonymised_lob[price] = list(filter(lambda x: x['order_id'] != order_id, self.anonymised_lob[price]))
                 
-                self.book_volume -= (order.qty - order.qty_filled) # Remove remainining liquidity
+                # This is todo with kraken sending 0 volume orders so no update required!
+                if update_volume:
+                    self.book_volume -= (order.qty - order.qty_filled) # Remove remainining liquidity
 
                 # Remove the price if there is nothing available
                 self.update_price(price)
