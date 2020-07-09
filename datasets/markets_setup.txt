@@ -28,5 +28,5 @@ CREATE TABLE IF NOT EXISTS prices (
     ask_volume real, 
     n_bids integer, 
     n_asks integer,
-    PRIMARY KEY (timestamp, exchange, ticker)
+    PRIMARY KEY (timestamp, exchange, ticker, best_bid, best_ask)
 );
