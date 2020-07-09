@@ -7,7 +7,6 @@ from sqlite3 import Error
 
 from database import Database
 
-
 class WebServer:
     def __init__(self, backend_config_dir = './configs/backend_config.json', frontend_config_dir = './configs/frontend_config.json', ):
         with open(frontend_config_dir) as config_file:
@@ -67,34 +66,34 @@ class WebServer:
                 # Store the data for sending to the server.
                 exchange_name = 'unkown'
                 # Create SQL Connection
-                with Database() as db:
-                    while True:
-                        data = await ws.recv()
-                        msg = json.loads(data)
-                        msg_type = msg['type']
+                
+                while True:
+                    data = await ws.recv()
+                    msg = json.loads(data)
+                    msg_type = msg['type']
 
-                        # This must always be the first message sent from the server
-                        if msg_type == 'config':
-                            self.backend_to_app_cache.append(data)
-                            self.backend_to_app_config_cache.append(data)
-                            self.n_config_messages = msg['n_config_messages']
-                            exchange_name = msg['data']['exchange_name']
+                    # This must always be the first message sent from the server
+                    if msg_type == 'config':
+                        self.backend_to_app_cache.append(data)
+                        self.backend_to_app_config_cache.append(data)
+                        self.n_config_messages = msg['n_config_messages']
+                        exchange_name = msg['data']['exchange_name']
 
-                        # Handles caching of key setup information
-                        elif len(self.backend_to_app_config_cache) < self.n_config_messages:
-                            self.backend_to_app_config_cache.append(data)
+                    # Handles caching of key setup information
+                    elif len(self.backend_to_app_config_cache) < self.n_config_messages:
+                        self.backend_to_app_config_cache.append(data)
 
-                        if msg_type in self.last_posts:
-                            if self.last_posts[msg_type] < time.time() - self._debounce:
-                                self.backend_to_app_cache.append(data)
-                                self.backend_has_updates.set()
-                                self.last_posts[msg_type] = time.time() 
-                        else:
+                    if msg_type in self.last_posts:
+                        if self.last_posts[msg_type] < time.time() - self._debounce:
                             self.backend_to_app_cache.append(data)
                             self.backend_has_updates.set()
+                            self.last_posts[msg_type] = time.time() 
+                    else:
+                        self.backend_to_app_cache.append(data)
+                        self.backend_has_updates.set()
 
-                        if msg_type == 'LOBS':
-                            db.update_prices(msg['data'], exchange_name)
+                    # if msg_type == 'LOBS':
+                    #     db.update_prices(msg['data'], exchange_name)
             
             elif is_app: 
                 print("App [Backend State Management] connection established")
