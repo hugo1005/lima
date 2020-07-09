@@ -102,7 +102,7 @@ class Database:
                     bid_levels[i-1] = bid
                     bid_vol_levels[i-1] = bid_vol
 
-                print("Adding Record: ", (timestamp, exchange_name, ticker, best_bid, best_ask))
+                # print("Adding Record: ", (timestamp, exchange_name, ticker, best_bid, best_ask))
                 c.execute(sql, (timestamp, exchange_name, ticker, best_bid, best_ask, bid_depth, ask_depth, bid_volume, ask_volume, n_bids, n_asks,*ask_levels, *bid_levels, *ask_vol_levels, *bid_vol_levels))
                 
             self.conn.commit()
