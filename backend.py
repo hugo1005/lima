@@ -21,6 +21,7 @@ from shared import to_named_tuple, update_named_tuple, named_tuple_to_dict, Luna
 from aiodebug import log_slow_callbacks
 import logging
 import argparse
+import requests
 
 # logging.basicConfig(filename='./profiles/backend.log', level=logging.INFO)
 
@@ -914,10 +915,11 @@ class KrakenOrderbook:
         self.db = db
 
     async def connect(self):
+        last_connected_at = time.time()
+
         while True:
             try:
                 async with websockets.connect(self._ws_uri, ssl = True, max_size= None) as ws:
-
                     # initialization
                     # get system status info
                     system_status = json.loads(await ws.recv())
@@ -1038,6 +1040,120 @@ class KrakenOrderbook:
                 self.update_orders(KrakenToExchangeOrder(
                     self.ticker, order_data_mod, self.get_time(), self.get_trader_id))
     
+    def get_order_by_id(self, order_id):
+        buy_order = self._bids.get_order(order_id, 'LMT')
+
+        if type(buy_order) == type(None):
+            sell_order = self._asks.get_order(order_id, 'LMT')
+            return sell_order
+        else:
+            return buy_order
+
+    def get_LOB(self):
+        return LOB(self._bids.anonymised_lob, self._asks.anonymised_lob, self._bids.best_price, self._asks.best_price, self._bids.book_depth, self._asks.book_depth, self._bids.num_orders, self._asks.num_orders, round(self._bids.book_volume,2), round(self._asks.book_volume,2))
+
+    def get_market_book(self):
+        return MarketBook(self._bids.anonymised_market_order_q, self._asks.anonymised_market_order_q)
+
+class BitstampOrderbook:
+    def __init__(self, credentials, config, time_fn, ticker, tape, traders, observers, mark_traders_to_market, get_books, get_tape, update_pnls, trader_still_connected, get_trader_id, db):
+        self._bids = KrakenHalfOrderbook('bids')
+        self._asks = KrakenHalfOrderbook('asks')
+        self.get_time = time_fn  # Exchange time function
+        # since we do not trade on Kraken, we do not need to use wss://ws-auth.kraken.com
+        self._ws_uri = 'wss://ws.bitstamp.net'
+        self.ticker = ticker
+        self.credentials = credentials
+
+        # Forwarded from exhcange
+        self._tape = tape
+        self._traders = traders
+        self._observers = observers
+        self.mark_traders_to_market = mark_traders_to_market
+        self.get_books =  get_books
+        self.get_tape = get_tape
+        self.update_pnls = update_pnls
+        self.trader_still_connected = trader_still_connected
+        self.get_trader_id = get_trader_id
+        self._credentials = credentials
+        self.db = db
+
+    async def connect(self):
+        while True:
+            res = requests.get('https://www.bitstamp.net/api/v2/order_book/'+ self.ticker + '?group=1')
+            data = res.json()
+            
+            self.build_book(data)
+            self.db.update_prices(self.get_books(order_type='LMT'), "bitstamp")
+
+            async with websockets.connect(self._ws_uri, ssl = True, max_size= None) as ws:
+                await ws.send(json.dumps({"event":"bts:subscribe", "data": {
+                    "channel": "diff_order_book_" + self.ticker
+                }}))
+
+                assert json.loads(await ws.recv())['event'] == 'bts:subscription_succeeded'
+                seq = -1
+
+                async for data in ws:
+                    parsed = json.loads(data)
+                    
+                    if 'event' in parsed:
+                        if parsed['event'] == "bts:request_reconnect":
+                            print("Reconnecting to bitstamp...")
+                            break
+
+                    update = parsed['data']
+                    timestamp = float(update['timestamp'])
+                    microtimestamp = float(update['microtimestamp'])
+                    asks = update['asks']
+                    bids = update['bids']
+
+                    if microtimestamp < seq:
+                        print("-------- OUT OF SEQUENCE (RESTARTING) -----------")
+                        break
+
+                    seq = microtimestamp
+
+                    for bid in bids:
+                        price = float(bid[0])
+                        qty = float(bid[1])
+                        order_data_mod = {'order_id': price, 'type': 'BID', 'price': price, 'volume': qty}
+                        
+                        self.update_orders(KrakenToExchangeOrder(
+                            self.ticker, order_data_mod, self.get_time(), self.get_trader_id))
+
+                    for ask in asks:
+                        price = float(ask[0])
+                        qty = float(ask[1])
+                        order_data_mod = {'order_id': price, 'type': 'BID', 'price': price, 'volume': qty}
+                        
+                        self.update_orders(KrakenToExchangeOrder(
+                            self.ticker, order_data_mod, self.get_time(), self.get_trader_id))
+
+                    self.db.update_prices(self.get_books(order_type='LMT'), "bitstamp")
+
+    def build_book(self, book_snapshot):
+        # we could use the provided timestamp - but then it would be inconsistent with Luno, so use self.get_time()
+        for order_data in book_snapshot['bids']:
+            # order_data is an array of price, volume, timestamp in this order
+            # price is used as the id
+            price = float(order_data[0])
+            qty = float(order_data[1])
+            order_data_mod = {'order_id': price, 'type': 'BID', 'price': price, 'volume': qty}
+            self.update_orders(KrakenToExchangeOrder(self.ticker, order_data_mod, self.get_time(), self.get_trader_id))
+
+        for order_data in book_snapshot['asks']:
+            # order_data is an array of price, volume, timestamp in this order
+            # price is used as the id
+            price = float(order_data[0])
+            qty = float(order_data[1])
+            order_data_mod = {'order_id': price, 'type': 'ASK', 'price': price, 'volume': qty}
+            self.update_orders(KrakenToExchangeOrder(self.ticker, order_data_mod, self.get_time(), self.get_trader_id))
+
+    def update_orders(self, exchange_order):
+        halfbook = self._bids if exchange_order.action == "BUY" else self._asks
+        halfbook.update_orders(exchange_order)
+
     def get_order_by_id(self, order_id):
         buy_order = self._bids.get_order(order_id, 'LMT')
 
@@ -1202,7 +1318,7 @@ class Exchange:
         self._exchange_name = exchange_name
         self._case_config = self._config['exchanges'][self._exchange_name]
 
-        if self._exchange_name == 'luno' or self._exchange_name == 'kraken':
+        if self._exchange_name == 'luno' or self._exchange_name == 'kraken' or self._exchange_name == 'bitstamp':
             self._credentials = self._case_config['credentials']
             self._client = Client(api_key_id=self._credentials['api_key_id'], api_key_secret=self._credentials['api_key_secret'])
         
@@ -1223,7 +1339,7 @@ class Exchange:
         self._db = db
 
     def connect(self):
-        if self._exchange_name != 'luno' and self._exchange_name != 'kraken':
+        if self._exchange_name != 'luno' and self._exchange_name != 'kraken' and self._exchange_name != 'bitstamp':
             self._market_dynamics = self.init_market_dynamics()
         
         self._books = self.init_books()
@@ -1245,7 +1361,7 @@ class Exchange:
         handler = websockets.serve(self.exchange_handler, self._ip, self._port, max_size = None)
 
         # Creating Price Paths for securities
-        if self._exchange_name != 'luno' and self._exchange_name != 'kraken':
+        if self._exchange_name != 'luno' and self._exchange_name != 'kraken'  and self._exchange_name != 'bitstamp':
             dynamics = asyncio.gather(*[md.create_dynamics() for ticker, md in self._market_dynamics.items()])
 
         # Communications to web app intermediary
@@ -1253,9 +1369,9 @@ class Exchange:
         webserver = self.connect_to_web_server()
 
         # core = asyncio.gather(handler, dynamics)
-        if self._exchange_name != 'luno' and self._exchange_name != 'kraken':
+        if self._exchange_name != 'luno' and self._exchange_name != 'kraken' and self._exchange_name != 'bitstamp':
             core = asyncio.gather(webserver, handler, dynamics)
-        elif self._exchange_name == 'kraken':
+        elif self._exchange_name == 'kraken' or self._exchange_name == 'bitstamp':
             book_monitors = asyncio.gather(*[book.connect() for ticker, book in self._books.items()])
             core = asyncio.gather(book_monitors, webserver)
             # TODO: decide if we want a handler here?
@@ -1541,6 +1657,9 @@ class Exchange:
             elif self._exchange_name == 'kraken':
                 books[ticker] = KrakenOrderbook(self._credentials, securities_config[ticker], 
                 self.get_time, ticker, self._tape, self._traders, self._observers, self.mark_traders_to_market,  self.get_books, self.get_tape, self.update_pnls, self.trader_still_connected, self.get_trader_id, self._db)
+            elif self._exchange_name == 'bitstamp':
+                books[ticker] = BitstampOrderbook(self._credentials, securities_config[ticker], 
+                self.get_time, ticker, self._tape, self._traders, self._observers, self.mark_traders_to_market,  self.get_books, self.get_tape, self.update_pnls, self.trader_still_connected, self.get_trader_id, self._db)
             else:
                 books[ticker] = Orderbook(securities_config[ticker], time_fn=self.get_time)
         
@@ -1808,19 +1927,19 @@ def main():
         loop = asyncio.get_event_loop()
 
         luno_exchange = Exchange('luno',db)
-        kraken_exchange = Exchange('kraken',db)
+        bitstamp_exchange = Exchange('bitstamp',db)
 
         core_luno = luno_exchange.connect()
-        core_kraken = kraken_exchange.connect()
+        core_bitstamp = bitstamp_exchange.connect()
         
-        core = asyncio.gather(core_luno, core_kraken)
+        core = asyncio.gather(core_luno, core_bitstamp)
 
-        luno, kraken = loop.run_until_complete(core)
+        luno, bitstamp = loop.run_until_complete(core)
         loop.run_forever()
 
         luno[0].close()
         kraken[0].close()
-        loop.run_until_complete(asyncio.gather(luno[0].wait_closed(), kraken[0].wait_closed()))
+        loop.run_until_complete(asyncio.gather(luno[0].wait_closed(), bitstamp[0].wait_closed()))
 
 if __name__ == "__main__":
     main()
