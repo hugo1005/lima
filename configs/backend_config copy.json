@@ -1,0 +1,532 @@
+{
+    "app-websocket": {
+        "port": 3456,
+        "ip": "localhost"
+    },
+    "websocket": {
+        "port": 5678,
+        "ip": "localhost"
+    },
+    "exchanges": {
+        "notes": "Base currency is a direct quote => USD will be the # CAD required to buy 1 USD",
+        "active_case": "kraken",
+        "citadel_algo_case": {
+            "websocket": {
+                "port": 5678,
+                "ip": "localhost"
+            },
+            "base_currency": "CAD", 
+            "simulation_end_time": 300,
+            "prevent_self_trades": 0,
+            "simulation_notional_timestep": 3600,
+            "market_agents": {
+                "giveaway_trader": 30
+            },
+            "risk_limits": {
+                "net_position": 100000,
+                "gross_position": 100000
+            },
+            "securities": {
+                "RITC": {
+                    "trade_cost": 0.02,
+                    "rebate": 0.01,
+                    "max_order_size": 10000,
+                    "risk_limit_multiplier": 2,
+                    "starting_price": 25,
+                    "starting_spread": 1,
+                    "resolution": 2,
+                    "contract_point_value": 1,
+                    "quote_currency": "USD",
+                    "market_dynamics": {
+                        "price_path": {
+                            "expected_return": 0.05,
+                            "volatility": 0.2,
+                            "updates_per_second": 4
+                        },
+                        "institutional_orders": {
+                            "enabled": true,
+                            "avg_num_tenders_per_second": 10,
+                            "prob_of_bad_tender_price": 0.05,
+                            "tender_price_mean": 1,
+                            "tender_price_deviation": 3,
+                            "expected_tender_qty": 500,
+                            "expires_after": 10
+                        }
+                    }
+                },
+                "BEAR": {
+                    "trade_cost": 0.02,
+                    "rebate": 0.01,
+                    "max_order_size": 10000,
+                    "risk_limit_multiplier": 1,
+                    "starting_price": 15,
+                    "starting_spread": 0.05,
+                    "resolution": 2,
+                    "contract_point_value": 1,
+                    "quote_currency": "CAD",
+                    "market_dynamics": {
+                        "price_path": {
+                            "expected_return": 0.08,
+                            "volatility": 0.4,
+                            "updates_per_second": 4
+                        },
+                        "institutional_orders": {
+                            "enabled": true,
+                            "avg_num_tenders_per_second": 10,
+                            "prob_of_bad_tender_price": 0.05,
+                            "tender_price_mean": 1,
+                            "tender_price_deviation": 2,
+                            "expected_tender_qty": 250,
+                            "expires_after": 10
+                        } 
+                    }
+                },
+                "BULL": {
+                    "trade_cost": 0.02,
+                    "rebate": 0.01,
+                    "max_order_size": 10000,
+                    "risk_limit_multiplier": 1,
+                    "starting_price": 10,
+                    "starting_spread": 0.05,
+                    "resolution": 2,
+                    "contract_point_value": 1,
+                    "quote_currency": "CAD",
+                    "market_dynamics": {
+                        "price_path": {
+                            "expected_return": 0.12,
+                            "volatility": 0.5,
+                            "updates_per_second": 4
+                        },
+                        "institutional_orders": {
+                            "enabled": true,
+                            "avg_num_tenders_per_second": 10,
+                            "prob_of_bad_tender_price": 0.05,
+                            "tender_price_mean": 1,
+                            "tender_price_deviation": 1.5,
+                            "expected_tender_qty": 250,
+                            "expires_after": 10
+                        } 
+                    }
+                }, 
+                "USD": {
+                    "trade_cost": 0.02,
+                    "rebate": 0.01,
+                    "max_order_size": 10000,
+                    "risk_limit_multiplier": 0,
+                    "starting_price": 0.71,
+                    "starting_spread": 0.005,
+                    "resolution": 6,
+                    "contract_point_value": 1,
+                    "quote_currency": "CAD",
+                    "market_dynamics": {
+                        "price_path": {
+                            "expected_return": 0,
+                            "volatility": 0.005,
+                            "updates_per_second": 1
+                        },
+                        "institutional_orders": {
+                            "enabled": false
+                        } 
+                    }
+                }
+            }
+        },
+        "luno": {
+            "websocket": {
+                "port": 5679,
+                "ip": "localhost"
+            },
+            "base_currency": "GBP", 
+            "prevent_self_trades": 0,
+            "market_agents": {},
+            "credentials": {
+                "api_key_id": "m9w952edzhqfr",
+                "api_key_secret": "OcpAf1m9ZbgLbsS9LjyzoccFZAmUtOwTgOwmufMbfDE"
+            },
+            "risk_limits": {
+                "net_position": 100000,
+                "gross_position": 100000
+            },
+            "securities": {
+                "XBTEUR": {
+                    "trade_cost": 0.0025,
+                    "rebate": 0,
+                    "max_order_size": 10000,
+                    "risk_limit_multiplier": 1,
+                    "resolution": 2,
+                    "contract_point_value": 1,
+                    "quote_currency": "GBP",
+                    "market_dynamics": {}
+                },
+                "XBTGBP": {
+                    "trade_cost": 0.0025,
+                    "rebate": 0,
+                    "max_order_size": 10000,
+                    "risk_limit_multiplier": 1,
+                    "resolution": 2,
+                    "contract_point_value": 1,
+                    "quote_currency": "GBP",
+                    "market_dynamics": {}
+                },
+                "XBTIDR": {
+                    "trade_cost": 0.0025,
+                    "rebate": 0,
+                    "max_order_size": 10000,
+                    "risk_limit_multiplier": 1,
+                    "resolution": 2,
+                    "contract_point_value": 1,
+                    "quote_currency": "GBP",
+                    "market_dynamics": {}
+                },
+                "XBTMYR": {
+                    "trade_cost": 0.0025,
+                    "rebate": 0,
+                    "max_order_size": 10000,
+                    "risk_limit_multiplier": 1,
+                    "resolution": 2,
+                    "contract_point_value": 1,
+                    "quote_currency": "GBP",
+                    "market_dynamics": {}
+                }, 
+                "XBTNGN": {
+                    "trade_cost": 0.0025,
+                    "rebate": 0,
+                    "max_order_size": 10000,
+                    "risk_limit_multiplier": 1,
+                    "resolution": 2,
+                    "contract_point_value": 1,
+                    "quote_currency": "GBP",
+                    "market_dynamics": {}
+                }, 
+                "XBTSGD": {
+                    "trade_cost": 0.0025,
+                    "rebate": 0,
+                    "max_order_size": 10000,
+                    "risk_limit_multiplier": 1,
+                    "resolution": 2,
+                    "contract_point_value": 1,
+                    "quote_currency": "GBP",
+                    "market_dynamics": {}
+                },
+                "XBTUGX": {
+                    "trade_cost": 0.0025,
+                    "rebate": 0,
+                    "max_order_size": 10000,
+                    "risk_limit_multiplier": 1,
+                    "resolution": 2,
+                    "contract_point_value": 1,
+                    "quote_currency": "GBP",
+                    "market_dynamics": {}
+                },
+                "XBTZAR": {
+                    "trade_cost": 0.0025,
+                    "rebate": 0,
+                    "max_order_size": 10000,
+                    "risk_limit_multiplier": 1,
+                    "resolution": 2,
+                    "contract_point_value": 1,
+                    "quote_currency": "GBP",
+                    "market_dynamics": {}
+                },
+                "XBTZMW": {
+                    "trade_cost": 0.0025,
+                    "rebate": 0,
+                    "max_order_size": 10000,
+                    "risk_limit_multiplier": 1,
+                    "resolution": 2,
+                    "contract_point_value": 1,
+                    "quote_currency": "GBP",
+                    "market_dynamics": {}
+                },
+                "ETHZAR": {
+                    "trade_cost": 0.0025,
+                    "rebate": 0,
+                    "max_order_size": 10000,
+                    "risk_limit_multiplier": 1,
+                    "resolution": 2,
+                    "contract_point_value": 1,
+                    "quote_currency": "GBP",
+                    "market_dynamics": {}
+                },
+                "ETHXBT": {
+                    "trade_cost": 0.0025,
+                    "rebate": 0,
+                    "max_order_size": 10000,
+                    "risk_limit_multiplier": 1,
+                    "resolution": 2,
+                    "contract_point_value": 1,
+                    "quote_currency": "GBP",
+                    "market_dynamics": {}
+                },
+                "ETHMYR": {
+                    "trade_cost": 0.0025,
+                    "rebate": 0,
+                    "max_order_size": 10000,
+                    "risk_limit_multiplier": 1,
+                    "resolution": 2,
+                    "contract_point_value": 1,
+                    "quote_currency": "GBP",
+                    "market_dynamics": {}
+                },
+                "ETHNGN": {
+                    "trade_cost": 0.0025,
+                    "rebate": 0,
+                    "max_order_size": 10000,
+                    "risk_limit_multiplier": 1,
+                    "resolution": 2,
+                    "contract_point_value": 1,
+                    "quote_currency": "GBP",
+                    "market_dynamics": {}
+                },
+                "XRPXBT": {
+                    "trade_cost": 0.0025,
+                    "rebate": 0,
+                    "max_order_size": 10000,
+                    "risk_limit_multiplier": 1,
+                    "resolution": 2,
+                    "contract_point_value": 1,
+                    "quote_currency": "GBP",
+                    "market_dynamics": {}
+                },
+                "XRPMYR": {
+                    "trade_cost": 0.0025,
+                    "rebate": 0,
+                    "max_order_size": 10000,
+                    "risk_limit_multiplier": 1,
+                    "resolution": 2,
+                    "contract_point_value": 1,
+                    "quote_currency": "GBP",
+                    "market_dynamics": {}
+                },
+                "XRPNGN": {
+                    "trade_cost": 0.0025,
+                    "rebate": 0,
+                    "max_order_size": 10000,
+                    "risk_limit_multiplier": 1,
+                    "resolution": 2,
+                    "contract_point_value": 1,
+                    "quote_currency": "GBP",
+                    "market_dynamics": {}
+                },
+                "XRPZAR": {
+                    "trade_cost": 0.0025,
+                    "rebate": 0,
+                    "max_order_size": 10000,
+                    "risk_limit_multiplier": 1,
+                    "resolution": 2,
+                    "contract_point_value": 1,
+                    "quote_currency": "GBP",
+                    "market_dynamics": {}
+                },
+                "LTCXBT": {
+                    "trade_cost": 0.0025,
+                    "rebate": 0,
+                    "max_order_size": 10000,
+                    "risk_limit_multiplier": 1,
+                    "resolution": 2,
+                    "contract_point_value": 1,
+                    "quote_currency": "GBP",
+                    "market_dynamics": {}
+                },
+                "LTCMYR": {
+                    "trade_cost": 0.0025,
+                    "rebate": 0,
+                    "max_order_size": 10000,
+                    "risk_limit_multiplier": 1,
+                    "resolution": 2,
+                    "contract_point_value": 1,
+                    "quote_currency": "GBP",
+                    "market_dynamics": {}
+                },
+                "LTCNGN": {
+                    "trade_cost": 0.0025,
+                    "rebate": 0,
+                    "max_order_size": 10000,
+                    "risk_limit_multiplier": 1,
+                    "resolution": 2,
+                    "contract_point_value": 1,
+                    "quote_currency": "GBP",
+                    "market_dynamics": {}
+                },
+                "LTCZAR": {
+                    "trade_cost": 0.0025,
+                    "rebate": 0,
+                    "max_order_size": 10000,
+                    "risk_limit_multiplier": 1,
+                    "resolution": 2,
+                    "contract_point_value": 1,
+                    "quote_currency": "GBP",
+                    "market_dynamics": {}
+                },
+                "BCHXBT": {
+                    "trade_cost": 0.0025,
+                    "rebate": 0,
+                    "max_order_size": 10000,
+                    "risk_limit_multiplier": 1,
+                    "resolution": 2,
+                    "contract_point_value": 1,
+                    "quote_currency": "GBP",
+                    "market_dynamics": {}
+                }
+            }
+        },
+        "kraken": {
+            "websocket": {
+                "port": 5680,
+                "ip": "localhost"
+            },
+            "base_currency": "GBP", 
+            "prevent_self_trades": 0,
+            "market_agents": {},
+            "credentials": {
+                "api_key_id": "m9w952edzhqfr",
+                "api_key_secret": "OcpAf1m9ZbgLbsS9LjyzoccFZAmUtOwTgOwmufMbfDE"
+            },
+            "risk_limits": {
+                "net_position": 100000,
+                "gross_position": 100000
+            },
+            "securities": {
+                "XBTEUR": {
+                    "trade_cost": 0.0025,
+                    "rebate": 0,
+                    "max_order_size": 10000,
+                    "risk_limit_multiplier": 1,
+                    "resolution": 2,
+                    "contract_point_value": 1,
+                    "quote_currency": "GBP",
+                    "market_dynamics": {}
+                },
+                "XBTGBP": {
+                    "trade_cost": 0.0025,
+                    "rebate": 0,
+                    "max_order_size": 10000,
+                    "risk_limit_multiplier": 1,
+                    "resolution": 2,
+                    "contract_point_value": 1,
+                    "quote_currency": "GBP",
+                    "market_dynamics": {}
+                },
+                "ETHXBT": {
+                    "trade_cost": 0.0025,
+                    "rebate": 0,
+                    "max_order_size": 10000,
+                    "risk_limit_multiplier": 1,
+                    "resolution": 2,
+                    "contract_point_value": 1,
+                    "quote_currency": "GBP",
+                    "market_dynamics": {}
+                },
+                "XRPXBT": {
+                    "trade_cost": 0.0025,
+                    "rebate": 0,
+                    "max_order_size": 10000,
+                    "risk_limit_multiplier": 1,
+                    "resolution": 2,
+                    "contract_point_value": 1,
+                    "quote_currency": "GBP",
+                    "market_dynamics": {}
+                },
+                "LTCXBT": {
+                    "trade_cost": 0.0025,
+                    "rebate": 0,
+                    "max_order_size": 10000,
+                    "risk_limit_multiplier": 1,
+                    "resolution": 2,
+                    "contract_point_value": 1,
+                    "quote_currency": "GBP",
+                    "market_dynamics": {}
+                },
+                "BCHXBT": {
+                    "trade_cost": 0.0025,
+                    "rebate": 0,
+                    "max_order_size": 10000,
+                    "risk_limit_multiplier": 1,
+                    "resolution": 2,
+                    "contract_point_value": 1,
+                    "quote_currency": "GBP",
+                    "market_dynamics": {}
+                }
+            }
+        }, 
+        "bitstamp": {
+            "websocket": {
+                "port": 5680,
+                "ip": "localhost"
+            },
+            "base_currency": "GBP", 
+            "prevent_self_trades": 0,
+            "market_agents": {},
+            "credentials": {
+                "api_key_id": "m9w952edzhqfr",
+                "api_key_secret": "OcpAf1m9ZbgLbsS9LjyzoccFZAmUtOwTgOwmufMbfDE"
+            },
+            "risk_limits": {
+                "net_position": 100000,
+                "gross_position": 100000
+            },
+            "securities": {
+                "btceur": {
+                    "trade_cost": 0.0025,
+                    "rebate": 0,
+                    "max_order_size": 10000,
+                    "risk_limit_multiplier": 1,
+                    "resolution": 2,
+                    "contract_point_value": 1,
+                    "quote_currency": "GBP",
+                    "market_dynamics": {}
+                },
+                "btcgbp": {
+                    "trade_cost": 0.0025,
+                    "rebate": 0,
+                    "max_order_size": 10000,
+                    "risk_limit_multiplier": 1,
+                    "resolution": 2,
+                    "contract_point_value": 1,
+                    "quote_currency": "GBP",
+                    "market_dynamics": {}
+                },
+                "ethbtc": {
+                    "trade_cost": 0.0025,
+                    "rebate": 0,
+                    "max_order_size": 10000,
+                    "risk_limit_multiplier": 1,
+                    "resolution": 2,
+                    "contract_point_value": 1,
+                    "quote_currency": "GBP",
+                    "market_dynamics": {}
+                },
+                "xrpbtc": {
+                    "trade_cost": 0.0025,
+                    "rebate": 0,
+                    "max_order_size": 10000,
+                    "risk_limit_multiplier": 1,
+                    "resolution": 2,
+                    "contract_point_value": 1,
+                    "quote_currency": "GBP",
+                    "market_dynamics": {}
+                },
+                "ltcbtc": {
+                    "trade_cost": 0.0025,
+                    "rebate": 0,
+                    "max_order_size": 10000,
+                    "risk_limit_multiplier": 1,
+                    "resolution": 2,
+                    "contract_point_value": 1,
+                    "quote_currency": "GBP",
+                    "market_dynamics": {}
+                },
+                "bchbtc": {
+                    "trade_cost": 0.0025,
+                    "rebate": 0,
+                    "max_order_size": 10000,
+                    "risk_limit_multiplier": 1,
+                    "resolution": 2,
+                    "contract_point_value": 1,
+                    "quote_currency": "GBP",
+                    "market_dynamics": {}
+                }
+            }
+        }
+    }
+}
