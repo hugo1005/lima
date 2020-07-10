@@ -47,7 +47,8 @@ ExchangeOrder = namedtuple('ExchangeOrder', ['ticker','tid','order_id','order_ty
 # ------------------------------------------------------------------------------------------------------------------------
 LunaCreateOrder = namedtuple('LunaCreateOrder', ['id','type','price','volume'])
 LunaCreateOrderV2 = namedtuple('LunaCreateOrder', ['order_id','type','price','volume'])
-
+BitstampCreateOrder = namedtuple('BitstampCreateOrder', ['order_id','type','price','qty'])
+BitstampCreateOrderV2 = namedtuple('BitstampCreateOrderV2', ['id','order_type','price','amount'])
 def LunaToExchangeOrder(ticker, data, submission_time, get_trader_id):
     if 'order_id' in data:
         luna_create_order = to_named_tuple(data, LunaCreateOrderV2)
@@ -59,6 +60,20 @@ def LunaToExchangeOrder(ticker, data, submission_time, get_trader_id):
         action = 'BUY' if luna_create_order.type == 'BID' else 'SELL'
         tid = get_trader_id(luna_create_order.id) # Either -1 or one of ours
         return ExchangeOrder(ticker, tid, luna_create_order.id, 'LMT', float(luna_create_order.volume), action, float(luna_create_order.price), 0, submission_time)
+
+def BitstampToExchangeOrder(ticker, data, submission_time, get_trader_id):
+    bitstamp_create_order = to_named_tuple(data, BitstampCreateOrder)
+    action = 'BUY' if bitstamp_create_order.type == 'BID' else 'SELL'
+    tid = get_trader_id(bitstamp_create_order.order_id)
+    return ExchangeOrder(ticker, tid, bitstamp_create_order.order_id, 'LMT', float(bitstamp_create_order.qty), action, float(bitstamp_create_order.price), 0, submission_time)
+
+def BitstampToExchangeOrderV2(ticker, data, submission_time, get_trader_id):
+    bitstamp_create_order = to_named_tuple(data, BitstampCreateOrderV2)
+    action = 'BUY' if int(bitstamp_create_order.order_type) == 0 else 'SELL'
+    tid = get_trader_id(bitstamp_create_order.id)
+    order = ExchangeOrder(ticker, tid, bitstamp_create_order.id, 'LMT', float(bitstamp_create_order.amount), action, float(bitstamp_create_order.price), 0, submission_time)
+    return order
+
     
 # ------------------------------------------------------------------------------------------------------------------------
 KrakenCreateOrder = namedtuple('KrakenCreateOrder', ['order_id','type','price','volume'])
