@@ -1,0 +1,21 @@
+#Stragey gathering
+
+Within traders.py:
+
+	GiveawayTrader (trader) function
+
+#Test 
+
+Test_suite.py:
+
+	Convert into order
+	LMT_order.execute()
+
+	e.g. 
+	await trader.execute()
+
+
+#Data Collection
+	run_all.bash
+
+	
