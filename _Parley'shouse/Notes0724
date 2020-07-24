@@ -1,0 +1,12 @@
+
+D = [t_0, ... ,t_n]
+
+PK = [PK_0,...,PK_m] such that m <-> t_1
+PL = [PL_0,...,PL_n] such that n <-> t_1
+
+during the align (S1P2:)
+
+indexL = f(0,...,n)
+indexK = g(0,...,m)
+
+intersection = indexL ^ indexK
