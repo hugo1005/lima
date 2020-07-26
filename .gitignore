@@ -4,3 +4,6 @@ node_modules/
 *.db
 *.pem
 *.pyc
+*.sql
+*.csv
+configs/backend_config.json
