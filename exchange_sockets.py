@@ -629,7 +629,7 @@ class GlobitexOrderbook(ExternalOrderbook):
         # provided
         price, qty, order_type = float(order_msg['price']), float(order_msg['size']), order_msg['order_type']
     
-        # inferred
+        # inferredter
         order_id = price
         action = 'BUY' if order_type == 0 else 'SELL'
         tid = self.get_trader_id(order_id)
