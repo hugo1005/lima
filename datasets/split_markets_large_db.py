@@ -17,12 +17,12 @@ def clean_prices(df):
 # chunksize of 1000000 (1 million) is about 200 MB
 
 # luno
-conn = sqlite3.connect('markets_2_cp.db')
-prices_luno = pd.read_sql('SELECT * FROM prices WHERE exchange = "luno" AND ticker = "XBTEUR" AND timestamp > 1594940000', conn, chunksize=1000000)
+conn = sqlite3.connect('markets_3_cp.db')
+prices_luno = pd.read_sql('SELECT * FROM prices WHERE exchange = "luno" AND ticker = "XBTEUR" AND timestamp > 1594940000', conn, chunksize=2000000)
 header = True
 for prices_luno_chunk in prices_luno:
     prices_luno_clean = clean_prices(prices_luno_chunk)
-    prices_luno_clean.to_csv('p_luno_large.csv', header=header, mode='a')
+    prices_luno_clean.to_csv('p_luno_large_2.csv', header=header, mode='a')
     header = False
 
 conn.close()
@@ -30,12 +30,12 @@ conn.close()
 print('Luno processed')
 
 # kraken
-conn = sqlite3.connect('markets_2_cp.db')
-prices_kraken = pd.read_sql('SELECT * FROM prices WHERE exchange = "bitstamp" AND ticker = "btceur" AND timestamp > 1594940000', conn, chunksize=1000000)
+conn = sqlite3.connect('markets_3_cp.db')
+prices_kraken = pd.read_sql('SELECT * FROM prices WHERE exchange = "bitstamp" AND ticker = "btceur" AND timestamp > 1594940000', conn, chunksize=2000000)
 header = True
 for prices_kraken_chunk in prices_kraken:
     prices_kraken_clean = clean_prices(prices_kraken_chunk)
-    prices_kraken_clean.to_csv('p_kraken_large.csv', header=header, mode='a')
+    prices_kraken_clean.to_csv('p_kraken_large_2.csv', header=header, mode='a')
     header = False
 
 conn.close()
