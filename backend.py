@@ -1952,16 +1952,21 @@ class Exchange:
         }
 
 def main():
+    parser = argparse.ArgumentParser(description='Runs algo backtest on secuirties')
+    parser.add_argument("-e","--exchanges", nargs='+' ,help="exchanges to run")
+    args = parser.parse_args()
+
     with Database() as db:
-        loop = asyncio.get_event_loop()
-
-        luno_exchange = Exchange('luno',db, LunaOrderbook)
-        bitstamp_exchange = Exchange('bitstamp',db, BitstampOrderbook)
-        globitex_exchange = Exchange('globitex',db, GlobitexOrderbook)
-        kraken_exchange = Exchange('kraken',db, KrakenOrderbook)
-
-        exchanges = [luno_exchange, bitstamp_exchange, globitex_exchange, kraken_exchange]
+        exchanges_dict = {
+            'luno': Exchange('luno',db, LunaOrderbook),
+            'bitstamp':Exchange('bitstamp',db, BitstampOrderbook),
+            'globitex':Exchange('globitex',db, GlobitexOrderbook),
+            'kraken':Exchange('kraken',db, KrakenOrderbook)
+        }
         
+        exchanges = [exchanges_dict[exc] for exc in args.exchanges]
+        
+        loop = asyncio.get_event_loop()
         core = asyncio.gather(*[exchange.connect() for exchange in exchanges])
 
         servers = loop.run_until_complete(core)
