@@ -1,25 +1,42 @@
-def buy_and_sell_entries(ADhandle,BDhandle,df_general=df_general,signalmatrix=signalmatrix):
+def buy_and_sell_entries(ADhandle,BDhandle,df_general=None,signalmatrix=None):
 
+	# df_general is Best Bid Best Ask for both exchanges
+
+	# Our entry and exits
 	buyentry=[];sellentry=[]
-	buyentry.append(df_general[signalmatrix['AskDiff']<-ADhandle].head(1).index.values)
-	sellentry.append(df_general[signalmatrix['BidDiff']>BDhandle][
-	    df_general[signalmatrix['BidDiff']>BDhandle].index.values>buyentry[-1]].head(1).index.values)
+	
+	# Enter the first buy (Index is zero indexed)
+	open_signal = signalmatrix['AskDiff']< -ADhandle
+	first_entry_idx = df_general[open_signal].head(1).index.values
+	buyentry.append(first_entry_idx)
+	
+	# Enter the first close
+	close_signal = signalmatrix['BidDiff']>BDhandle
+	first_close_signal = df_general[close_signal] 
+	first_close_idx = (first_close_signal[first_close_signal].index.values > first_entry_idx).head(1).index.values
+	sellentry.append(first_close_idx)
 
-	while len(sellentry[-1])!=0:
-	  buyentry.append(df_general[signalmatrix['AskDiff']<-ADhandle][
-	    df_general[signalmatrix['AskDiff']<-ADhandle].index.values>sellentry[-1]].head(1).index.values)
-	  if len(buyentry[-1])!=0:
-	    sellentry.append(df_general[signalmatrix['BidDiff']>BDhandle][
-	        df_general[signalmatrix['BidDiff']>BDhandle].index.values>buyentry[-1]].head(1).index.values)
-	  else:
-	    break
+	more_oppurtunities = lambda: len(sellentry[-1])!=0
+	trade_initated = lambda: len(buyentry[-1])!=0
 
+	while more_oppurtunities():
+		next_open_signal = df_general[open_signal]
+		next_open_idx = next_open_signal[next_open_signal.index.values > sellentry[-1]].head(1).index.values
+		buyentry.append(next_open_idx)
+
+		if trade_initated():
+			next_close_signal = df_general[close_signal] 
+			next_close_idx = next_close_signal[next_close_signal].index.values > first_entry_idx.head(1).index.values
+			sellentry.append(next_close_idx)
+		else:
+			break
+	
+	# Cleanup the mess 
 	for i in [sellentry, buyentry]:
 	  if len(i[-1])==0:
 	    i.pop(-1)
 
 	return [buyentry, sellentry]
-
 
 def trading_plugin(buysellentries):
 	[buyentry,sellentry]=buysellentries
@@ -37,8 +54,8 @@ def trading_plugin(buysellentries):
 		RoT[i]=sellprice/buyprice
 
 	Entries_in_time=df(df_general.loc[Entries['B']]['Time']).reset_index(
-    drop=True).join(
-	df(df_general.loc[Entries['S']]['Time']).reset_index(drop=True),rsuffix='S')
+    drop=True).join(df(df_general.loc[Entries['S']]['Time']).reset_index(drop=True),rsuffix='S')
+	
 	Entries_in_time.columns=Entries.columns
 
-	return [Entries_in_time,RoT]
+	return [Entries_in_time, RoT]
