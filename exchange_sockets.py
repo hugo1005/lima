@@ -7,6 +7,7 @@ import json
 from collections import namedtuple
 from shared import to_named_tuple, ExchangeOrder, MarketBook, ExchangeOrderAnon, LOB
 from abc import ABC, abstractmethod
+import traceback
 import warnings
 
 class ExternalHalfOrderbook:
@@ -236,7 +237,9 @@ class ExternalOrderbook(ABC):
             await self.recieve_data()
         except:
             print("Rebooting connection due to connection closure!")
-            print(sys.exc_info())
+            error = sys.exc_info()
+            print(error)
+            traceback.print_exc()
             time.sleep(10) # Wait for connection to be resetablished
 
     async def recieve_data(self):
@@ -254,20 +257,31 @@ class ExternalOrderbook(ABC):
         data = res.json()
         self.build_book(data)
     
+    def extract_from_dict(self, data, target):
+        if target in data:
+            return data[target]
+        elif 'result' in data:
+            nested = data['result']
+            return nested[list(nested.keys())[0]][target]
+
     def update_database(self):
         self.db.update_prices(self.get_books(tickers = [self.ticker], order_type='LMT'), self.exchange_name)
 
     def build_book(self, book):
-        for bid in book['bids']:
+        bids = self.extract_from_dict(book, 'bids')
+        asks = self.extract_from_dict(book, 'asks')
+
+        for bid in bids:
             order = self.parse_snapshot_order(bid, 'BID')
             self.add_order(order)
             
-        for ask in book['asks']:
+        for ask in asks:
             order = self.parse_snapshot_order(ask, 'ASK')
             self.add_order(order)
 
     async def incremental_updates(self):
         async with websockets.connect(self._ws_uri, ssl = True, max_size= None) as ws:
+            await self.assert_setup_success(ws)
             await self.subscribe_to_stream(ws)
             await self.send_snapshot_to_traders()
 
@@ -415,6 +429,13 @@ class ExternalOrderbook(ABC):
         pass
 
     @abstractmethod
+    async def assert_setup_success(self, ws):
+        """ MODIFY: Assert that stream was succesfully subscribed """
+        print("Warning: Unimplemeneted!")
+        # response = await ws.recv()
+        # assert json.loads(response)['event'] == 'bts:subscription_succeeded'
+
+    @abstractmethod
     async def assert_subscription_success(self, ws):
         """ MODIFY: Assert that stream was succesfully subscribed """
         print("Warning: Unimplemeneted!")
@@ -484,6 +505,10 @@ class ExternalOrderbook(ABC):
 class BitstampOrderbook(ExternalOrderbook):
     def __init__(self, exchange_config, ticker, credentials, await_success_response):
         super().__init__(exchange_config, ticker, credentials, await_success_response, exchange_name='bitstamp')
+
+    async def assert_setup_success(self, ws):
+        """ MODIFY: Assert that stream was succesfully subscribed """
+        return None
 
     def define_websocket_url(self):
         """ MODIFY: define the enpoint for the websocket
@@ -572,6 +597,10 @@ class GlobitexOrderbook(ExternalOrderbook):
     def __init__(self, exchange_config, ticker, credentials, await_success_response, exchange_name='globitex'):
         super().__init__(exchange_config, ticker, credentials, await_success_response)
 
+    async def assert_setup_success(self, ws):
+        """ MODIFY: Assert that stream was succesfully subscribed """
+        return None
+
     def define_websocket_url(self):
         """ MODIFY: define the enpoint for the websocket
         """
@@ -598,8 +627,7 @@ class GlobitexOrderbook(ExternalOrderbook):
 
     async def assert_subscription_success(self, ws):
         """ MODIFY: Assert that stream was succesfully subscribed """
-        response = await ws.recv()
-        assert json.loads(response)['event'] == 'bts:subscription_succeeded'
+        return None
 
     def assert_sequence_integrity(self, data, seq):
         """ MODIFY: Assert that stream sequencing of messages is correct """
@@ -649,7 +677,7 @@ class GlobitexOrderbook(ExternalOrderbook):
         :return seq: The sequence number of the latest order
         """
         parsed = json.loads(msg)
-        print(parsed)
+
         if "MarketDataIncrementalRefresh" in parsed:
             data = parsed['MarketDataIncrementalRefresh']
 
@@ -661,7 +689,7 @@ class GlobitexOrderbook(ExternalOrderbook):
                         order_data['microtimestamp'] = current_seq
                         order_data['order_type'] = side
                         
-                        order = self.parse_streamed_order(order).qty
+                        order = self.parse_streamed_order(order_data)
 
                         if order.qty == 0:
                             return await self.map_message_to_handler("order_deleted", order_data, current_seq)
@@ -672,8 +700,126 @@ class GlobitexOrderbook(ExternalOrderbook):
                                 return await self.map_message_to_handler("order_changed", order_data, current_seq)
                             else: 
                                 return await self.map_message_to_handler("order_created", order_data, current_seq)
-
-            return current_seq
+            else:
+                return seq
         else:
             return seq
+
+class KrakenOrderbook(ExternalOrderbook):
+    def __init__(self, exchange_config, ticker, credentials, await_success_response, exchange_name='globitex'):
+        super().__init__(exchange_config, ticker, credentials, await_success_response)
+
+    def define_websocket_url(self):
+        """ MODIFY: define the enpoint for the websocket
+        """
+        return  'wss://ws.kraken.com'
+
+    def define_handler_mapping(self):
+        """ MODIFY: Define the mapping between handlers and internal required methods 
+        [handle_reconnect_request, self.handle_order_create, self.handle_order_delete, self.handle_order_change]
+        """
+        return {
+            "bts:request_reconnect": self.handle_reconnect_request,
+            "order_created": self.handle_order_create,
+            "order_deleted": self.handle_order_delete,
+            "order_changed": self.handle_order_change,
+        }
+
+    async def assert_setup_success(self, ws):
+        """ MODIFY: Assert that stream was succesfully subscribed """
+        system_status = json.loads(await ws.recv())
+        assert system_status['event'] == 'systemStatus' and system_status['status'] == 'online', \
+            "Could not connect to the system. Response: " + str(system_status)
+
+    def define_subscription_message(self):
+        """ MODIFY: Define message (in string format) for subscription request"""
+        payload = json.dumps({
+            "event": "subscribe",
+            "pair": [self.ticker[:3] + "/" + self.ticker[3:]],
+            "subscription": {
+                "name": "book",
+                "depth": 1000
+            }
+        })
+
+        return payload
+
+    def define_book_snapshot_uri(self):
+        """ MODIFY: Define snapshot endpoint """
+        return 'https://api.kraken.com/0/public/Depth?pair=' + self.ticker +'&count=100'
+
+    async def assert_subscription_success(self, ws):
+        """ MODIFY: Assert that stream was succesfully subscribed """
+        subscription_status = json.loads(await ws.recv())
+        assert subscription_status['status'] == "subscribed" and subscription_status['channelName'][:4] == "book", \
+                        "Did not successfully subscribe to book channel. Response: " + \
+                        str(subscription_status)
+
+    def assert_sequence_integrity(self, data, seq):
+        """ MODIFY: Assert that stream sequencing of messages is correct """
+        return True
+        
+    def parse_snapshot_order(self, order_msg, side):
+        """ 
+        MODIFY: Format of order data recieved in initial snapshot 
+        :return ExchangeOrder
+        """
+        # provided
+        price, qty = float(order_msg[0]), float(order_msg[1])
+
+        # inferred
+        order_id = price
+        action = 'BUY' if side == 'BID' else 'SELL'
+        tid = self.get_trader_id(order_id)
+        qty_filled = 0
+        submission_time = self.get_time()
+
+        return ExchangeOrder(self.ticker, tid, order_id, 'LMT', qty, action, price, qty_filled, submission_time)
+
+    def parse_streamed_order(self, order_msg):
+        """ 
+        MODIFY: Format of order data recieved in stream data 
+        :return ExchangeOrder: An order as specified in shared.py
+        """
+        # provided
+        price, qty, order_type = float(order_msg[0]), float(order_msg[1]), order_msg[3]
+    
+        # inferredter
+        order_id = price
+        action = 'BUY' if order_type == 'BID' else 'SELL'
+        tid = self.get_trader_id(order_id)
+        submission_time = self.get_time()
+
+        return ExchangeOrder(self.ticker, tid, order_id, 'LMT', qty, action, price, 0, submission_time)
+
+    async def parse_incremental_update(self, msg, seq):
+        """ 
+        MODIFY: Each exchange may have a slightly different JSON structure
+        :return seq: The sequence number of the latest order
+        """
+    
+        parsed = json.loads(msg)
+
+        if len(parsed) == 4:
+            data = parsed[1]
+            for side in ['b', 'a']:
+                if side in data:
+                    for order_data in data[side]:
+                        order_data.append('BID' if side == 'b' else 'ASK')
+                        timestamp = order_data[2]
+                        
+                        order = self.parse_streamed_order(order_data)
+
+                        if order.qty == 0:
+                            return await self.map_message_to_handler("order_deleted", order_data, timestamp)
+                        else:
+                            halfbook = self._bids if side == 'b' else self._asks
+                            
+                            if order.price in halfbook.lob:
+                                return await self.map_message_to_handler("order_changed", order_data, timestamp)
+                            else: 
+                                return await self.map_message_to_handler("order_created", order_data, timestamp)
+        
+        return -1 # We don't have seq info for Kraken
+
 

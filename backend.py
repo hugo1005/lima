@@ -18,7 +18,7 @@ from shared import LOB, OrderSpec, ExchangeOrder, Transaction, TransactionPair, 
 from shared import to_named_tuple, update_named_tuple, named_tuple_to_dict, LunaToExchangeOrder, LunaToExchangeTransactionPair, KrakenToExchangeOrder, BitstampToExchangeOrder, BitstampToExchangeOrderV2
 # from traders import GiveawayTrader
 
-from exchange_sockets import BitstampOrderbook, GlobitexOrderbook
+from exchange_sockets import BitstampOrderbook, GlobitexOrderbook, KrakenOrderbook
 
 from aiodebug import log_slow_callbacks
 import logging
@@ -722,339 +722,339 @@ class LunaOrderbook:
     def get_market_book(self):
         return MarketBook(self._bids.anonymised_market_order_q, self._asks.anonymised_market_order_q)
 
-class KrakenHalfOrderbook:
-    def __init__(self, book_side):
-        self.anonymised_lob = {}
-        self.lob = {}
+# class KrakenHalfOrderbook:
+#     def __init__(self, book_side):
+#         self.anonymised_lob = {}
+#         self.lob = {}
 
-        self.book_side = book_side # bids or asks
-        self.book_depth = 0 # Number of different prices
-        self.num_orders = 0
-        self.book_volume = 0 # Limit order book volume only
-        self.best_price = 0
-        self._market_order_q = []
-        self.anonymised_market_order_q = []
+#         self.book_side = book_side # bids or asks
+#         self.book_depth = 0 # Number of different prices
+#         self.num_orders = 0
+#         self.book_volume = 0 # Limit order book volume only
+#         self.best_price = 0
+#         self._market_order_q = []
+#         self.anonymised_market_order_q = []
 
-    def anonymise(self, order):
-        order_dict = dict(order._asdict())
-        return dict(to_named_tuple(order_dict, ExchangeOrderAnon)._asdict())
+#     def anonymise(self, order):
+#         order_dict = dict(order._asdict())
+#         return dict(to_named_tuple(order_dict, ExchangeOrderAnon)._asdict())
 
-    def update_orders(self, order):
-        if order.order_type == "LMT":
-            if order.price not in self.lob:
-                self.book_volume += order.qty
-            else:
-                self.book_volume += order.qty - self.lob[order.price][0].qty
+#     def update_orders(self, order):
+#         if order.order_type == "LMT":
+#             if order.price not in self.lob:
+#                 self.book_volume += order.qty
+#             else:
+#                 self.book_volume += order.qty - self.lob[order.price][0].qty
 
-            # if qty for a price is 0, remove the price level from the book
-            if order.qty == 0.0:
-                self.cancel_order(order)
-            else:
-                self.lob[order.price] = [order]
-                self.anonymised_lob[order.price] = [self.anonymise(order)]
-        else:
-            if order.order_type == "MKT":
-                warnings.warn('MKT order type is not supported for Kraken.', UserWarning)
-            else:
-                warnings.warn('An unknown order type [%s] was used and could not be executed' % order.action, UserWarning)
+#             # if qty for a price is 0, remove the price level from the book
+#             if order.qty == 0.0:
+#                 self.cancel_order(order)
+#             else:
+#                 self.lob[order.price] = [order]
+#                 self.anonymised_lob[order.price] = [self.anonymise(order)]
+#         else:
+#             if order.order_type == "MKT":
+#                 warnings.warn('MKT order type is not supported for Kraken.', UserWarning)
+#             else:
+#                 warnings.warn('An unknown order type [%s] was used and could not be executed' % order.action, UserWarning)
 
-        self.recompute_stats()
+#         self.recompute_stats()
 
-    def get_order(self, order_id, order_type, price = -1):
+#     def get_order(self, order_id, order_type, price = -1):
 
-        if order_type == 'LMT':
-            if price > 0:
-                order_match = list(filter(lambda x: x.order_id == order_id, self.lob[price]))
-            else:
-                all_orders = []
-                for price in self.lob:
-                    all_orders += self.lob[price]
+#         if order_type == 'LMT':
+#             if price > 0:
+#                 order_match = list(filter(lambda x: x.order_id == order_id, self.lob[price]))
+#             else:
+#                 all_orders = []
+#                 for price in self.lob:
+#                     all_orders += self.lob[price]
 
-                order_match = list(filter(lambda x: x.order_id == order_id, all_orders))
-        else:
-            order_match = list(filter(lambda x: x.order_id == order_id, self._market_order_q))
+#                 order_match = list(filter(lambda x: x.order_id == order_id, all_orders))
+#         else:
+#             order_match = list(filter(lambda x: x.order_id == order_id, self._market_order_q))
 
-        return order_match[0] if len(order_match) > 0 else None
+#         return order_match[0] if len(order_match) > 0 else None
 
-    def cancel_order(self, order_spec, update_volume = False):
-        order_id = order_spec.order_id
-        price = order_spec.price
+#     def cancel_order(self, order_spec, update_volume = False):
+#         order_id = order_spec.order_id
+#         price = order_spec.price
 
-        if order_spec.order_type == 'LMT':
-            # Edge case (Order already processed)
-            if price not in self.lob:
-                return False
+#         if order_spec.order_type == 'LMT':
+#             # Edge case (Order already processed)
+#             if price not in self.lob:
+#                 return False
 
-            # Remove the order
-            order = self.get_order(order_id, 'LMT', price)
-            if type(order) != type(None):
-                self.lob[price] = list(filter(lambda x: x.order_id != order_id, self.lob[price]))
-                self.anonymised_lob[price] = list(filter(lambda x: x['order_id'] != order_id, self.anonymised_lob[price]))
+#             # Remove the order
+#             order = self.get_order(order_id, 'LMT', price)
+#             if type(order) != type(None):
+#                 self.lob[price] = list(filter(lambda x: x.order_id != order_id, self.lob[price]))
+#                 self.anonymised_lob[price] = list(filter(lambda x: x['order_id'] != order_id, self.anonymised_lob[price]))
                 
-                # This is todo with kraken sending 0 volume orders so no update required!
-                if update_volume:
-                    self.book_volume -= (order.qty - order.qty_filled) # Remove remainining liquidity
+#                 # This is todo with kraken sending 0 volume orders so no update required!
+#                 if update_volume:
+#                     self.book_volume -= (order.qty - order.qty_filled) # Remove remainining liquidity
 
-                # Remove the price if there is nothing available
-                self.update_price(price)
-                return True
-            else:
-                # Edge case (Order already processed)
-                return False
-        elif order_spec.order_type == 'MKT':
-            order = self.get_order(order_id, 'MKT')
+#                 # Remove the price if there is nothing available
+#                 self.update_price(price)
+#                 return True
+#             else:
+#                 # Edge case (Order already processed)
+#                 return False
+#         elif order_spec.order_type == 'MKT':
+#             order = self.get_order(order_id, 'MKT')
 
-            if type(order) != type(None):
-                self._market_order_q = list(filter(lambda x: x.order_id != order_id, self._market_order_q))
-                self.anonymised_market_order_q = list(filter(lambda x: x['order_id'] != order_id, self.anonymised_market_order_q))
-                self.recompute_stats()
-                return True
-            else:
-                return False
+#             if type(order) != type(None):
+#                 self._market_order_q = list(filter(lambda x: x.order_id != order_id, self._market_order_q))
+#                 self.anonymised_market_order_q = list(filter(lambda x: x['order_id'] != order_id, self.anonymised_market_order_q))
+#                 self.recompute_stats()
+#                 return True
+#             else:
+#                 return False
 
-        return False
+#         return False
 
-    def has_market_orders(self):
-        return len(self._market_order_q) > 0
+#     def has_market_orders(self):
+#         return len(self._market_order_q) > 0
 
-    def recompute_stats(self):
-        # Prices in ascending order
-        available_prices = sorted(self.lob)
+#     def recompute_stats(self):
+#         # Prices in ascending order
+#         available_prices = sorted(self.lob)
 
-        # Compute best price
-        # Note: If there is no current prices we leave it unchanged as the 'last' best price
-        if len(available_prices) > 0:
-            self.best_price = available_prices[-1] if self.book_side == 'bids' else available_prices[0]
+#         # Compute best price
+#         # Note: If there is no current prices we leave it unchanged as the 'last' best price
+#         if len(available_prices) > 0:
+#             self.best_price = available_prices[-1] if self.book_side == 'bids' else available_prices[0]
         
-        # compute num orders
-        self.num_orders = sum([len(self.lob[price]) for price in self.lob]) + len(self._market_order_q)
-        self.book_depth = len(available_prices)
+#         # compute num orders
+#         self.num_orders = sum([len(self.lob[price]) for price in self.lob]) + len(self._market_order_q)
+#         self.book_depth = len(available_prices)
 
-    def update_price(self, price):
-        if len(self.lob[price]) == 0:
-            del(self.lob[price])
-            del(self.anonymised_lob[price])
+#     def update_price(self, price):
+#         if len(self.lob[price]) == 0:
+#             del(self.lob[price])
+#             del(self.anonymised_lob[price])
 
-        self.recompute_stats()
+#         self.recompute_stats()
 
-    def update_best_quote(self, quote):
-        if quote.order_type == "MKT":
-            warnings.warn(
-                'MKT order type is not supported for Kraken.', UserWarning)
-        elif quote.order_type == "LMT":
-            increase_in_filled_qty = quote.qty_filled - self.lob[self.best_price][0].qty_filled
+#     def update_best_quote(self, quote):
+#         if quote.order_type == "MKT":
+#             warnings.warn(
+#                 'MKT order type is not supported for Kraken.', UserWarning)
+#         elif quote.order_type == "LMT":
+#             increase_in_filled_qty = quote.qty_filled - self.lob[self.best_price][0].qty_filled
 
-            if quote.qty - quote.qty_filled > 0:
-                # Update the quote
-                self.lob[self.best_price][0] = quote
-                self.anonymised_lob[self.best_price][0] = self.anonymise(quote)
-            else:
-                # Remove the quote if it is filled entirely
-                self.lob[self.best_price].pop(0)
-                self.anonymised_lob[self.best_price].pop(0)
+#             if quote.qty - quote.qty_filled > 0:
+#                 # Update the quote
+#                 self.lob[self.best_price][0] = quote
+#                 self.anonymised_lob[self.best_price][0] = self.anonymise(quote)
+#             else:
+#                 # Remove the quote if it is filled entirely
+#                 self.lob[self.best_price].pop(0)
+#                 self.anonymised_lob[self.best_price].pop(0)
         
-            # Remove the price if there is nothing available
-            # And implicity recomputes the stats
+#             # Remove the price if there is nothing available
+#             # And implicity recomputes the stats
         
-            self.update_price(self.best_price)    
+#             self.update_price(self.best_price)    
 
-            # Remove the filled amount - Note we are only tracking limit volume
-            # id %s qty %s filled %s incre %s vol %s
-            self.book_volume -= increase_in_filled_qty
-            assert(self.book_volume >= 0)
+#             # Remove the filled amount - Note we are only tracking limit volume
+#             # id %s qty %s filled %s incre %s vol %s
+#             self.book_volume -= increase_in_filled_qty
+#             assert(self.book_volume >= 0)
 
-    def get_best_quote(self):
-        """
-        Gets the best available quote from the halfbook using the
-        price time priority queue protocol.
-        :return quote: an ExchangeOrder or None if none available
-        """
+#     def get_best_quote(self):
+#         """
+#         Gets the best available quote from the halfbook using the
+#         price time priority queue protocol.
+#         :return quote: an ExchangeOrder or None if none available
+#         """
 
-        # Implements a price time priority queue
-        has_limit_order = self.best_price in self.lob
-        has_market_order = len(self._market_order_q) > 0
+#         # Implements a price time priority queue
+#         has_limit_order = self.best_price in self.lob
+#         has_market_order = len(self._market_order_q) > 0
 
-        if has_limit_order and has_market_order:
-            best_limit_order = self.lob[self.best_price][0] 
-            best_market_order = self._market_order_q[0]
+#         if has_limit_order and has_market_order:
+#             best_limit_order = self.lob[self.best_price][0] 
+#             best_market_order = self._market_order_q[0]
 
-            limit_arrived_before_market = best_limit_order.submission_time < best_market_order.submission_time
+#             limit_arrived_before_market = best_limit_order.submission_time < best_market_order.submission_time
 
-            if limit_arrived_before_market:
-                return best_limit_order
-            else:
-                return best_market_order
+#             if limit_arrived_before_market:
+#                 return best_limit_order
+#             else:
+#                 return best_market_order
 
-        elif has_limit_order:
-            return self.lob[self.best_price][0] 
-        elif has_market_order:
-            return self._market_order_q[0]
-        else:
-            return None
+#         elif has_limit_order:
+#             return self.lob[self.best_price][0] 
+#         elif has_market_order:
+#             return self._market_order_q[0]
+#         else:
+#             return None
 
-class KrakenOrderbook:
-    def __init__(self, credentials, config, time_fn, ticker, tape, traders, observers, mark_traders_to_market, get_books, get_tape, update_pnls, trader_still_connected, get_trader_id, db):
-        self._bids = KrakenHalfOrderbook('bids')
-        self._asks = KrakenHalfOrderbook('asks')
-        self.get_time = time_fn  # Exchange time function
-        # since we do not trade on Kraken, we do not need to use wss://ws-auth.kraken.com
-        self._ws_uri = 'wss://ws.kraken.com'
-        self.ticker = ticker
-        self.credentials = credentials
+# class KrakenOrderbook:
+#     def __init__(self, credentials, config, time_fn, ticker, tape, traders, observers, mark_traders_to_market, get_books, get_tape, update_pnls, trader_still_connected, get_trader_id, db):
+#         self._bids = KrakenHalfOrderbook('bids')
+#         self._asks = KrakenHalfOrderbook('asks')
+#         self.get_time = time_fn  # Exchange time function
+#         # since we do not trade on Kraken, we do not need to use wss://ws-auth.kraken.com
+#         self._ws_uri = 'wss://ws.kraken.com'
+#         self.ticker = ticker
+#         self.credentials = credentials
 
-        # Forwarded from exhcange
-        self._tape = tape
-        self._traders = traders
-        self._observers = observers
-        self.mark_traders_to_market = mark_traders_to_market
-        self.get_books =  get_books
-        self.get_tape = get_tape
-        self.update_pnls = update_pnls
-        self.trader_still_connected = trader_still_connected
-        self.get_trader_id = get_trader_id
-        self._credentials = credentials
-        self.db = db
+#         # Forwarded from exhcange
+#         self._tape = tape
+#         self._traders = traders
+#         self._observers = observers
+#         self.mark_traders_to_market = mark_traders_to_market
+#         self.get_books =  get_books
+#         self.get_tape = get_tape
+#         self.update_pnls = update_pnls
+#         self.trader_still_connected = trader_still_connected
+#         self.get_trader_id = get_trader_id
+#         self._credentials = credentials
+#         self.db = db
 
-    async def connect(self):
-        last_connected_at = time.time()
+#     async def connect(self):
+#         last_connected_at = time.time()
 
-        while True:
-            try:
-                async with websockets.connect(self._ws_uri, ssl = True, max_size= None) as ws:
-                    # initialization
-                    # get system status info
-                    system_status = json.loads(await ws.recv())
-                    assert system_status['event'] == 'systemStatus' and system_status['status'] == 'online', \
-                        "Could not connect to the system. Response: " + str(system_status)
+#         while True:
+#             try:
+#                 async with websockets.connect(self._ws_uri, ssl = True, max_size= None) as ws:
+#                     # initialization
+#                     # get system status info
+#                     system_status = json.loads(await ws.recv())
+#                     assert system_status['event'] == 'systemStatus' and system_status['status'] == 'online', \
+#                         "Could not connect to the system. Response: " + str(system_status)
 
-                    # subscribe to book channel
-                    # get the maximum depth
-                    # the pair format is different than in Luno
-                    payload = {
-                        "event": "subscribe",
-                        "pair": [self.ticker[:3] + "/" + self.ticker[3:]],
-                        "subscription": {
-                            "name": "book",
-                            "depth": 1000
-                        }
-                    }
-                    await ws.send(json.dumps(payload))
-                    # we should get a confirmation about subscription
-                    subscription_status = json.loads(await ws.recv())
-                    assert subscription_status['status'] == "subscribed" and subscription_status['channelName'][:4] == "book", \
-                        "Did not successfully subscribe to book channel. Response: " + \
-                        str(subscription_status)
+#                     # subscribe to book channel
+#                     # get the maximum depth
+#                     # the pair format is different than in Luno
+#                     payload = {
+#                         "event": "subscribe",
+#                         "pair": [self.ticker[:3] + "/" + self.ticker[3:]],
+#                         "subscription": {
+#                             "name": "book",
+#                             "depth": 1000
+#                         }
+#                     }
+#                     await ws.send(json.dumps(payload))
+#                     # we should get a confirmation about subscription
+#                     subscription_status = json.loads(await ws.recv())
+#                     assert subscription_status['status'] == "subscribed" and subscription_status['channelName'][:4] == "book", \
+#                         "Did not successfully subscribe to book channel. Response: " + \
+#                         str(subscription_status)
                     
-                    # we should also get an initial snapshot of the book
-                    book_snapshot = json.loads(await ws.recv())
-                    book_channel_name = "book-" + str(payload["subscription"]["depth"])
-                    assert book_snapshot[2] == book_channel_name, \
-                        "Did not receive expected book snapshot. Response: " + str(book_snapshot)
-                    self.build_book(book_snapshot)
+#                     # we should also get an initial snapshot of the book
+#                     book_snapshot = json.loads(await ws.recv())
+#                     book_channel_name = "book-" + str(payload["subscription"]["depth"])
+#                     assert book_snapshot[2] == book_channel_name, \
+#                         "Did not receive expected book snapshot. Response: " + str(book_snapshot)
+#                     self.build_book(book_snapshot)
 
-                    # TODO: Reimplement Broadcast to traders when we start trading
-                    # broadcast the initial snapshot of the order book to the traders and observers
-                    # async def broadcast_to_trader_init(tid):
-                    #     # Optimised to not send back everything
-                    #     await self._traders[tid].send(json.dumps({'type': 'LOBS', 'data': self.get_books()}))
-                    #     await self._traders[tid].send(json.dumps({'type': 'tape', 'data': self.get_tape()}))
+#                     # TODO: Reimplement Broadcast to traders when we start trading
+#                     # broadcast the initial snapshot of the order book to the traders and observers
+#                     # async def broadcast_to_trader_init(tid):
+#                     #     # Optimised to not send back everything
+#                     #     await self._traders[tid].send(json.dumps({'type': 'LOBS', 'data': self.get_books()}))
+#                     #     await self._traders[tid].send(json.dumps({'type': 'tape', 'data': self.get_tape()}))
 
-                    # await asyncio.gather(*[broadcast_to_trader_init(tid) for tid in self._traders])
+#                     # await asyncio.gather(*[broadcast_to_trader_init(tid) for tid in self._traders])
 
-                    # Broadcast new book and tape to observers
-                    # async def broadcast_to_observer_init(oid):
-                    #     await self._observers[oid].send(json.dumps({'type': 'LOBS', 'data': self.get_books(order_type='LMT')}))
-                    #     # Only observers may recieve the market book for debug purposes
-                    #     await self._observers[oid].send(json.dumps({'type': 'MBS', 'data': self.get_books(order_type='MKT')}))
-                    #     await self._observers[oid].send(json.dumps({'type': 'tape', 'data': self.get_tape()}))
+#                     # Broadcast new book and tape to observers
+#                     # async def broadcast_to_observer_init(oid):
+#                     #     await self._observers[oid].send(json.dumps({'type': 'LOBS', 'data': self.get_books(order_type='LMT')}))
+#                     #     # Only observers may recieve the market book for debug purposes
+#                     #     await self._observers[oid].send(json.dumps({'type': 'MBS', 'data': self.get_books(order_type='MKT')}))
+#                     #     await self._observers[oid].send(json.dumps({'type': 'tape', 'data': self.get_tape()}))
 
-                    # await asyncio.gather(*[broadcast_to_observer_init(oid) for oid in self._observers])
+#                     # await asyncio.gather(*[broadcast_to_observer_init(oid) for oid in self._observers])
 
-                    self.db.update_prices(self.get_books(order_type='LMT'), "kraken")
+#                     self.db.update_prices(self.get_books(order_type='LMT'), "kraken")
 
-                    # receive updates
-                    # we do not check for failures such as incorrect checksum or no heartbeat for some time
-                    # we return to the outer while loop if connection fails
-                    while True:
-                        updates = json.loads(await ws.recv())
+#                     # receive updates
+#                     # we do not check for failures such as incorrect checksum or no heartbeat for some time
+#                     # we return to the outer while loop if connection fails
+#                     while True:
+#                         updates = json.loads(await ws.recv())
 
-                        # make sure this is not a general message and that it relates to the book channel
-                        if "event" not in updates and updates[-2][:4] == "book":
-                            # update the book
-                            self.update_book(updates)
-                            # print(updates)  # use this to check it works even after restart
-                            self.db.update_prices(self.get_books(tickers = [self.ticker], order_type='LMT'), "kraken")
+#                         # make sure this is not a general message and that it relates to the book channel
+#                         if "event" not in updates and updates[-2][:4] == "book":
+#                             # update the book
+#                             self.update_book(updates)
+#                             # print(updates)  # use this to check it works even after restart
+#                             self.db.update_prices(self.get_books(tickers = [self.ticker], order_type='LMT'), "kraken")
 
-                            # TODO: Reimplement Broadcast to traders when we start trading
-                            # # Broadcast new limit order books
-                            # async def broadcast_to_trader(tid):
-                            #     # Optimised to not send back everything
-                            #     await self._traders[tid].send(json.dumps({'type': 'LOBS', 'data': self.get_books(tickers = [self.ticker])}))
+#                             # TODO: Reimplement Broadcast to traders when we start trading
+#                             # # Broadcast new limit order books
+#                             # async def broadcast_to_trader(tid):
+#                             #     # Optimised to not send back everything
+#                             #     await self._traders[tid].send(json.dumps({'type': 'LOBS', 'data': self.get_books(tickers = [self.ticker])}))
 
-                            # await asyncio.gather(*[broadcast_to_trader(tid) for tid in self._traders])
+#                             # await asyncio.gather(*[broadcast_to_trader(tid) for tid in self._traders])
 
-                            # NOTE: This was causing problems so we've scrapped it (and the web UI for now)
-                            # # Broadcast new book and tape to observers
-                            # async def broadcast_to_observer(oid):
-                            #     await self._observers[oid].send(json.dumps({'type': 'LOBS', 'data': self.get_books(tickers = [self.ticker], order_type='LMT')}))
-                            #     # Only observers may recieve the market book for debug purposes
-                            #     await self._observers[oid].send(json.dumps({'type': 'MBS', 'data': self.get_books(tickers = [self.ticker], order_type='MKT')}))
+#                             # NOTE: This was causing problems so we've scrapped it (and the web UI for now)
+#                             # # Broadcast new book and tape to observers
+#                             # async def broadcast_to_observer(oid):
+#                             #     await self._observers[oid].send(json.dumps({'type': 'LOBS', 'data': self.get_books(tickers = [self.ticker], order_type='LMT')}))
+#                             #     # Only observers may recieve the market book for debug purposes
+#                             #     await self._observers[oid].send(json.dumps({'type': 'MBS', 'data': self.get_books(tickers = [self.ticker], order_type='MKT')}))
 
-                            # await asyncio.gather(*[broadcast_to_observer(oid) for oid in self._observers])
+#                             # await asyncio.gather(*[broadcast_to_observer(oid) for oid in self._observers])
 
-                            # We call mark to market again at to make sure 
-                            # we have caught any no transacted market moving limits
-                            # await self.mark_traders_to_market(self.ticker)
-            except:
-                print("Rebooting connection due to unexpected closure!")
-                print(sys.exc_info())
-                time.sleep(10) # Wait for connection to be resetablished
+#                             # We call mark to market again at to make sure 
+#                             # we have caught any no transacted market moving limits
+#                             # await self.mark_traders_to_market(self.ticker)
+#             except:
+#                 print("Rebooting connection due to unexpected closure!")
+#                 print(sys.exc_info())
+#                 time.sleep(10) # Wait for connection to be resetablished
 
-    def build_book(self, book_snapshot):
-        # we could use the provided timestamp - but then it would be inconsistent with Luno, so use self.get_time()
-        for order_data in book_snapshot[1]['bs']:
-            # order_data is an array of price, volume, timestamp in this order
-            # price is used as the id
-            order_data_mod = {'order_id': order_data[0], 'type': 'BID', 'price': order_data[0], 'volume': order_data[1]}
-            self.update_orders(KrakenToExchangeOrder(self.ticker, order_data_mod, self.get_time(), self.get_trader_id))
+#     def build_book(self, book_snapshot):
+#         # we could use the provided timestamp - but then it would be inconsistent with Luno, so use self.get_time()
+#         for order_data in book_snapshot[1]['bs']:
+#             # order_data is an array of price, volume, timestamp in this order
+#             # price is used as the id
+#             order_data_mod = {'order_id': order_data[0], 'type': 'BID', 'price': order_data[0], 'volume': order_data[1]}
+#             self.update_orders(KrakenToExchangeOrder(self.ticker, order_data_mod, self.get_time(), self.get_trader_id))
 
-        for order_data in book_snapshot[1]['as']:
-            # order_data is an array of price, volume, timestamp in this order
-            # price is used as the id
-            order_data_mod = {'order_id': order_data[0], 'type': 'ASK', 'price': order_data[0], 'volume': order_data[1]}
-            self.update_orders(KrakenToExchangeOrder(self.ticker, order_data_mod, self.get_time(), self.get_trader_id))
+#         for order_data in book_snapshot[1]['as']:
+#             # order_data is an array of price, volume, timestamp in this order
+#             # price is used as the id
+#             order_data_mod = {'order_id': order_data[0], 'type': 'ASK', 'price': order_data[0], 'volume': order_data[1]}
+#             self.update_orders(KrakenToExchangeOrder(self.ticker, order_data_mod, self.get_time(), self.get_trader_id))
 
-    def update_orders(self, exchange_order):
-        halfbook = self._bids if exchange_order.action == "BUY" else self._asks
-        halfbook.update_orders(exchange_order)
+#     def update_orders(self, exchange_order):
+#         halfbook = self._bids if exchange_order.action == "BUY" else self._asks
+#         halfbook.update_orders(exchange_order)
 
-    def update_book(self, updates):
-        # some updates may be a republication - but that does not affect the result, so we do not check for it
-        if "a" in updates[1]:
-            for order_data in updates[1]['a']:
-                order_data_mod = {'order_id': order_data[0], 'type': 'ASK', 'price': order_data[0], 'volume': order_data[1]}
-                self.update_orders(KrakenToExchangeOrder(
-                    self.ticker, order_data_mod, self.get_time(), self.get_trader_id))
-        if "b" in updates[1]:
-            for order_data in updates[1]['b']:
-                order_data_mod = {'order_id': order_data[0], 'type': 'BID', 'price': order_data[0], 'volume': order_data[1]}
-                self.update_orders(KrakenToExchangeOrder(
-                    self.ticker, order_data_mod, self.get_time(), self.get_trader_id))
+#     def update_book(self, updates):
+#         # some updates may be a republication - but that does not affect the result, so we do not check for it
+#         if "a" in updates[1]:
+#             for order_data in updates[1]['a']:
+#                 order_data_mod = {'order_id': order_data[0], 'type': 'ASK', 'price': order_data[0], 'volume': order_data[1]}
+#                 self.update_orders(KrakenToExchangeOrder(
+#                     self.ticker, order_data_mod, self.get_time(), self.get_trader_id))
+#         if "b" in updates[1]:
+#             for order_data in updates[1]['b']:
+#                 order_data_mod = {'order_id': order_data[0], 'type': 'BID', 'price': order_data[0], 'volume': order_data[1]}
+#                 self.update_orders(KrakenToExchangeOrder(
+#                     self.ticker, order_data_mod, self.get_time(), self.get_trader_id))
     
-    def get_order_by_id(self, order_id):
-        buy_order = self._bids.get_order(order_id, 'LMT')
+#     def get_order_by_id(self, order_id):
+#         buy_order = self._bids.get_order(order_id, 'LMT')
 
-        if type(buy_order) == type(None):
-            sell_order = self._asks.get_order(order_id, 'LMT')
-            return sell_order
-        else:
-            return buy_order
+#         if type(buy_order) == type(None):
+#             sell_order = self._asks.get_order(order_id, 'LMT')
+#             return sell_order
+#         else:
+#             return buy_order
 
-    def get_LOB(self):
-        return LOB(self._bids.anonymised_lob, self._asks.anonymised_lob, self._bids.best_price, self._asks.best_price, self._bids.book_depth, self._asks.book_depth, self._bids.num_orders, self._asks.num_orders, round(self._bids.book_volume,2), round(self._asks.book_volume,2))
+#     def get_LOB(self):
+#         return LOB(self._bids.anonymised_lob, self._asks.anonymised_lob, self._bids.best_price, self._asks.best_price, self._bids.book_depth, self._asks.book_depth, self._bids.num_orders, self._asks.num_orders, round(self._bids.book_volume,2), round(self._asks.book_volume,2))
 
-    def get_market_book(self):
-        return MarketBook(self._bids.anonymised_market_order_q, self._asks.anonymised_market_order_q)
+#     def get_market_book(self):
+#         return MarketBook(self._bids.anonymised_market_order_q, self._asks.anonymised_market_order_q)
 
 # class BitstampOrderbook: 
 #     def __init__(self, credentials, config, time_fn, ticker, tape, traders, observers, mark_traders_to_market, get_books, get_tape, update_pnls, trader_still_connected, get_trader_id, db):
@@ -1958,8 +1958,9 @@ def main():
         luno_exchange = Exchange('luno',db, LunaOrderbook)
         bitstamp_exchange = Exchange('bitstamp',db, BitstampOrderbook)
         globitex_exchange = Exchange('globitex',db, GlobitexOrderbook)
+        kraken_exchange = Exchange('kraken',db, KrakenOrderbook)
 
-        exchanges = [luno_exchange, bitstamp_exchange, globitex_exchange]
+        exchanges = [luno_exchange, bitstamp_exchange, globitex_exchange, kraken_exchange]
         
         core = asyncio.gather(*[exchange.connect() for exchange in exchanges])
 
