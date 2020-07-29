@@ -10,12 +10,12 @@
     "exchanges": {
         "notes": "Base currency is a direct quote => USD will be the # CAD required to buy 1 USD",
         "active_case": "kraken",
-        "citadel_algo_case": {
+        "simulator": {
             "websocket": {
                 "port": 5678,
                 "ip": "localhost"
             },
-            "base_currency": "CAD", 
+            "base_currency": "CAD",
             "simulation_end_time": 300,
             "prevent_self_trades": 0,
             "simulation_notional_timestep": 3600,
@@ -78,7 +78,7 @@
                             "tender_price_deviation": 2,
                             "expected_tender_qty": 250,
                             "expires_after": 10
-                        } 
+                        }
                     }
                 },
                 "BULL": {
@@ -105,9 +105,9 @@
                             "tender_price_deviation": 1.5,
                             "expected_tender_qty": 250,
                             "expires_after": 10
-                        } 
+                        }
                     }
-                }, 
+                },
                 "USD": {
                     "trade_cost": 0.02,
                     "rebate": 0.01,
@@ -126,7 +126,7 @@
                         },
                         "institutional_orders": {
                             "enabled": false
-                        } 
+                        }
                     }
                 }
             }
@@ -136,7 +136,7 @@
                 "port": 5679,
                 "ip": "localhost"
             },
-            "base_currency": "GBP", 
+            "base_currency": "GBP",
             "prevent_self_trades": 0,
             "market_agents": {},
             "credentials": {
@@ -165,7 +165,7 @@
                 "port": 5680,
                 "ip": "localhost"
             },
-            "base_currency": "GBP", 
+            "base_currency": "GBP",
             "prevent_self_trades": 0,
             "market_agents": {},
             "credentials": {
@@ -188,13 +188,13 @@
                     "market_dynamics": {}
                 }
             }
-        }, 
+        },
         "bitstamp": {
             "websocket": {
-                "port": 5680,
+                "port": 5681,
                 "ip": "localhost"
             },
-            "base_currency": "GBP", 
+            "base_currency": "GBP",
             "prevent_self_trades": 0,
             "market_agents": {},
             "credentials": {
@@ -207,6 +207,35 @@
             },
             "securities": {
                 "btcgbp": {
+                    "trade_cost": 0.0025,
+                    "rebate": 0,
+                    "max_order_size": 10000,
+                    "risk_limit_multiplier": 1,
+                    "resolution": 2,
+                    "contract_point_value": 1,
+                    "quote_currency": "GBP",
+                    "market_dynamics": {}
+                }
+            }
+        },
+        "globitex": {
+            "websocket": {
+                "port": 5682,
+                "ip": "localhost"
+            },
+            "base_currency": "GBP",
+            "prevent_self_trades": 0,
+            "market_agents": {},
+            "credentials": {
+                "api_key_id": "m9w952edzhqfr",
+                "api_key_secret": "OcpAf1m9ZbgLbsS9LjyzoccFZAmUtOwTgOwmufMbfDE"
+            },
+            "risk_limits": {
+                "net_position": 100000,
+                "gross_position": 100000
+            },
+            "securities": {
+                "BTCGBP": {
                     "trade_cost": 0.0025,
                     "rebate": 0,
                     "max_order_size": 10000,
