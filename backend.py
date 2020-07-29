@@ -1347,7 +1347,7 @@ class MarketDynamics:
 
 class Exchange:
     # TODO: Implement Risk Rules / trade limits
-    def __init__(self, exchange_name, db, config_dir='./configs/backend_config.json'):
+    def __init__(self, exchange_name, db, orderbook_class, config_dir='./configs/backend_config.json'):
         # read config dir
         with open(config_dir) as config_file:
             self._config = json.load(config_file)
@@ -1356,10 +1356,11 @@ class Exchange:
         self._exchange_name = exchange_name
         self._case_config = self._config['exchanges'][self._exchange_name]
 
-        if self._exchange_name == 'luno' or self._exchange_name == 'kraken' or self._exchange_name == 'bitstamp':
+        if self._exchange_name != 'simulator':
             self._credentials = self._case_config['credentials']
             self._client = Client(api_key_id=self._credentials['api_key_id'], api_key_secret=self._credentials['api_key_secret'])
         
+        self.orderbook_class =orderbook_class
         self._port = self._case_config['websocket']['port']
         self._ip = self._case_config['websocket']['ip']
         self._webserver_port = self._config['app-websocket']['port']
@@ -1377,7 +1378,7 @@ class Exchange:
         self._db = db
 
     def connect(self):
-        if self._exchange_name != 'luno' and self._exchange_name != 'kraken' and self._exchange_name != 'bitstamp':
+        if self._exchange_name == 'simulator':
             self._market_dynamics = self.init_market_dynamics()
         
         self._books = self.init_books()
@@ -1399,7 +1400,7 @@ class Exchange:
         handler = websockets.serve(self.exchange_handler, self._ip, self._port, max_size = None)
 
         # Creating Price Paths for securities
-        if self._exchange_name != 'luno' and self._exchange_name != 'kraken'  and self._exchange_name != 'bitstamp':
+        if self._exchange_name == 'simulator':
             dynamics = asyncio.gather(*[md.create_dynamics() for ticker, md in self._market_dynamics.items()])
 
         # Communications to web app intermediary
@@ -1407,24 +1408,13 @@ class Exchange:
         webserver = self.connect_to_web_server()
 
         # core = asyncio.gather(handler, dynamics)
-        if self._exchange_name != 'luno' and self._exchange_name != 'kraken' and self._exchange_name != 'bitstamp':
+        if self._exchange_name == 'simulator':
             core = asyncio.gather(webserver, handler, dynamics)
-        elif self._exchange_name == 'kraken' or self._exchange_name == 'bitstamp':
-            book_monitors = asyncio.gather(*[book.connect() for ticker, book in self._books.items()])
-            core = asyncio.gather(book_monitors, webserver)
-            # TODO: decide if we want a handler here?
         else:
             book_monitors = asyncio.gather(*[book.connect() for ticker, book in self._books.items()])
-            core = asyncio.gather(book_monitors, webserver, handler)
+            core = asyncio.gather(book_monitors, webserver)
         
         return core
-        # server, _ = loop.run_until_complete(core)
-
-        # loop.run_forever()
-
-        # # Close the server
-        # server.close()
-        # loop.run_until_complete(server.wait_closed())
 
     async def connect_to_web_server(self):
         # Abstracts away messages sent to vuejs
@@ -1692,19 +1682,8 @@ class Exchange:
             if self._exchange_name == 'luno':
                 books[ticker] = LunaOrderbook(self._credentials, securities_config[ticker], 
                 self.get_time, ticker, self._tape, self._traders, self._observers, self.mark_traders_to_market,  self.get_books, self.get_tape, self.update_pnls, self.trader_still_connected, self.get_trader_id, self._db)
-            elif self._exchange_name == 'kraken':
-                books[ticker] = KrakenOrderbook(self._credentials, securities_config[ticker], 
-                self.get_time, ticker, self._tape, self._traders, self._observers, self.mark_traders_to_market,  self.get_books, self.get_tape, self.update_pnls, self.trader_still_connected, self.get_trader_id, self._db)
-            elif self._exchange_name == 'bitstamp':
-                # books[ticker] = BitstampOrderbook(self._credentials, securities_config[ticker], 
-                # self.get_time, ticker, self._tape, self._traders, self._observers, self.mark_traders_to_market,  self.get_books, self.get_tape, self.update_pnls, self.trader_still_connected, self.get_trader_id, self._db)
-                
-                books[ticker] = BitstampOrderbook(self.create_exchange_config_for_orderbook(), ticker, self._credentials, True)
-            elif self._exchange_name == 'globitex':
-                # books[ticker] = BitstampOrderbook(self._credentials, securities_config[ticker], 
-                # self.get_time, ticker, self._tape, self._traders, self._observers, self.mark_traders_to_market,  self.get_books, self.get_tape, self.update_pnls, self.trader_still_connected, self.get_trader_id, self._db)
-                
-                books[ticker] = GlobitexOrderbook(self.create_exchange_config_for_orderbook(), ticker, self._credentials, False)
+            elif self._exchange_name != 'simulator':
+                books[ticker] = self.orderbook_class(self.create_exchange_config_for_orderbook(), ticker, self._credentials, True)
             else:
                 books[ticker] = Orderbook(securities_config[ticker], time_fn=self.get_time)
         
@@ -1973,32 +1952,24 @@ class Exchange:
         }
 
 def main():
-    # parser = argparse.ArgumentParser(description='Runs exchange backend')
-    # parser.add_argument("-e", '--exchange', help="select the exchange setup to run")
-
-    # args = parser.parse_args()
-
-    # if args.exchange:
-    #     exchange = Exchange(args.exchange) 
-    # else:
-    #     print("Please specify an exchange name (--exchange or -e)")
     with Database() as db:
         loop = asyncio.get_event_loop()
 
-        luno_exchange = Exchange('luno',db)
-        bitstamp_exchange = Exchange('bitstamp',db)
+        luno_exchange = Exchange('luno',db, LunaOrderbook)
+        bitstamp_exchange = Exchange('bitstamp',db, BitstampOrderbook)
+        globitex_exchange = Exchange('globitex',db, GlobitexOrderbook)
 
-        core_luno = luno_exchange.connect()
-        core_bitstamp = bitstamp_exchange.connect()
+        exchanges = [luno_exchange, bitstamp_exchange, globitex_exchange]
         
-        core = asyncio.gather(core_luno, core_bitstamp)
+        core = asyncio.gather(*[exchange.connect() for exchange in exchanges])
 
-        luno, bitstamp = loop.run_until_complete(core)
+        servers = loop.run_until_complete(core)
         loop.run_forever()
 
-        luno[0].close()
-        kraken[0].close()
-        loop.run_until_complete(asyncio.gather(luno[0].wait_closed(), bitstamp[0].wait_closed()))
+        for server in servers:
+            servers[0].close()
+        
+        loop.run_until_complete(asyncio.gather(*[server[0].wait_closed() for server in servers]))
 
 if __name__ == "__main__":
     main()

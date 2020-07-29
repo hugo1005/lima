@@ -594,7 +594,7 @@ class GlobitexOrderbook(ExternalOrderbook):
 
     def define_book_snapshot_uri(self):
         """ MODIFY: Define snapshot endpoint """
-        return 'https://globitex.com/api/1/public/orderbook/'+ self.ticker
+        return 'https://api.globitex.com/api/1/public/orderbook/'+ self.ticker
 
     async def assert_subscription_success(self, ws):
         """ MODIFY: Assert that stream was succesfully subscribed """
@@ -649,13 +649,12 @@ class GlobitexOrderbook(ExternalOrderbook):
         :return seq: The sequence number of the latest order
         """
         parsed = json.loads(msg)
-        
+        print(parsed)
         if "MarketDataIncrementalRefresh" in parsed:
-            if parsed["symbol"] == self.ticker:
+            data = parsed['MarketDataIncrementalRefresh']
 
-                data = parsed['MarketDataIncrementalRefresh']
-                current_seq = parsed["seqNo"]
-                event_type = parsed['event']
+            if data["symbol"] == self.ticker:
+                current_seq = data["seqNo"]
                 
                 for side in ['bid', 'ask']:
                     for order_data in data[side]:
