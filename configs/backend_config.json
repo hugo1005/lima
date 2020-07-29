@@ -191,7 +191,7 @@
         }, 
         "bitstamp": {
             "websocket": {
-                "port": 5680,
+                "port": 5681,
                 "ip": "localhost"
             },
             "base_currency": "GBP", 
@@ -220,7 +220,7 @@
         },
         "globitex": {
             "websocket": {
-                "port": 5680,
+                "port": 5682,
                 "ip": "localhost"
             },
             "base_currency": "GBP", 
