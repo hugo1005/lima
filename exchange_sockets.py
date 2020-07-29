@@ -5,8 +5,9 @@ import time
 import asyncio
 import json
 from collections import namedtuple
-from shared import to_named_tuple
+from shared import to_named_tuple, ExchangeOrder, MarketBook, ExchangeOrderAnon, LOB
 from abc import ABC, abstractmethod
+import warnings
 
 class ExternalHalfOrderbook:
     def __init__(self, book_side):
@@ -183,7 +184,7 @@ class ExternalHalfOrderbook:
             return None
 
 class ExternalOrderbook(ABC): 
-    def __init__(self, exchange_config, ticker, credentials, await_success_response):
+    def __init__(self, exchange_config, ticker, credentials, await_success_response, exchange_name='luno'):
         # Stanardised info passed from backend
         # exchange_config = {
         #     'time_fn': None,
@@ -212,6 +213,7 @@ class ExternalOrderbook(ABC):
         self.trader_still_connected =  exchange_config['trader_still_connected'] 
         self.get_trader_id = exchange_config['get_trader_id'] 
         self.db = exchange_config['db'] 
+        self.exchange_name = exchange_name
 
         # Args
         self.ticker = ticker
@@ -253,7 +255,7 @@ class ExternalOrderbook(ABC):
         self.build_book(data)
     
     def update_database(self):
-        self.db.update_prices(self.get_books(tickers = [self.ticker], order_type='LMT'), "bitstamp")
+        self.db.update_prices(self.get_books(tickers = [self.ticker], order_type='LMT'), self.exchange_name)
 
     def build_book(self, book):
         for bid in book['bids']:
@@ -261,7 +263,7 @@ class ExternalOrderbook(ABC):
             self.add_order(order)
             
         for ask in book['asks']:
-            order = self.parse_snapshot_order(bid, 'ASK')
+            order = self.parse_snapshot_order(ask, 'ASK')
             self.add_order(order)
 
     async def incremental_updates(self):
@@ -272,14 +274,14 @@ class ExternalOrderbook(ABC):
             seq = -1
 
             async for msg in ws:
-                seq = self.parse_incremental_update(msg, seq)
+                seq = await self.parse_incremental_update(msg, seq)
 
     async def subscribe_to_stream(self, ws):
-        if type(self._subscription_message) != type(None:
+        if type(self._subscription_message) != type(None):
             await ws.send(self._subscription_message)
             
             if self._has_subscription_success_response:
-                await assert_subscription_success()
+                await self.assert_subscription_success(ws)
 
     async def send_snapshot_to_traders(self):
         await asyncio.gather(*[self.broadcast_to_trader(tid) for tid in self._traders])
@@ -292,19 +294,19 @@ class ExternalOrderbook(ABC):
         # tape = json.dumps({'type': 'tape', 'data': self.get_tape()})
         # await self._traders[tid].send(tape)
 
-    async def propogate_event_updates(self):
-        await self.send_snapshot_to_traders()
-        self.update_database()
-        self.mark_traders_to_market(self.ticker)
-
     async def handle_event(self, event_type, parsed, seq):
         handler = self.handlers[event_type]
         new_seq = handler(parsed, seq)
         await self.propogate_event_updates()
-
+        
         return new_seq
 
-        def add_order(self, exchange_order):
+    async def propogate_event_updates(self):
+        await self.send_snapshot_to_traders()
+        self.update_database()
+        await self.mark_traders_to_market(self.ticker)
+
+    def add_order(self, exchange_order):
         halfbook = self._bids if exchange_order.action == "BUY" else self._asks
         halfbook.add_order(exchange_order)
     
@@ -353,34 +355,33 @@ class ExternalOrderbook(ABC):
     
     def handle_order_create(self, data, seq):
         new_seq = self.assert_sequence_integrity(data, seq)
-
-        order = parse_streamed_order(data)
+        order = self.parse_streamed_order(data)
         self.add_order(order)
         return new_seq
 
     def handle_order_delete(self, data, seq):
         new_seq = self.assert_sequence_integrity(data, seq)
 
-        order = parse_streamed_order(data)
+        order = self.parse_streamed_order(data)
         self.cancel_order_with_id(order.order_id)
         return new_seq
 
     def handle_reconnect_request(self, parsed, seq):
         raise ConnectionResetError("Exchange requests reconnect...")
  
-    def map_message_to_handler(event_type, data, seq):
+    async def map_message_to_handler(self, event_type, data, seq):
         if event_type in self.handlers:
             return await self.handle_event(event_type, data, seq)
         else:
             print("Unkown event occured.... %s" % event_type)
             return seq
 
-
     @abstractmethod
     def define_websocket_url(self):
         """ MODIFY: define the enpoint for the websocket
         """
         # return  'wss://ws.bitstamp.net'
+        print("Warning: Unimplemeneted!")
         pass
 
     @abstractmethod
@@ -394,6 +395,7 @@ class ExternalOrderbook(ABC):
         #     "order_deleted": self.handle_order_delete,
         #     "order_changed": self.handle_order_change,
         # }
+        print("Warning: Unimplemeneted!")
         pass
 
     @abstractmethod
@@ -408,18 +410,21 @@ class ExternalOrderbook(ABC):
     @abstractmethod
     def define_book_snapshot_uri(self):
         """ MODIFY: Define snapshot endpoint """
+        print("Warning: Unimplemeneted!")
         # return 'https://www.bitstamp.net/api/v2/order_book/'+ self.ticker + '?group=2'
         pass
 
     @abstractmethod
-    async def assert_subscription_success(self):
+    async def assert_subscription_success(self, ws):
         """ MODIFY: Assert that stream was succesfully subscribed """
+        print("Warning: Unimplemeneted!")
         # response = await ws.recv()
         # assert json.loads(response)['event'] == 'bts:subscription_succeeded'
 
     @abstractmethod
     def assert_sequence_integrity(self, data, seq):
         """ MODIFY: Assert that stream sequencing of messages is correct """
+        print("Warning: Unimplemeneted!")
         # new_seq = float(data['microtimestamp'])
 
         # if new_seq < seq:
@@ -433,6 +438,7 @@ class ExternalOrderbook(ABC):
         MODIFY: Format of order data recieved in initial snapshot 
         :return ExchangeOrder
         """
+        print("Warning: Unimplemeneted!")
         # # provided
         # price, qty, order_id = float(order_msg[0]), float(order_msg[1]), order_msg[2]
 
@@ -450,6 +456,7 @@ class ExternalOrderbook(ABC):
         MODIFY: Format of order data recieved in stream data 
         :return ExchangeOrder: An order as specified in shared.py
         """
+        print("Warning: Unimplemeneted!")
         # # provided
         # price, qty = float(order_msg['price']), float(order_msg['amount'])
         # order_id, order_type =  order_msg['id'], int(order_msg['order_type'])
@@ -462,21 +469,21 @@ class ExternalOrderbook(ABC):
         # return ExchangeOrder(self.ticker, tid, order_id, 'LMT', qty, action, price, 0, submission_time)
 
     @abstractmethod
-    def parse_incremental_update(self, msg, seq):
+    async def parse_incremental_update(self, msg, seq):
         """ 
         MODIFY: Each exchange may have a slightly different JSON structure
         :return seq: The sequence number of the latest order
         """
+        print("Warning: Unimplemeneted!")
         # parsed = json.loads(msg)
         # event_type = parsed['event']
         # data = parsed['data']
 
         # return self.map_message_to_handler(event_type, data, seq)
 
-
 class BitstampOrderbook(ExternalOrderbook):
     def __init__(self, exchange_config, ticker, credentials, await_success_response):
-        super().__init__(exchange_config, ticker, credentials, await_success_response)
+        super().__init__(exchange_config, ticker, credentials, await_success_response, exchange_name='bitstamp')
 
     def define_websocket_url(self):
         """ MODIFY: define the enpoint for the websocket
@@ -505,7 +512,7 @@ class BitstampOrderbook(ExternalOrderbook):
         """ MODIFY: Define snapshot endpoint """
         return 'https://www.bitstamp.net/api/v2/order_book/'+ self.ticker + '?group=2'
 
-    async def assert_subscription_success(self):
+    async def assert_subscription_success(self, ws):
         """ MODIFY: Assert that stream was succesfully subscribed """
         response = await ws.recv()
         assert json.loads(response)['event'] == 'bts:subscription_succeeded'
@@ -551,19 +558,18 @@ class BitstampOrderbook(ExternalOrderbook):
 
         return ExchangeOrder(self.ticker, tid, order_id, 'LMT', qty, action, price, 0, submission_time)
 
-    def parse_incremental_update(self, msg, seq):
+    async def parse_incremental_update(self, msg, seq):
         """ 
         MODIFY: Each exchange may have a slightly different JSON structure
         :return seq: The sequence number of the latest order
         """
         parsed = json.loads(msg)
-        event_type = parsed['event']
+        event_type = parsed['event'].strip()
         data = parsed['data']
-
-        return self.map_message_to_handler(event_type, data, seq)
+        return await self.map_message_to_handler(event_type, data, seq)
 
 class GlobitexOrderbook(ExternalOrderbook):
-    def __init__(self, exchange_config, ticker, credentials, await_success_response):
+    def __init__(self, exchange_config, ticker, credentials, await_success_response, exchange_name='globitex'):
         super().__init__(exchange_config, ticker, credentials, await_success_response)
 
     def define_websocket_url(self):
@@ -590,7 +596,7 @@ class GlobitexOrderbook(ExternalOrderbook):
         """ MODIFY: Define snapshot endpoint """
         return 'https://globitex.com/api/1/public/orderbook/'+ self.ticker
 
-    async def assert_subscription_success(self):
+    async def assert_subscription_success(self, ws):
         """ MODIFY: Assert that stream was succesfully subscribed """
         response = await ws.recv()
         assert json.loads(response)['event'] == 'bts:subscription_succeeded'
@@ -637,7 +643,7 @@ class GlobitexOrderbook(ExternalOrderbook):
 
         return ExchangeOrder(self.ticker, tid, order_id, 'LMT', qty, action, price, 0, submission_time)
 
-    def parse_incremental_update(self, msg, seq):
+    async def parse_incremental_update(self, msg, seq):
         """ 
         MODIFY: Each exchange may have a slightly different JSON structure
         :return seq: The sequence number of the latest order
@@ -656,17 +662,17 @@ class GlobitexOrderbook(ExternalOrderbook):
                         order_data['microtimestamp'] = current_seq
                         order_data['order_type'] = side
                         
-                        order = parse_streamed_order(order).qty
+                        order = self.parse_streamed_order(order).qty
 
                         if order.qty == 0:
-                            self.map_message_to_handler("order_deleted", order_data)
+                            return await self.map_message_to_handler("order_deleted", order_data, current_seq)
                         else:
                             halfbook = self._bids if side == 'bid' else self._asks
                             
                             if order.price in halfbook.lob:
-                                self.map_message_to_handler("order_changed", order_data)
+                                return await self.map_message_to_handler("order_changed", order_data, current_seq)
                             else: 
-                                self.map_message_to_handler("order_created", order_data)
+                                return await self.map_message_to_handler("order_created", order_data, current_seq)
 
             return current_seq
         else:
