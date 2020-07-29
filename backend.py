@@ -1683,7 +1683,7 @@ class Exchange:
                 books[ticker] = LunaOrderbook(self._credentials, securities_config[ticker], 
                 self.get_time, ticker, self._tape, self._traders, self._observers, self.mark_traders_to_market,  self.get_books, self.get_tape, self.update_pnls, self.trader_still_connected, self.get_trader_id, self._db)
             elif self._exchange_name != 'simulator':
-                books[ticker] = self.orderbook_class(self.create_exchange_config_for_orderbook(), ticker, self._credentials, True)
+                books[ticker] = self.orderbook_class(self.create_exchange_config_for_orderbook(), ticker, self._credentials, True, exchange_name=self._exchange_name)
             else:
                 books[ticker] = Orderbook(securities_config[ticker], time_fn=self.get_time)
         

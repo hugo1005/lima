@@ -503,9 +503,8 @@ class ExternalOrderbook(ABC):
         # return self.map_message_to_handler(event_type, data, seq)
 
 class BitstampOrderbook(ExternalOrderbook):
-    def __init__(self, exchange_config, ticker, credentials, await_success_response):
-        super().__init__(exchange_config, ticker, credentials, await_success_response, exchange_name='bitstamp')
-
+    def __init__(self, exchange_config, ticker, credentials, await_success_response, exchange_name='bitstamp'):
+        super().__init__(exchange_config, ticker, credentials, await_success_response, exchange_name=exchange_name)
     async def assert_setup_success(self, ws):
         """ MODIFY: Assert that stream was succesfully subscribed """
         return None
@@ -706,8 +705,8 @@ class GlobitexOrderbook(ExternalOrderbook):
             return seq
 
 class KrakenOrderbook(ExternalOrderbook):
-    def __init__(self, exchange_config, ticker, credentials, await_success_response, exchange_name='globitex'):
-        super().__init__(exchange_config, ticker, credentials, await_success_response)
+    def __init__(self, exchange_config, ticker, credentials, await_success_response, exchange_name='kraken'):
+        super().__init__(exchange_config, ticker, credentials, await_success_response, exchange_name=exchange_name)
 
     def define_websocket_url(self):
         """ MODIFY: define the enpoint for the websocket
