@@ -18,7 +18,7 @@ signalmatrix=signalmatrix.join(df(df_general['lAsk']-df_general['kAsk']),rsuffix
 #The big boy
 exec(open("S1_General.py").read())
 
-timeindf,RoT=trading_plugin(buy_and_sell_entries(10,10))
+timeindf,RoT=trading_plugin(buy_and_sell_entries(20,10))
 
 #In case you fancy
 timeindf['RoT']=RoT
