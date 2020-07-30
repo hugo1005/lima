@@ -263,6 +263,8 @@ class ExternalOrderbook(ABC):
         elif 'result' in data:
             nested = data['result']
             return nested[list(nested.keys())[0]][target]
+        else:
+            return []
 
     def update_database(self):
         self.db.update_prices(self.get_books(tickers = [self.ticker], order_type='LMT'), self.exchange_name)
