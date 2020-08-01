@@ -82,18 +82,19 @@ export default {
       marginRight: {default: 8, type: Number},
       marginTop: {default: 16, type: Number},
       marginBottom: {default: 16, type: Number}, 
-      colorBidLine: {default: 'white', type: String}, // Color outline of candle
-      colorAskLine: {default: 'white', type: String}, // Color outline of candle
+      colorBidLine: {default: '#46C38F', type: String}, // Color outline of candle
+      colorAskLine: {default: '#EC7F6C', type: String}, // Color outline of candle
       showEveryKthPoint: {default: 10, type: Number}, // Shows every 10th Price Point
       maxPointsToShow: {default: 10, type: Number},
-      showEveryKthTime: {default: 30, type: Number}, // Default 5s time interval -> show line every 30 seconds
-      maxTimePeriodDisplay: {default: 120, type: Number} // Time in seconds
+      showEveryKthTime: {default: 10, type: Number}, // Default 5s time interval -> show line every 30 seconds
+      maxTimePeriodDisplay: {default: 30, type: Number} // Time in seconds
   },
   computed: {
     ...mapGetters({
         getProduct: 'frontend/getProduct'
     }),
     unfilteredProductBidAsk: function() {
+        console.log("Getting product info!")
         return this.getProduct(this.ticker)
     },
     productBidAsk: function() {
@@ -106,9 +107,9 @@ export default {
     },
     xTicks: function() {
         if(this.productBidAsk.length > 0) {
+            
             let numXTicks = Math.floor(this.maxTimePeriodDisplay / this.resolution) + 1
             let xTickValues = [...Array(numXTicks).keys()].map(x => (this.productBidAsk[0].timestamp + (x * this.resolution)))
-            
             return xTickValues
         } else {
             return []
@@ -132,10 +133,13 @@ export default {
     y: function() {
         let minLow = Math.min(...this.productBidAsk.map(tick => tick.best_bid))
         let maxHigh = Math.max(...this.productBidAsk.map(tick => tick.best_ask))
+        console.log(minLow, maxHigh)
 
+        let min =  Math.min(minLow, maxHigh)
+        let max =  Math.max(minLow, maxHigh)
         // Y-axis is a continuous price scale
         let y = d3.scaleLinear()
-            .domain([minLow-0.2, maxHigh+0.2])
+            .domain([min-2, max+2])
             .range([this.height - this.marginBottom, this.marginTop]) // Make sure axis goes increasing from bottom to top of screen!
         
         return y

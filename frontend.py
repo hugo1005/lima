@@ -354,8 +354,9 @@ class ExchangeConnection:
         # ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
         # ssl_context.load_verify_locations(pathlib.Path("ssl_cert/cert.pem"))
         # async with websockets.connect(self._uri, ssl = ssl_context) as ws:
-        
+        print("Connecting to %s" % self._uri)
         async with websockets.connect(self._uri, max_size= None) as ws:
+            
             # First message recieved on connecting is your trader id
             # Note losing connection to the server will be fatal
             # As you will not be able to rejoin with the same id.
@@ -461,13 +462,13 @@ class ExchangeConnection:
 
     async def dispatch_products_to_app(self, ws_app, update_delay = 1):
          while True:
-            for security in self._products:
+            for security, prefix in self._products:
                 best_bid = security.evaluate(1)
                 best_ask = security.evaluate(-1)
                 ticker = security._ticker
 
                 # Updates every second.
-                data = {'ticker': ticker, 'timestamp': floor(time() - self._exchange_open_time), 'best_bid': best_bid, 'best_ask': best_ask}
+                data = {'ticker': prefix + ': ' + ticker, 'timestamp': floor(time() - self._exchange_open_time), 'best_bid': best_bid, 'best_ask': best_ask}
                 await self.pass_to_app(ws_app, 'product_update', data)
 
             await asyncio.sleep(update_delay)
@@ -557,12 +558,12 @@ class ExchangeConnection:
                 tender = to_named_tuple(data, TenderOrder)
                 warnings.warn('Tender [%s] for ticker [%s] was rejected, this is an anti-tamper mechanism warning. You must accept a tender before it expires. Note your code will likely fail now as it will be still waiting for the tender complete flag. To fix this you should allow a greater buffer between a tender\'s expiration and your acceptance' % (tender.tender_id, tender.ticker))
 
-    def register_product(self, security):
+    def register_product(self, security, prefix=""):
         """
         Registers a product with the frontend client so that a chart can be drawn of the compound price.
         """
         if self._enable_app:
-            self._products.append(security)
+            self._products.append((security, prefix))
            
     # ------ Helper Methods -----
     
