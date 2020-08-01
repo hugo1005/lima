@@ -74,7 +74,7 @@ const mutations = {
     },
     UPDATE_PRODUCT(state, payload) {
       // Registers the product if necessary
-      state.products.add(payload.ticker)
+      state.products = new Set([...state.products, ...(new Set([payload.ticker]))])
       // Updates the list of product data
       state.productData.push(payload)
     },
