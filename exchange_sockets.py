@@ -5,7 +5,7 @@ import time
 import asyncio
 import json
 from collections import namedtuple
-from shared import to_named_tuple, ExchangeOrder, MarketBook, ExchangeOrderAnon, LOB, named_tuple_to_dict. TransactionPair
+from shared import to_named_tuple, ExchangeOrder, MarketBook, ExchangeOrderAnon, LOB, named_tuple_to_dict, TransactionPair, Transaction
 from abc import ABC, abstractmethod
 import traceback
 import warnings
@@ -40,25 +40,19 @@ class ExternalHalfOrderbook:
         if order.price in self.lob:
             existing_idx = self.get_order_idx(order)
             
-            if type(existing_idx) == type(None):
-                self.lob[order.price].append(order)
-            else:
+            if type(existing_idx) != type(None):
                 self.cancel_order(self.lob[order.price][existing_idx])
 
-                if order.price in self.lob:
-                    self.add_order_at_existing_price(order)
-                else:
-                    self.add_order_at_new_price(order)
-
-            # Update Stats
-            self.num_orders += 1
-            self.book_volume += order.qty
-            self.best_price = max(list(self.lob.keys())) if self.book_side == 'bids' else min(list(self.lob.keys()))
+            if order.price in self.lob:
+                self.add_order_at_existing_price(order)
+            else:
+                self.add_order_at_new_price(order)
         else:
             self.add_order_at_new_price(order)
 
     def add_order_at_existing_price(self,order):
         self.lob[order.price].append(order)
+        self.anonymised_lob[order.price].append(self.anonymise(order))
         # Update Stats (Special)
         self.num_orders += 1
         self.book_volume += order.qty
@@ -66,6 +60,7 @@ class ExternalHalfOrderbook:
     
     def add_order_at_new_price(self,order):
         self.lob[order.price] = [order]
+        self.anonymised_lob[order.price] = [self.anonymise(order)]
         # Update Stats (Special)
         self.book_depth += 1
         self.num_orders += 1
@@ -78,14 +73,16 @@ class ExternalHalfOrderbook:
         """
 
         if price > 0:
-            return self.get_order_idx_by_id(order_id, price)
-            return self.lob[price][idx]
+            idx = self.get_order_idx_by_id(order_id, price)
+            
+            if type(idx) != type(None):
+                return self.lob[price][idx]
         else:
             for price_level in self.lob:
                 idx = self.get_order_idx_by_id(order_id, price_level)
 
-                if idx:
-                    return self.lob[price][idx]
+                if type(idx) != type(None):
+                    return self.lob[price_level][idx]
 
         return None
 
@@ -186,7 +183,8 @@ class ExternalOrderbook(ABC):
         try:
             await self.recieve_data()
         except:
-            print("Rebooting connection due to connection closure!")
+            print("Rebooting %s connection due to connection closure!" % self.exchange_name )
+            
             error = sys.exc_info()
             print(error)
             traceback.print_exc()
@@ -509,7 +507,7 @@ class ExternalOrderbook(ABC):
 class BitstampOrderbook(ExternalOrderbook):
     def __init__(self, exchange_config, ticker, credentials, await_success_response, exchange_name='bitstamp'):
         super().__init__(exchange_config, ticker, credentials, await_success_response, exchange_name=exchange_name)
-        self._client = trading_client = bitstamp.client.Trading(username=credentials['username'], key=credentials['key'], secret=credentials['secret'])
+        self._client = trading_client = BitstampClient.Trading(username=credentials['username'], key=credentials['key'], secret=credentials['secret'])
 
     async def assert_setup_success(self, ws):
         """ MODIFY: Assert that stream was succesfully subscribed """
@@ -562,6 +560,7 @@ class BitstampOrderbook(ExternalOrderbook):
 
     def assert_sequence_integrity(self, data, seq):
         """ MODIFY: Assert that stream sequencing of messages is correct """
+        
         new_seq = float(data['microtimestamp'])
 
         if new_seq < seq:
@@ -635,18 +634,21 @@ class BitstampOrderbook(ExternalOrderbook):
 
         buy_order = ExchangeOrder(self.ticker, buyer_tid, buy_oid, buy_order_type, qty, 'BUY', price, qty, self.get_time())
         sell_order = ExchangeOrder(self.ticker, seller_tid, sell_oid, sell_order_type, qty, 'SELL', price, qty, self.get_time())
+        
+        taker = buy_order if buy_order.order_type == 'MKT' else sell_order
+        maker = buy_order if buy_order.order_type == 'LMT' else sell_order
+        taker_transaction = Transaction(taker.tid, taker.order_id, qty, taker.price, time.time())
+        maker_transaction = Transaction(maker.tid, maker.order_id, qty, maker.price, time.time())
 
         if self.trader_still_connected(buyer_tid):
             maker_ws = self._traders[buyer_tid]
-            await maker_ws.send(json.dumps({'type': 'order_fill', 'data': named_tuple_to_dict(buy_order)}))
+            await maker_ws.send(json.dumps({'type': 'order_fill', 'data': named_tuple_to_dict(maker_transaction)}))
 
         if self.trader_still_connected(seller_tid):
             taker_ws = self._traders[seller_tid]
-            await taker_ws.send(json.dumps({'type': 'order_fill', 'data': named_tuple_to_dict(sell_order)}))
+            await taker_ws.send(json.dumps({'type': 'order_fill', 'data': named_tuple_to_dict(taker_transaction)}))
 
-        maker = buy_order if buy_order_type == 'LMT' else sell_order
-        taker = sell_order if sell_order_type == 'LMT' else buy_order
-        transaction_pair = TransactionPair(self.ticker, direction, maker, taker, self.get_time())
+        transaction_pair = TransactionPair(self.ticker, direction, maker_transaction, taker_transaction, self.get_time())
 
         await self.update_pnls(transaction_pair)
         self._tape += [transaction_pair]
@@ -916,7 +918,8 @@ class KrakenOrderbook(ExternalOrderbook):
 class LunoOrderbook(ExternalOrderbook):
     def __init__(self, exchange_config, ticker, credentials, await_success_response, exchange_name='bitstamp'):
         super().__init__(exchange_config, ticker, credentials, await_success_response, exchange_name=exchange_name)
-        self._client = Client(api_key_id=self._credentials['api_key_id'], api_key_secret=self._credentials['api_key_secret'])
+        self._client = Client(api_key_id=credentials['api_key_id'], api_key_secret=credentials['api_key_secret'])
+        self._client_orders = {}
 
     async def assert_setup_success(self, ws):
         """ MODIFY: Assert that stream was succesfully subscribed """
@@ -1007,47 +1010,74 @@ class LunoOrderbook(ExternalOrderbook):
         :return seq: The sequence number of the latest order
         """
         parsed = json.loads(msg)
- 
-        create_data = parsed['create_update']
-        cancel_data = parsed['delete_update']
-        trade_data = parsed['trade_data']
-        seq = parsed['sequence']
+        is_snapshot = 'asks' in parsed
+        is_string = type(parsed) == type(" ")
+        if not is_snapshot and not is_string:
+            create_data = parsed['create_update']
+            cancel_data = parsed['delete_update']
+            trade_data = parsed['trade_updates']
 
-        if type(cancel_data) != type(None):
-            event_type = 'order_deleted'
-            return await self.map_message_to_handler(event_type, cancel_data, seq)
-        elif type(create_data) != type(None) and len(trade_data) == 0:
-            event_type = 'order_created'
-            return await self.map_message_to_handler(event_type, create_data, seq)
-        elif type(create_data) != type(None) and len(trade_data) > 0:
-            event_type = 'order_changed'
-            new_seq = await self.map_message_to_handler(event_type, create_data, seq)
+            if type(trade_data) == type(None):
+                trade_data = []
 
-            for trade in trade_data:
-                maker_oid = trade['maker_order_id']
-                taker_oid = trade['taker_order_id']
-                qty = trade['base']
-                
-                maker = self.get_order(maker_oid)
-                taker = self.get_order(taker_oid)
-                direction = taker.action
+            seq = float(parsed['sequence'])
 
-                transaction_pair = TransactionPair(self.ticker, direction, maker, taker, self.get_time())
-                
-                if self.trader_still_connected(maker.tid):
-                    maker_ws = self._traders[maker.tid]
-                    await maker_ws.send(json.dumps({'type': 'order_fill', 'data': named_tuple_to_dict(maker)}))
+            if type(cancel_data) != type(None):
+                event_type = 'order_deleted'
+                cancel_data['microtimestamp'] = seq
+                return await self.map_message_to_handler(event_type, cancel_data, seq)
 
-                if self.trader_still_connected(taker.tid):
-                    taker_ws = self._traders[taker.tid]
-                    await taker_ws.send(json.dumps({'type': 'order_fill', 'data': named_tuple_to_dict(taker)}))
+            elif type(create_data) != type(None) and len(trade_data) == 0:
+                event_type = 'order_created'
+                create_data['microtimestamp'] = seq
+                return await self.map_message_to_handler(event_type, create_data, seq)
 
-                await self.update_pnls(transaction_pair)
-                self._tape += [transaction_pair]
-                await self.mark_traders_to_market(self.ticker)
+            elif type(create_data) != type(None) and len(trade_data) > 0:
+                event_type = 'order_changed'
+                create_data['microtimestamp'] = seq
+                new_seq = await self.map_message_to_handler(event_type, create_data, seq)
 
-            return new_seq
-    
+                for trade in trade_data:
+                    maker_oid = trade['maker_order_id']
+                    taker_oid = trade['taker_order_id']
+                    qty = trade['base']
+
+                    maker = self._client_orders[maker_oid] if maker_oid in self._client_orders else None
+                    taker = self._client_orders[taker_oid] if taker_oid in self._client_orders else None
+                    
+                    if type(maker) == type(None) and type(taker) == type(None):
+                        continue
+                    else:
+                        if type(taker) == type(None):
+                            inv_order_type = 'LMT' if maker.order_type == 'MKT' else 'MKT'
+                            inv_action = 'BUY' if maker.action == 'SELL' else 'SELL'
+                            taker = ExchangeOrder(self.ticker, -1, taker_oid, inv_order_type, qty, inv_action, maker.price, qty, maker.submission_time)
+                        elif type(maker) == type(None):
+                            inv_order_type = 'LMT' if taker.order_type == 'MKT' else 'MKT'
+                            inv_action = 'BUY' if taker.action == 'SELL' else 'SELL'
+                            maker = ExchangeOrder(self.ticker, -1, taker_oid, inv_order_type, qty, inv_action, taker.price, qty, taker.submission_time)
+
+                        taker_transaction = Transaction(taker.tid, taker_oid, qty, taker.price, time.time())
+                        maker_transaction = Transaction(maker.tid, maker_oid, qty, maker.price, time.time())
+            
+                        transaction_pair = TransactionPair(self.ticker, taker.action, maker_transaction, taker_transaction, self.get_time())
+                        
+                        if self.trader_still_connected(maker.tid):
+                            maker_ws = self._traders[maker.tid]
+                            await maker_ws.send(json.dumps({'type': 'order_fill', 'data': named_tuple_to_dict(maker_transaction)}))
+
+                    
+                        if self.trader_still_connected(taker.tid):
+                            taker_ws = self._traders[taker.tid]
+                            await taker_ws.send(json.dumps({'type': 'order_fill', 'data': named_tuple_to_dict(taker_transaction)}))
+
+                        # Similarly we need some way to deal with None Types here (and replciate to other exchange implementations)
+                        await self.update_pnls(transaction_pair)
+                        self._tape += [transaction_pair]
+                        await self.mark_traders_to_market(self.ticker)
+
+                return new_seq
+        
     # Overriden Method
     def handle_order_delete(self, data, seq):
         new_seq = self.assert_sequence_integrity(data, seq)
@@ -1060,8 +1090,10 @@ class LunoOrderbook(ExternalOrderbook):
     def post_order(self, order_spec):
         """:returns order_id"""
         if order_spec.order_type == 'LMT':
-            res = self._client.post_limit_order(order_spec.ticker, order_spec.price, order_spec.action, counter_volume)
+            res = self._client.post_limit_order(order_spec.ticker, order_spec.price, order_spec.action, order_spec.qty)
         else:
             res = self._client.post_market_order(order_spec.ticker, order_spec.action, base_volume = order_spec.qty)
+        
+        self._client_orders[res['order_id']] = ExchangeOrder(self.ticker, order_spec.tid, res['order_id'], order_spec.order_type, order_spec.qty, order_spec.action, order_spec.price, 0, time.time())
 
         return res['order_id']
