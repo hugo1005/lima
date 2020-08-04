@@ -405,7 +405,8 @@ class ExchangeConnection:
                 #     # Update our book keeping mechanism
                 #     # TODO Eventually refactor this looping into async queues for greater eficiency
                 #     await asyncio.gather(self.update_state(ws), self.dispatch_orders(ws), self.dispatch_tenders(ws), self.dispatch_cancellations(ws))            
-    
+
+    print("Connection to backend has closed...")
      # TODO: Refactor this pattern its getting repetitive
 
     def add_order_batch(self, orders, events):
@@ -563,7 +564,7 @@ class ExchangeConnection:
         Registers a product with the frontend client so that a chart can be drawn of the compound price.
         """
         if self._enable_app:
-            self._products.append((security, prefix))
+            self._products.append((security, prefix                                                              ))
            
     # ------ Helper Methods -----
     
