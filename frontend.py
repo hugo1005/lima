@@ -487,6 +487,8 @@ class ExchangeConnection:
                 self._tape = self._tape + data
             elif s_type == 'order_opened':
                 order_id = data['order_id']
+                print("order_opened")
+                print(data)
                 new_order = to_named_tuple(data, ExchangeOrder)
 
                 self._open_orders[order_id] = new_order
@@ -510,12 +512,15 @@ class ExchangeConnection:
                     # and cancellations
                     # del(self._open_orders[order_id])              
             elif s_type == 'order_fill':
+                print("order_fill")
+                print(data)
                 # 1. Get the qty, price of fill, order id [x]
                 # 2. update the open order [x]
                 # 3. if it has been fully filled close the order [x]
                 # 4. Run book keeper to update our gross / net positions [o]
                 transaction = to_named_tuple(data, Transaction)
                 order_id = transaction.order_id
+
                 existing_order = self._open_orders[order_id]
                 total_filled = existing_order.qty_filled + transaction.qty
 
@@ -780,13 +785,14 @@ class Order:
         if qty_fn != None:
             # prevents any floating point artifacts from occurring 
             def qtf_fn_cast_to_int():
-                return int(qty_fn())
+                return float(qty_fn())
 
             self.evaluate_qty = qtf_fn_cast_to_int
         else:
             def compute_qty_base():
-                return int(qty)
-
+                return float(qty)
+            
+            print("creating order with qty : %s" % qty)
             self.evaluate_qty = compute_qty_base
 
         self._security = security
@@ -965,7 +971,7 @@ class Order:
             action = "BUY" if weighting > 0 else "SELL"
 
             order_id = self._security._exchange.get_next_id()
-            order_qty = int(self.evaluate_qty() * abs(weighting)) # Essential to avoid residual fill bugs
+            order_qty = abs(float(self.evaluate_qty() * abs(weighting))) # Essential to avoid residual fill bugs
             spec = OrderSpec(ticker, self._security._exchange._tid, order_id, order_type, order_qty, action, price, self.group_name)
             
             order_filled_event = asyncio.Event()

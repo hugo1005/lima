@@ -18,7 +18,7 @@ class MarketAgentsManager():
         print("Activating automated traders...")
         await asyncio.gather(trader_activations)
 
-
+        
 """
 Create agents
 """
