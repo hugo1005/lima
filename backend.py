@@ -1008,6 +1008,9 @@ class Exchange:
                 await asyncio.gather(self.handle_msgs(ws), self.broadcast_active_traders(ws))
         except:
             print("Connection closed due to error!")
+            error = sys.exc_info()
+            print(error)
+            traceback.print_exc()
         finally:
             if is_trader:
                 print("Connection with [%s] [%s] closed" % (('trader', tid)))
@@ -1045,8 +1048,9 @@ class Exchange:
                 if self._exchange_name != 'simulator':
                     book = self._books[order_spec.ticker]
                     order_id = book.post_order(order_spec)
-                    self._orders[order_id] = order_spec.tid
-                
+                    self._orders[order_id] = order_spec
+                    print(self._orders)
+
                     await ws.send(json.dumps({'type': 'order_opened', 'data': named_tuple_to_dict(exchange_order)}))
                 else:
                     book.add_order(exchange_order)
@@ -1443,7 +1447,13 @@ class Exchange:
 
     def get_trader_id(self, order_id):
         if order_id in self._orders:
-            return self._orders[order_id]
+            return self._orders[order_id].tid
+        else:
+            return -1
+
+    def get_internal_order_id(self, order_id):
+        if order_id in self._orders:
+            return self._orders[order_id].order_id
         else:
             return -1
                 
@@ -1459,6 +1469,7 @@ class Exchange:
             'update_pnls': self.update_pnls,
             'trader_still_connected': self.trader_still_connected,
             'get_trader_id': self.get_trader_id,
+            'get_internal_order_id': self.get_internal_order_id,
             'db': self._db,
         }
 

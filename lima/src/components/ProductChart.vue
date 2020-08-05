@@ -137,6 +137,7 @@ export default {
 
         let min =  Math.min(minLow, maxHigh)
         let max =  Math.max(minLow, maxHigh)
+        
         // Y-axis is a continuous price scale
         let y = d3.scaleLinear()
             .domain([min-2, max+2])

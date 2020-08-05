@@ -6,6 +6,6 @@ def improve_on_best_quote(edge):
     """
     def compute_price(direction, evaluate):
         # If direction = 1 => subtract edge from best bid
-        return evaluate(direction) - direction * edge 
+        return round(evaluate(direction) - direction * edge,2)
 
     return compute_price

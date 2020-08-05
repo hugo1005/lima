@@ -2,6 +2,7 @@ from frontend import Security, ExchangeConnection
 import asyncio
 import json
 import time
+from pricing import improve_on_best_quote
 
 class TradingDashboard:
     def __init__(self):
@@ -47,6 +48,9 @@ class TradingDashboard:
             LAhandle = 5 
             LBhandle = 5
             print("Started trading --------")
+            qty_to_trade = 1
+            away_from_best = -0.01
+
             while True:
                 await asyncio.sleep(0.5)
                 if not is_open:
@@ -61,6 +65,10 @@ class TradingDashboard:
                         print("LMT - BUY [Luno BTC] @ %s [BEST ASK]" % l_ask)
                         print("LMT - SELL [Bitstamp BTC] @ %s [BEST BID]" % b_bid)
                         print("@Time: %s" % time.time())
+                        LMT_ORDER_L = L_BTCEUR.to_order(qty=qty_to_trade, order_type='LMT', price_fn=improve_on_best_quote(away_from_best))
+                        LMT_ORDER_B = -1 * (B_BTCEUR.to_order(qty=qty_to_trade, order_type='LMT', price_fn=improve_on_best_quote(away_from_best)))
+
+                        assert(all(await asyncio.gather(*[LMT_ORDER_L, LMT_ORDER_B])))
                         # TODO: Figure out which trades to execute
                         is_open = True
                 else:
@@ -74,6 +82,12 @@ class TradingDashboard:
                         print("LMT - BUY [Bitstamp BTC] @ %s [BEST ASK]" % b_ask)
                         print("@Time: %s" % time.time())
                         # TODO: Figure out which trades to execute
+
+                        LMT_ORDER_L = -1 * L_BTCEUR.to_order(qty=qty_to_trade, order_type='LMT', price_fn=improve_on_best_quote(away_from_best))
+                        LMT_ORDER_B =  B_BTCEUR.to_order(qty=qty_to_trade, order_type='LMT', price_fn=improve_on_best_quote(away_from_best))
+
+                        assert(all(await asyncio.gather(*[LMT_ORDER_L, LMT_ORDER_B])))
+
                         is_open = False
                 
 TradingDashboard()

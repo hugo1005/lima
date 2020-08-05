@@ -159,6 +159,7 @@ class ExternalOrderbook(ABC):
         self.update_pnls = exchange_config['update_pnls'] 
         self.trader_still_connected =  exchange_config['trader_still_connected'] 
         self.get_trader_id = exchange_config['get_trader_id'] 
+        self.get_internal_order_id = exchange_config['get_internal_order_id']
         self.db = exchange_config['db'] 
         self.exchange_name = exchange_name
 
@@ -637,15 +638,15 @@ class BitstampOrderbook(ExternalOrderbook):
         
         taker = buy_order if buy_order.order_type == 'MKT' else sell_order
         maker = buy_order if buy_order.order_type == 'LMT' else sell_order
-        taker_transaction = Transaction(taker.tid, taker.order_id, qty, taker.price, time.time())
-        maker_transaction = Transaction(maker.tid, maker.order_id, qty, maker.price, time.time())
+        taker_transaction = Transaction(taker.tid, self.get_internal_order_id(taker.order_id), qty, taker.price, time.time())
+        maker_transaction = Transaction(maker.tid, self.get_internal_order_id(maker.order_id), qty, maker.price, time.time())
 
-        if self.trader_still_connected(buyer_tid):
-            maker_ws = self._traders[buyer_tid]
+        if self.trader_still_connected(maker_transaction.tid):
+            maker_ws = self._traders[maker_transaction.tid]
             await maker_ws.send(json.dumps({'type': 'order_fill', 'data': named_tuple_to_dict(maker_transaction)}))
 
-        if self.trader_still_connected(seller_tid):
-            taker_ws = self._traders[seller_tid]
+        if self.trader_still_connected(taker_transaction.tid):
+            taker_ws = self._traders[taker_transaction.tid]
             await taker_ws.send(json.dumps({'type': 'order_fill', 'data': named_tuple_to_dict(taker_transaction)}))
 
         transaction_pair = TransactionPair(self.ticker, direction, maker_transaction, taker_transaction, self.get_time())
@@ -661,16 +662,18 @@ class BitstampOrderbook(ExternalOrderbook):
         quote = order_spec.ticker[3:]
         if order_spec.action == 'BUY':
             if order_spec.order_type == 'LMT':
+                print(order_spec)
                 res = self._client.buy_limit_order(order_spec.qty, order_spec.price, base=base, quote=quote)
             else:
                 res = self._client.buy_market_order(order_spec.qty, base=base, quote=quote)
         else:
             if order_spec.order_type == 'LMT':
+                print(order_spec)
                 res = self._client.sell_limit_order(order_spec.qty, order_spec.price, base=base, quote=quote)
             else:
                 res = self._client.sell_market_order(order_spec.qty, base=base, quote=quote)
 
-        return res['id']
+        return int(res['id'])
 
 class GlobitexOrderbook(ExternalOrderbook):
     def __init__(self, exchange_config, ticker, credentials, await_success_response, exchange_name='globitex'):
@@ -1056,9 +1059,10 @@ class LunoOrderbook(ExternalOrderbook):
                             inv_order_type = 'LMT' if taker.order_type == 'MKT' else 'MKT'
                             inv_action = 'BUY' if taker.action == 'SELL' else 'SELL'
                             maker = ExchangeOrder(self.ticker, -1, taker_oid, inv_order_type, qty, inv_action, taker.price, qty, taker.submission_time)
-
-                        taker_transaction = Transaction(taker.tid, taker_oid, qty, taker.price, time.time())
-                        maker_transaction = Transaction(maker.tid, maker_oid, qty, maker.price, time.time())
+                        
+                        
+                        taker_transaction = Transaction(taker.tid, self.get_internal_order_id(taker_oid), qty, taker.price, time.time())
+                        maker_transaction = Transaction(maker.tid, self.get_internal_order_id(maker_oid), qty, maker.price, time.time())
             
                         transaction_pair = TransactionPair(self.ticker, taker.action, maker_transaction, taker_transaction, self.get_time())
                         
