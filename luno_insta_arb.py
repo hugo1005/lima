@@ -3,6 +3,7 @@ import asyncio
 import json
 import time
 from pricing import improve_on_best_quote
+from traders import StatArbTrader
 
 class TradingDashboard:
     def __init__(self):
@@ -41,21 +42,36 @@ class TradingDashboard:
                 spread_plus = spread + 0.01
                 # Buy
                 marketable_buy_price = evaluate(1) + spread_plus
-                marketable_sell_price = evaluate(-1) - (spread + 0.01)
+                marketable_sell_price = evaluate(-1) - (spread - 0.05)
                 is_buying = direction == 1
 
                 return round(marketable_buy_price if is_buying else marketable_sell_price,2)
 
-            OPEN_BITSTAMP_POSITION = (B_BTCEUR.to_order(
-                qty=0.003,
-                order_type='LMT',
-                price_fn=cross_spread
-            ))
+            # print('-------- BITSTAMP ---------')
 
-            await asyncio.gather(*[OPEN_BITSTAMP_POSITION.unwind().execute()])
+            # OPEN_BITSTAMP_POSITION = (B_BTCEUR.to_order(
+            #     qty=0.003,
+            #     order_type='LMT',
+            #     price_fn=cross_spread
+            # )) # BUY
+
+            # await asyncio.gather(*[OPEN_BITSTAMP_POSITION.unwind().execute()]) # SELL
+            # print("1st Trade complete")
+            # await asyncio.sleep(1)
+            # await asyncio.gather(*[OPEN_BITSTAMP_POSITION.execute()]) # BUY
+            # print("2nd Trade complete")
+
+            print('--------- LUNO ------------')
+
+            OPEN_LUNO_POSITION = (L_BTCEUR.to_order(
+                qty=0.003,
+                order_type='MKT'
+            )) # BUY
+
+            await asyncio.gather(*[OPEN_LUNO_POSITION.unwind().execute()]) # SELL
             print("1st Trade complete")
             await asyncio.sleep(1)
-            await asyncio.gather(*[OPEN_BITSTAMP_POSITION.execute()])
+            await asyncio.gather(*[OPEN_LUNO_POSITION.execute()]) # BUY
             print("2nd Trade complete")
 
 
@@ -105,3 +121,6 @@ class TradingDashboard:
 
 
 TradingDashboard()
+
+
+
