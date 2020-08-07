@@ -5,7 +5,7 @@ import time
 import asyncio
 import json
 from collections import namedtuple
-from shared import to_named_tuple, ExchangeOrder, MarketBook, ExchangeOrderAnon, LOB, named_tuple_to_dict, TransactionPair, Transaction
+from shared import to_named_tuple, ExchangeOrder, MarketBook, ExchangeOrderAnon, LOB, named_tuple_to_dict, TransactionPair, Transaction,update_named_tuple
 from abc import ABC, abstractmethod
 import traceback
 import warnings
@@ -159,7 +159,6 @@ class ExternalOrderbook(ABC):
         self.update_pnls = exchange_config['update_pnls'] 
         self.trader_still_connected =  exchange_config['trader_still_connected'] 
         self.get_trader_id = exchange_config['get_trader_id'] 
-        self.get_internal_order_id = exchange_config['get_internal_order_id']
         self.db = exchange_config['db'] 
         self.exchange_name = exchange_name
 
@@ -168,6 +167,9 @@ class ExternalOrderbook(ABC):
         self.credentials = credentials
         self._has_subscription_success_response = await_success_response
         
+        # Internal Order Tracking
+        self._client_orders = {}
+
         # User Defined in Subclass
         self._ws_uri = self.define_websocket_url()
         self.handlers = self.define_handler_mapping()
@@ -358,6 +360,43 @@ class ExternalOrderbook(ABC):
         else:
             print("Unkown event occured.... %s" % event_type)
             return seq
+
+    async def update_traders_with_transactions(self, maker, taker, qty, use_external_order_id = True):
+        internal_taker_order_id = self.get_internal_order_id(taker.order_id) if use_external_order_id else taker.order_id
+        internal_maker_order_id = self.get_internal_order_id(maker.order_id) if use_external_order_id else maker.order_id
+
+        taker_transaction = Transaction(taker.tid, internal_taker_order_id, qty, taker.price, time.time())
+        maker_transaction = Transaction(maker.tid, internal_maker_order_id, qty, maker.price, time.time())
+        transaction_pair = TransactionPair(self.ticker, taker.action, maker_transaction, taker_transaction, self.get_time())
+                    
+        if self.trader_still_connected(maker.tid):
+            maker_ws = self._traders[maker.tid]
+            await maker_ws.send(json.dumps({'type': 'order_fill', 'data': named_tuple_to_dict(maker_transaction)}))
+    
+        if self.trader_still_connected(taker.tid):
+            taker_ws = self._traders[taker.tid]
+            await taker_ws.send(json.dumps({'type': 'order_fill', 'data': named_tuple_to_dict(taker_transaction)}))
+
+        # Similarly we need some way to deal with None Types here (and replciate to other exchange implementations)
+        await self.update_pnls(transaction_pair)
+        self._tape += [transaction_pair]
+        await self.mark_traders_to_market(self.ticker)
+
+    def get_internal_order_id(self, external_order_id):
+        print(external_order_id, self._client_orders)
+        if external_order_id in self._client_orders:
+            return self._client_orders[external_order_id].order_id
+        else:
+            return -1
+
+    def new_order(self, order_spec):
+        """:returns order_id"""
+        internal_order_id = order_spec.order_id
+        external_order_id = self.post_order(order_spec)
+        internal_order_representation = ExchangeOrder(self.ticker, order_spec.tid, internal_order_id, order_spec.order_type, order_spec.qty, order_spec.action, order_spec.price, 0, time.time())
+
+        self._client_orders[external_order_id] = internal_order_representation
+        return external_order_id
 
     @abstractmethod
     def define_websocket_url(self):
@@ -617,7 +656,6 @@ class BitstampOrderbook(ExternalOrderbook):
         :return seq: The sequence number of the latest trade
         """
         parsed = json.loads(msg)
-        event_type = parsed['event']
         trade = parsed['data']
 
         # Provided
@@ -638,23 +676,8 @@ class BitstampOrderbook(ExternalOrderbook):
         
         taker = buy_order if buy_order.order_type == 'MKT' else sell_order
         maker = buy_order if buy_order.order_type == 'LMT' else sell_order
-        taker_transaction = Transaction(taker.tid, self.get_internal_order_id(taker.order_id), qty, taker.price, time.time())
-        maker_transaction = Transaction(maker.tid, self.get_internal_order_id(maker.order_id), qty, maker.price, time.time())
-
-        if self.trader_still_connected(maker_transaction.tid):
-            maker_ws = self._traders[maker_transaction.tid]
-            await maker_ws.send(json.dumps({'type': 'order_fill', 'data': named_tuple_to_dict(maker_transaction)}))
-
-        if self.trader_still_connected(taker_transaction.tid):
-            taker_ws = self._traders[taker_transaction.tid]
-            await taker_ws.send(json.dumps({'type': 'order_fill', 'data': named_tuple_to_dict(taker_transaction)}))
-
-        transaction_pair = TransactionPair(self.ticker, direction, maker_transaction, taker_transaction, self.get_time())
-
-        await self.update_pnls(transaction_pair)
-        self._tape += [transaction_pair]
-
-        await self.mark_traders_to_market(self.ticker)
+        
+        await self.update_traders_with_transactions(maker, taker, qty)
 
     def post_order(self, order_spec):
         """:returns order_id"""
@@ -922,7 +945,6 @@ class LunoOrderbook(ExternalOrderbook):
     def __init__(self, exchange_config, ticker, credentials, await_success_response, exchange_name='bitstamp'):
         super().__init__(exchange_config, ticker, credentials, await_success_response, exchange_name=exchange_name)
         self._client = Client(api_key_id=credentials['api_key_id'], api_key_secret=credentials['api_key_secret'])
-        self._client_orders = {}
 
     async def assert_setup_success(self, ws):
         """ MODIFY: Assert that stream was succesfully subscribed """
@@ -1019,23 +1041,29 @@ class LunoOrderbook(ExternalOrderbook):
             create_data = parsed['create_update']
             cancel_data = parsed['delete_update']
             trade_data = parsed['trade_updates']
-
+            
             if type(trade_data) == type(None):
                 trade_data = []
 
             seq = float(parsed['sequence'])
 
             if type(cancel_data) != type(None):
+                # Occurs when an order is cancelled
+
                 event_type = 'order_deleted'
                 cancel_data['microtimestamp'] = seq
                 return await self.map_message_to_handler(event_type, cancel_data, seq)
 
             elif type(create_data) != type(None) and len(trade_data) == 0:
+                # Occurs when a new LMT order is created
+
                 event_type = 'order_created'
                 create_data['microtimestamp'] = seq
                 return await self.map_message_to_handler(event_type, create_data, seq)
 
             elif type(create_data) != type(None) and len(trade_data) > 0:
+                # Occurs when a created LMT order is immediately filled
+
                 event_type = 'order_changed'
                 create_data['microtimestamp'] = seq
                 new_seq = await self.map_message_to_handler(event_type, create_data, seq)
@@ -1043,11 +1071,11 @@ class LunoOrderbook(ExternalOrderbook):
                 for trade in trade_data:
                     maker_oid = trade['maker_order_id']
                     taker_oid = trade['taker_order_id']
-                    qty = trade['base']
+                    qty = float(trade['base'])
 
                     maker = self._client_orders[maker_oid] if maker_oid in self._client_orders else None
                     taker = self._client_orders[taker_oid] if taker_oid in self._client_orders else None
-                    
+                    print(maker_oid, taker_oid)
                     if type(maker) == type(None) and type(taker) == type(None):
                         continue
                     else:
@@ -1058,30 +1086,59 @@ class LunoOrderbook(ExternalOrderbook):
                         elif type(maker) == type(None):
                             inv_order_type = 'LMT' if taker.order_type == 'MKT' else 'MKT'
                             inv_action = 'BUY' if taker.action == 'SELL' else 'SELL'
-                            maker = ExchangeOrder(self.ticker, -1, taker_oid, inv_order_type, qty, inv_action, taker.price, qty, taker.submission_time)
+                            maker = ExchangeOrder(self.ticker, -1, maker_oid, inv_order_type, qty, inv_action, taker.price, qty, taker.submission_time)
                         
-                        
-                        taker_transaction = Transaction(taker.tid, self.get_internal_order_id(taker_oid), qty, taker.price, time.time())
-                        maker_transaction = Transaction(maker.tid, self.get_internal_order_id(maker_oid), qty, maker.price, time.time())
-            
-                        transaction_pair = TransactionPair(self.ticker, taker.action, maker_transaction, taker_transaction, self.get_time())
-                        
-                        if self.trader_still_connected(maker.tid):
-                            maker_ws = self._traders[maker.tid]
-                            await maker_ws.send(json.dumps({'type': 'order_fill', 'data': named_tuple_to_dict(maker_transaction)}))
-
-                    
-                        if self.trader_still_connected(taker.tid):
-                            taker_ws = self._traders[taker.tid]
-                            await taker_ws.send(json.dumps({'type': 'order_fill', 'data': named_tuple_to_dict(taker_transaction)}))
-
-                        # Similarly we need some way to deal with None Types here (and replciate to other exchange implementations)
-                        await self.update_pnls(transaction_pair)
-                        self._tape += [transaction_pair]
-                        await self.mark_traders_to_market(self.ticker)
+                        await self.update_traders_with_transactions(maker, taker, qty, use_external_order_id=False)
 
                 return new_seq
-        
+            elif type(create_data) == type(None) and len(trade_data) > 0:
+                # Occurs when an order is updated by several trades
+
+                for trade in trade_data:
+                    maker_oid = trade['maker_order_id']
+                    taker_oid = trade['taker_order_id']
+                    qty = float(trade['base'])
+                    print('trade_only: ',maker_oid, taker_oid)
+                    # Modify the orders in the book
+                    # Compute the new order state
+                    # Call the order changed event
+                    new_maker_order = self.update_order_with_fill(maker_oid, qty)
+                    new_taker_order = self.update_order_with_fill(taker_oid, qty)
+
+                    if type(new_maker_order) != type(None):
+                        self.cancel_order_with_id(maker_oid)
+                        self.add_order(new_maker_order)
+                    
+                    if type(new_taker_order) != type(None):
+                        self.cancel_order_with_id(taker_oid)
+                        self.add_order(new_taker_order)
+
+                    # Notify our trading clients of the changes
+                    maker = self._client_orders[maker_oid] if maker_oid in self._client_orders else None
+                    taker = self._client_orders[taker_oid] if taker_oid in self._client_orders else None
+                    print(maker_oid, taker_oid)
+                    if type(maker) == type(None) and type(taker) == type(None):
+                        continue
+                    else:
+                        if type(taker) == type(None):
+                            inv_order_type = 'LMT' if maker.order_type == 'MKT' else 'MKT'
+                            inv_action = 'BUY' if maker.action == 'SELL' else 'SELL'
+                            taker = ExchangeOrder(self.ticker, -1, taker_oid, inv_order_type, qty, inv_action, maker.price, qty, maker.submission_time)
+                        elif type(maker) == type(None):
+                            inv_order_type = 'LMT' if taker.order_type == 'MKT' else 'MKT'
+                            inv_action = 'BUY' if taker.action == 'SELL' else 'SELL'
+                            maker = ExchangeOrder(self.ticker, -1, maker_oid, inv_order_type, qty, inv_action, taker.price, qty, taker.submission_time)
+                        
+                        await self.update_traders_with_transactions(maker, taker, qty, use_external_order_id=False)
+
+    def update_order_with_fill(self, order_id, qty):
+        order = self.get_order_by_id(order_id)
+
+        if type(order) != type(None):
+            return update_named_tuple(order, {'qty':order.qty - qty})
+        else:
+            return None
+
     # Overriden Method
     def handle_order_delete(self, data, seq):
         new_seq = self.assert_sequence_integrity(data, seq)
@@ -1094,10 +1151,16 @@ class LunoOrderbook(ExternalOrderbook):
     def post_order(self, order_spec):
         """:returns order_id"""
         if order_spec.order_type == 'LMT':
-            res = self._client.post_limit_order(order_spec.ticker, order_spec.price, order_spec.action, order_spec.qty)
+            print(order_spec)
+            order_action = 'BID' if  order_spec.action == 'BUY' else 'ASK'
+            res = self._client.post_limit_order(order_spec.ticker, order_spec.price, order_action, order_spec.qty)
         else:
-            res = self._client.post_market_order(order_spec.ticker, order_spec.action, base_volume = order_spec.qty)
-        
-        self._client_orders[res['order_id']] = ExchangeOrder(self.ticker, order_spec.tid, res['order_id'], order_spec.order_type, order_spec.qty, order_spec.action, order_spec.price, 0, time.time())
+            if order_spec.action == 'BUY':
+                ask_price = self._asks.best_price # best bid
+                counter_volume = order_spec.qty * ask_price # How much euro to purchase order_spec.qty in BTC
+                res = self._client.post_market_order(order_spec.ticker, order_spec.action, counter_volume = counter_volume)
+            else:
+                
+                res = self._client.post_market_order(order_spec.ticker, order_spec.action, base_volume = order_spec.qty)
 
         return res['order_id']
