@@ -79,6 +79,7 @@ class WebServer:
                         self.n_config_messages = msg['n_config_messages']
                         exchange_name = msg['data']['exchange_name']
 
+                    # TODO: Fix the implementation to send as little info as possible otherwise the frontend dies
                     # Handles caching of key setup information
                     elif len(self.backend_to_app_config_cache) < self.n_config_messages:
                         self.backend_to_app_config_cache.append(data)
@@ -91,9 +92,6 @@ class WebServer:
                     else:
                         self.backend_to_app_cache.append(data)
                         self.backend_has_updates.set()
-
-                    # if msg_type == 'LOBS':
-                    #     db.update_prices(msg['data'], exchange_name)
             
             elif is_app: 
                 print("App [Backend State Management] connection established")
@@ -103,6 +101,8 @@ class WebServer:
                     await ws.send(data)
 
                 # Pass messages from backend to frontend
+                # TODO: Fix the implementation to send as little info as possible otherwise the frontend dies
+
                 while True:
                     await self.backend_has_updates.wait()
                     self.backend_has_updates.clear()
