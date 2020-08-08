@@ -354,8 +354,9 @@ class ExchangeConnection:
         # ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
         # ssl_context.load_verify_locations(pathlib.Path("ssl_cert/cert.pem"))
         # async with websockets.connect(self._uri, ssl = ssl_context) as ws:
-        
+        print("Connecting to %s" % self._uri)
         async with websockets.connect(self._uri, max_size= None) as ws:
+            
             # First message recieved on connecting is your trader id
             # Note losing connection to the server will be fatal
             # As you will not be able to rejoin with the same id.
@@ -404,7 +405,8 @@ class ExchangeConnection:
                 #     # Update our book keeping mechanism
                 #     # TODO Eventually refactor this looping into async queues for greater eficiency
                 #     await asyncio.gather(self.update_state(ws), self.dispatch_orders(ws), self.dispatch_tenders(ws), self.dispatch_cancellations(ws))            
-    
+
+    print("Connection to backend has closed...")
      # TODO: Refactor this pattern its getting repetitive
 
     def add_order_batch(self, orders, events):
@@ -461,13 +463,13 @@ class ExchangeConnection:
 
     async def dispatch_products_to_app(self, ws_app, update_delay = 1):
          while True:
-            for security in self._products:
+            for security, prefix in self._products:
                 best_bid = security.evaluate(1)
                 best_ask = security.evaluate(-1)
                 ticker = security._ticker
 
                 # Updates every second.
-                data = {'ticker': ticker, 'timestamp': floor(time() - self._exchange_open_time), 'best_bid': best_bid, 'best_ask': best_ask}
+                data = {'ticker': prefix + ': ' + ticker, 'timestamp': floor(time() - self._exchange_open_time), 'best_bid': best_bid, 'best_ask': best_ask}
                 await self.pass_to_app(ws_app, 'product_update', data)
 
             await asyncio.sleep(update_delay)
@@ -485,6 +487,8 @@ class ExchangeConnection:
                 self._tape = self._tape + data
             elif s_type == 'order_opened':
                 order_id = data['order_id']
+                print("order_opened")
+                print(data)
                 new_order = to_named_tuple(data, ExchangeOrder)
 
                 self._open_orders[order_id] = new_order
@@ -508,12 +512,15 @@ class ExchangeConnection:
                     # and cancellations
                     # del(self._open_orders[order_id])              
             elif s_type == 'order_fill':
+                print("order_fill")
+                print(data)
                 # 1. Get the qty, price of fill, order id [x]
                 # 2. update the open order [x]
                 # 3. if it has been fully filled close the order [x]
                 # 4. Run book keeper to update our gross / net positions [o]
                 transaction = to_named_tuple(data, Transaction)
                 order_id = transaction.order_id
+
                 existing_order = self._open_orders[order_id]
                 total_filled = existing_order.qty_filled + transaction.qty
 
@@ -557,12 +564,12 @@ class ExchangeConnection:
                 tender = to_named_tuple(data, TenderOrder)
                 warnings.warn('Tender [%s] for ticker [%s] was rejected, this is an anti-tamper mechanism warning. You must accept a tender before it expires. Note your code will likely fail now as it will be still waiting for the tender complete flag. To fix this you should allow a greater buffer between a tender\'s expiration and your acceptance' % (tender.tender_id, tender.ticker))
 
-    def register_product(self, security):
+    def register_product(self, security, prefix=""):
         """
         Registers a product with the frontend client so that a chart can be drawn of the compound price.
         """
         if self._enable_app:
-            self._products.append(security)
+            self._products.append((security, prefix                                                              ))
            
     # ------ Helper Methods -----
     
@@ -778,13 +785,14 @@ class Order:
         if qty_fn != None:
             # prevents any floating point artifacts from occurring 
             def qtf_fn_cast_to_int():
-                return int(qty_fn())
+                return float(qty_fn())
 
             self.evaluate_qty = qtf_fn_cast_to_int
         else:
             def compute_qty_base():
-                return int(qty)
-
+                return float(qty)
+            
+            print("creating order with qty : %s" % qty)
             self.evaluate_qty = compute_qty_base
 
         self._security = security
@@ -963,7 +971,7 @@ class Order:
             action = "BUY" if weighting > 0 else "SELL"
 
             order_id = self._security._exchange.get_next_id()
-            order_qty = int(self.evaluate_qty() * abs(weighting)) # Essential to avoid residual fill bugs
+            order_qty = abs(float(self.evaluate_qty() * abs(weighting))) # Essential to avoid residual fill bugs
             spec = OrderSpec(ticker, self._security._exchange._tid, order_id, order_type, order_qty, action, price, self.group_name)
             
             order_filled_event = asyncio.Event()

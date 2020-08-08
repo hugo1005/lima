@@ -140,8 +140,8 @@
             "prevent_self_trades": 0,
             "market_agents": {},
             "credentials": {
-                "api_key_id": "m9w952edzhqfr",
-                "api_key_secret": "OcpAf1m9ZbgLbsS9LjyzoccFZAmUtOwTgOwmufMbfDE"
+                "api_key_id": "enyx3kanw7q4b",
+                "api_key_secret": "UeV-OIsfw4fQPhloYee4P-kzFWhlt8j0dF1SSqsayr0"
             },
             "risk_limits": {
                 "net_position": 100000,
@@ -169,7 +169,7 @@
             "prevent_self_trades": 0,
             "market_agents": {},
             "credentials": {
-                "api_key_id": "m9w952edzhqfr",
+                "api_key_id": "7eTvtSQy7KSH0n9jqOLage7l5MOKtNiZ",
                 "api_key_secret": "OcpAf1m9ZbgLbsS9LjyzoccFZAmUtOwTgOwmufMbfDE"
             },
             "risk_limits": {
@@ -198,8 +198,9 @@
             "prevent_self_trades": 0,
             "market_agents": {},
             "credentials": {
-                "api_key_id": "m9w952edzhqfr",
-                "api_key_secret": "OcpAf1m9ZbgLbsS9LjyzoccFZAmUtOwTgOwmufMbfDE"
+                "key": "8XTQUpTGBKdFbOJ2RiQaDiXhHVgCYWem",
+                "secret": "hd9AzHSTQcYjZ1SLSVh7XY25BKD0XzJV",
+                "username": "vyvv7189"
             },
             "risk_limits": {
                 "net_position": 100000,

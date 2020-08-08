@@ -1,4 +1,4 @@
-from traders import LunaTrader
+from traders import StatArbTrader
 import asyncio
 import json
 
