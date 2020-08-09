@@ -1,0 +1,63 @@
+Macro 1:
+(INTERNAL)
+300 quids aren't ours. So if we profit, we retain it but if we lose there's no harm.
+Anthony's happen with what we've done so far, thus 2 of the aims are just additional.
+
+Macro 2:
+(PUBLIC)
+Make liquidity. Good for LUNO. Good for everyone who's on LUNO.
+
+Aim:
+	MS --- max Volume subject to at most reasonable loss
+	SS --- max profit subject to reasonable volume
+
+
+Example for entry
+
+9080 @ 0.01
+==========
+==========
+9060 @ 0.01
+
+|
+|
+|Could do -- 2 orders
+------
+
+9080 @ 0.01
+==========
+9070+epsilon @0.001
+9070		 @0.001
+==========
+9060 @ 0.01
+
+|
+|
+|Could happen in 5 mins
+(we are 0.001 short for BTC)
+------
+
+9080 @ 0.01
+==========
+
+==========
+9070 @0.001 (Ours)
+9060 @ 0.01
+
+
+Example for getting out
+|
+|
+|Could happen in 5 mins
+(we are 0.001 short for BTC)
+------
+
+9080 @ 0.01
+==========
+
+==========
+9065 @0.001 (Ours)
+9060 @ 0.01
+
+
+
