@@ -1,0 +1,30 @@
+SS=Speculative Strategy
+Usually higher risk, holding time usually being long.
+
+MS=Market Making Strategy
+
+
+
+Summmary of the trading strategies developed so far:
+
+Our draft name: Strategy 1 / Strategy 2
+New name: SS1 
+Description: Luno's prices follow main exchange prices, lead-lag relationship.
+Current progress: protocol completed. Backtesting completed.
+
+
+Our draft name: Strategy 1E / Strategy 2E
+New name: MS1 
+Description: Luno+/-main exchange market making, la classic.
+Current progress: protocol completed. Backtesting completed.
+
+
+Our draft name: Strategy 3
+New name: SS2
+Description: Chasing the momentum via Bollinger / Time Series evaluations
+Current progress: Backtesting in progress.
+
+
+New name: MS2
+Description: Luno's orderbook-based liquidity provision.
+Current progress: Introduced.
