@@ -1,4 +1,4 @@
-from traders import LunaTrader
+from traders import StatArbTrader
 import asyncio
 import json
 
@@ -18,7 +18,7 @@ class MarketAgentsManager():
         print("Activating automated traders...")
         await asyncio.gather(trader_activations)
 
-        
+
 """
 Create agents
 """

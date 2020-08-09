@@ -140,8 +140,8 @@
             "prevent_self_trades": 0,
             "market_agents": {},
             "credentials": {
-                "api_key_id": "fmbez74m9mrr9",
-                "api_key_secret": "Ot_PwydJk6gCanRCVOsXtoxfeYWlh0T9HqLHNB7rst4"
+                "api_key_id": "enyx3kanw7q4b",
+                "api_key_secret": "UeV-OIsfw4fQPhloYee4P-kzFWhlt8j0dF1SSqsayr0"
             },
             "risk_limits": {
                 "net_position": 100000,
