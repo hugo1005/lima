@@ -105,9 +105,9 @@ export default {
   },
   computed: {
     ...mapGetters({
-        tickData: 'backend/getTickData',
-        securityParams: 'backend/getSecurityParams',
-        getTickerOHLC: 'backend/getTickerOHLC'
+        tickData: 'frontend/getTickData',
+        securityParams: 'frontend/getSecurityParams',
+        getTickerOHLC: 'frontend/getTickerOHLC'
     }),
     unfilteredOHLC: function() {
         return this.getTickerOHLC(this.ticker)

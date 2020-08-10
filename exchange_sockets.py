@@ -5,7 +5,7 @@ import time
 import asyncio
 import json
 from collections import namedtuple
-from shared import to_named_tuple, ExchangeOrder, MarketBook, ExchangeOrderAnon, LOB, named_tuple_to_dict, TransactionPair, Transaction,update_named_tuple
+from shared import to_named_tuple, ExchangeOrder, MarketBook, ExchangeOrderAnon, LOB, named_tuple_to_dict, TransactionPair, Transaction,update_named_tuple, TapeTransaction
 from abc import ABC, abstractmethod
 import traceback
 import warnings
@@ -112,9 +112,11 @@ class ExternalHalfOrderbook:
 
     def cancel_order_at_idx(self, order, idx):
         self.lob[order.price].pop(idx)
+        self.anonymised_lob[order.price].pop(idx)
 
         if len(self.lob[order.price]) == 0:
             del(self.lob[order.price])
+            del(self.anonymised_lob[order.price])
 
             self.book_depth -= 1
         
@@ -129,6 +131,18 @@ class ExternalHalfOrderbook:
         :return quote: an ExchangeOrder or None if none available
         """
         return self.lob[self.best_price][0]
+
+    def get_anonymised_lob(self, limit=10):
+        sorted_prices_iter = sorted(self.lob.keys())
+        prices = list(sorted_prices_iter) if self.book_side == 'asks' else list(reversed(sorted_prices_iter))
+
+        top_prices = prices[:min(limit, len(prices)-1)]
+        minified_lob = {}
+
+        for price in top_prices:
+            minified_lob[price] = self.anonymised_lob[price]
+
+        return minified_lob
    
 class ExternalOrderbook(ABC): 
     def __init__(self, exchange_config, ticker, credentials, await_success_response, exchange_name='luno'):
@@ -239,7 +253,7 @@ class ExternalOrderbook(ABC):
         
         if self._subscription_message:
             await self.subscribe_to_stream(ws, self._subscription_message)
-            
+        
         await self.send_snapshot_to_traders()
 
         seq = -1
@@ -280,9 +294,6 @@ class ExternalOrderbook(ABC):
         book = json.dumps({'type': 'LOBS', 'data': self.get_books(tickers = [self.ticker])})
         await self._traders[tid].send(book)
 
-        # tape = json.dumps({'type': 'tape', 'data': self.get_tape()})
-        # await self._traders[tid].send(tape)
-
     async def handle_event(self, event_type, parsed, seq):
         handler = self.handlers[event_type]
         new_seq = handler(parsed, seq)
@@ -293,7 +304,7 @@ class ExternalOrderbook(ABC):
     async def propogate_event_updates(self):
         await self.send_snapshot_to_traders()
         self.update_database()
-        await self.mark_traders_to_market(self.ticker)
+        # await self.mark_traders_to_market(self.ticker)
 
     def add_order(self, exchange_order):
         halfbook = self._bids if exchange_order.action == "BUY" else self._asks
@@ -330,7 +341,7 @@ class ExternalOrderbook(ABC):
             return False
     
     def get_LOB(self):
-        return LOB(self._bids.anonymised_lob, self._asks.anonymised_lob, self._bids.best_price, self._asks.best_price, self._bids.book_depth, self._asks.book_depth, self._bids.num_orders, self._asks.num_orders, round(self._bids.book_volume,2), round(self._asks.book_volume,2))
+        return LOB(self._bids.get_anonymised_lob(), self._asks.get_anonymised_lob(), self._bids.best_price, self._asks.best_price, self._bids.book_depth, self._asks.book_depth, self._bids.num_orders, self._asks.num_orders, round(self._bids.book_volume,2), round(self._asks.book_volume,2))
 
     def handle_order_change(self, data, seq):
         # A neat trick :) its  a hack we will fix this eventually
@@ -379,15 +390,29 @@ class ExternalOrderbook(ABC):
 
         # Similarly we need some way to deal with None Types here (and replciate to other exchange implementations)
         await self.update_pnls(transaction_pair)
-        self._tape += [transaction_pair]
-        await self.mark_traders_to_market(self.ticker)
+        tape_transaction = TapeTransaction(self.ticker, taker.action, qty, taker.price, taker_transaction.timestamp)
+        self._tape += [tape_transaction]
+
+        # await self.mark_traders_to_market(self.ticker)
+        
+        latest_tape_data = json.dumps({'type': 'tape', 'data': self.get_tape()})
+        for tid in self._traders:
+            if self.trader_still_connected(tid):
+                await self._traders[tid].send(latest_tape_data)
 
     def get_internal_order_id(self, external_order_id):
-        print(external_order_id, self._client_orders)
         if external_order_id in self._client_orders:
             return self._client_orders[external_order_id].order_id
         else:
             return -1
+    
+    def get_external_order_id(self, internal_order_id):
+        print("Looking for internal id: ",internal_order_id," in: ", self._client_orders)
+        for external_order_id in self._client_orders:
+            if self._client_orders[external_order_id].order_id == internal_order_id:
+                return external_order_id
+        else:
+            return None
 
     def new_order(self, order_spec):
         """:returns order_id"""
@@ -544,10 +569,25 @@ class ExternalOrderbook(ABC):
         """:returns order_id"""
         print("Warning Uimplemented: Post Order")
 
+    def revoke_order(self, order_spec):
+        """:returns order_id"""
+        external_order_id = self.get_external_order_id(order_spec.order_id)
+
+        if type(external_order_id) != type(None):
+            return self.revoke_order_from_sever(external_order_id)
+        else:
+            print("Warning: order could not be found to be revoked!")
+            return False
+
+    @abstractmethod
+    def revoke_order_from_sever(self, order_id):
+        """:returns order_id"""
+        print("Warning Uimplemented: Post Order")
+
 class BitstampOrderbook(ExternalOrderbook):
     def __init__(self, exchange_config, ticker, credentials, await_success_response, exchange_name='bitstamp'):
         super().__init__(exchange_config, ticker, credentials, await_success_response, exchange_name=exchange_name)
-        self._client = trading_client = BitstampClient.Trading(username=credentials['username'], key=credentials['key'], secret=credentials['secret'])
+        self._client = BitstampClient.Trading(username=credentials['username'], key=credentials['key'], secret=credentials['secret'])
 
     async def assert_setup_success(self, ws):
         """ MODIFY: Assert that stream was succesfully subscribed """
@@ -698,6 +738,15 @@ class BitstampOrderbook(ExternalOrderbook):
 
         return int(res['id'])
 
+    def revoke_order_from_sever(self, order_id):
+        """:returns order_id"""
+        try:
+            self._client.cancel_order(order_id)
+            return True
+        except:
+            print("Warning order could not be cancelled on bitstamp")
+            return False
+
 class GlobitexOrderbook(ExternalOrderbook):
     def __init__(self, exchange_config, ticker, credentials, await_success_response, exchange_name='globitex'):
         super().__init__(exchange_config, ticker, credentials, await_success_response)
@@ -820,6 +869,10 @@ class GlobitexOrderbook(ExternalOrderbook):
         """:returns order_id"""
         print("Warning Uimplemented: Post Order")
 
+    def revoke_order_from_sever(self, order_id):
+        """:returns order_id"""
+        print("Warning Uimplemented: Post Order")
+
 class KrakenOrderbook(ExternalOrderbook):
     def __init__(self, exchange_config, ticker, credentials, await_success_response, exchange_name='kraken'):
         super().__init__(exchange_config, ticker, credentials, await_success_response, exchange_name=exchange_name)
@@ -938,6 +991,10 @@ class KrakenOrderbook(ExternalOrderbook):
         return -1 # We don't have seq info for Kraken
 
     def post_order(self, order_spec):
+        """:returns order_id"""
+        print("Warning Uimplemented: Post Order")
+
+    def revoke_order_from_sever(self, order_id):
         """:returns order_id"""
         print("Warning Uimplemented: Post Order")
 
@@ -1164,3 +1221,8 @@ class LunoOrderbook(ExternalOrderbook):
                 res = self._client.post_market_order(order_spec.ticker, order_spec.action, base_volume = order_spec.qty)
 
         return res['order_id']
+    
+    def revoke_order_from_sever(self, order_id):
+        """:returns order_id"""
+        res = self._client.stop_order(order_id)
+        return res['success']

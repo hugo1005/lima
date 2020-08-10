@@ -38,7 +38,7 @@ export default {
   },
   computed: {
     ...mapGetters({
-        tape: 'backend/displayTape',
+        tape: 'frontend/displayTape',
         traderFills: 'frontend/getTraderFills'
     }),
     tapeReverse: function() {

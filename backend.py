@@ -40,7 +40,7 @@ class Exchange:
         if self._exchange_name != 'simulator':
             self._credentials = self._case_config['credentials']
         
-        self.orderbook_class =orderbook_class
+        self.orderbook_class = orderbook_class
         self._port = self._case_config['websocket']['port']
         self._ip = self._case_config['websocket']['ip']
         self._webserver_port = self._config['app-websocket']['port']
@@ -252,8 +252,9 @@ class Exchange:
         elif s_type == 'cancel_order':
             order_spec = to_named_tuple(data, OrderSpec)
 
-            if self._exchange_name == 'luna':
-                success = self._client.stop_order()['sucess']
+            if self._exchange_name != 'simulator':
+                book = self._books[order_spec.ticker]
+                success = book.revoke_order(order_spec)
 
                 # Send to confirmation back to user
                 await ws.send(json.dumps({'type': 'order_cancelled', 'data': {'order_spec': named_tuple_to_dict(order_spec), 'success': success}}))

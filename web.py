@@ -30,7 +30,7 @@ class WebServer:
         self.frontend_has_updates = asyncio.Event()
 
         # Debounce LOB messages to every 300 ms
-        self._debounce = 0.3
+        self._debounce = 1
         # Simple hack to ensure the first LOBs always sent
         self.last_posts = {s_type: time.time() - (self._debounce + 0.2) for s_type in ['LOBS','pnl','risk','MBS']}
 
@@ -140,8 +140,17 @@ class WebServer:
                 # Store the data for sending to the server.
                 while True:
                     data = await ws.recv()
-                    self.frontend_to_app_cache.append(data)
-                    self.frontend_has_updates.set()
+                    msg = json.loads(data)
+                    msg_type = msg['type']
+
+                    if msg_type in self.last_posts:
+                        if self.last_posts[msg_type] < time.time() - self._debounce:
+                            self.frontend_to_app_cache.append(data)
+                            self.frontend_has_updates.set()
+                            self.last_posts[msg_type] = time.time() 
+                    else:
+                        self.frontend_to_app_cache.append(data)
+                        self.frontend_has_updates.set()
                     
         except websockets.ConnectionClosed:
             print("Connection with [%s] closed: [%s]" % (path, time.time())) 

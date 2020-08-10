@@ -17,8 +17,14 @@
             :tableHeaders="contentHeaders"
             :itemKeys="contentKeys"
             :items='bidBook'
-            itemUniqueIdentifer='order_id'
             ></CardTable>
+            <!-- <CardTable 
+            :title="isLimitBook? 'Book': 'Bids'"
+            :tableHeaders="contentHeaders"
+            :itemKeys="contentKeys"
+            :items='bidBook'
+            itemUniqueIdentifer='order_id'
+            ></CardTable> -->
         </template>
 
         <template v-if="isLimitBook" #statsRight>
@@ -39,10 +45,18 @@
             :tableHeaders="contentHeaders"
             :itemKeys="contentKeys"
             :items='askBook'
-            itemUniqueIdentifer='order_id'
             accentColor = '#EC7F6C'
             accentBg = 'rgba(236, 127, 108, 0.3)'
             ></CardTable>
+            <!-- <CardTable
+            :title="isLimitBook? 'Book': 'Asks'"
+            :tableHeaders="contentHeaders"
+            :itemKeys="contentKeys"
+            :items='askBook'
+            itemUniqueIdentifer='order_id'
+            accentColor = '#EC7F6C'
+            accentBg = 'rgba(236, 127, 108, 0.3)'
+            ></CardTable> -->
         </template>
 
     </BaseCard>
@@ -76,7 +90,8 @@ export default {
         return this.orderType == 'LMT' ? 'LimitBook' : 'MarketBook'
     },
     book: function() {
-        return this.$store.getters[`backend/display${this.bookType}`](this.ticker)
+
+        return this.$store.getters[`frontend/display${this.bookType}`](this.ticker)
     },
     bidBook: function() {
         let book = this.book.bid_book.map(order => {

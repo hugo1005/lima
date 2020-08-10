@@ -76,9 +76,9 @@ export default {
   },
   computed: {
     ...mapGetters({
-        tickers: 'backend/getTickers',
-        displayLimitBook: 'backend/displayLimitBook',
-        displayMarketBook: 'backend/displayMarketBook',
+        tickers: 'frontend/getTickers',
+        displayLimitBook: 'frontend/displayLimitBook',
+        displayMarketBook: 'frontend/displayMarketBook',
         orderKeys: 'frontend/getTraderOpenOrderKeys',
         completedOrders: 'frontend/getTraderCompletedOrders',
     }),

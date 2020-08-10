@@ -77,3 +77,12 @@ TAPE
 [
 	{timstamp:, ticker:, price:, action:, qty:}
 ]
+
+===================================
+
+
+Things that are done in the backend web socket
+
+- Sending LOB info
+- Sending Tape info and MBS info
+- Broadcasting active traders

@@ -2,7 +2,6 @@
   <div class="home">
     <!-- <h1>Traders</h1> -->
     <p>Observer View</p>
-    {{ traders }} 
     
     <!-- <h1>Books</h1> -->
     <div id='book-pair'>
@@ -39,7 +38,6 @@ export default {
   computed: {
     ...mapGetters({
       tickers: 'backend/getTickers',
-      traders: 'backend/getTraders',
       tape: 'backend/displayTape',
       displayLimitBook: 'backend/displayLimitBook',
       displayMarketBook: 'backend/displayMarketBook'

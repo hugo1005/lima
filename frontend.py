@@ -483,12 +483,12 @@ class ExchangeConnection:
                 # Overwrites old limit order books where they already exist
                 self._LOBS = {**self._LOBS, **data}
                 self.update_complex_lob_events() # Updates price based triggers
+                await self.pass_to_app(ws_app, s_type, data)
             elif s_type == 'tape':
-                self._tape = self._tape + data
+                self._tape += data
+                await self.pass_to_app(ws_app, s_type, data)
             elif s_type == 'order_opened':
                 order_id = data['order_id']
-                print("order_opened")
-                print(data)
                 new_order = to_named_tuple(data, ExchangeOrder)
 
                 self._open_orders[order_id] = new_order
@@ -496,9 +496,10 @@ class ExchangeConnection:
                 order_key = cast_named_tuple_to_dict(new_order, OrderKey)
                 await self.pass_to_app(ws_app, 'order_opened', order_key)
             elif s_type == 'order_cancelled':
+                
                 success = data['success']
                 order_id = data['order_spec']['order_id']
-
+                print("Order cancelled:", order_id, success)
                 if success == False:
                     warnings.warn('Order with id: %s was already filled by the time you cancelled it! This is not serious but something to be concerned about if this is a very frequent! We will proceed for now as if it had been cancelled (But clearly this needs fixing)...')
                 else:
@@ -512,8 +513,6 @@ class ExchangeConnection:
                     # and cancellations
                     # del(self._open_orders[order_id])              
             elif s_type == 'order_fill':
-                print("order_fill")
-                print(data)
                 # 1. Get the qty, price of fill, order id [x]
                 # 2. update the open order [x]
                 # 3. if it has been fully filled close the order [x]
