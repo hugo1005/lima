@@ -129,7 +129,7 @@ class TradingDashboard:
                         break
 
             self.start_time = time.time()  
-            self.time_limit = 40 * 60 #
+            self.time_limit = 10 * 60 #
             self.end_time = self.start_time + self.time_limit
 
             while time.time() < self.end_time:
