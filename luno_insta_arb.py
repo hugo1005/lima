@@ -111,7 +111,7 @@ class TradingDashboard:
 
                 # Setup our 2 orders
                 CLOSE_POS = L_BTCEUR.to_order(
-                    qty=0.001,
+                    qty=0.0025,
                     order_type='MKT',
                 ) 
 
@@ -139,7 +139,7 @@ class TradingDashboard:
                 timeout_seconds = min(duration_remaining, 20)
 
                 OPEN_POS = L_BTCEUR.to_order(
-                    qty=0.001,
+                    qty=0.025,
                     order_type='LMT',
                     price_fn= cross_spread,
                     timeout = timeout_seconds,
@@ -147,7 +147,7 @@ class TradingDashboard:
                 ) # BUY
 
                 CLOSE_POS = L_BTCEUR.to_order(
-                    qty=0.001,
+                    qty=0.025,
                     order_type='LMT',
                     price_fn=make_profit,
                     timeout = 1,
