@@ -64,7 +64,7 @@ class TradingDashboard:
                 spread = abs(evaluate(-1) - evaluate(1))
                 is_buying = direction == 1
 
-                return self.execution_price[direction * -1] - spread if is_buying else self.execution_price[direction * -1] + spread
+                return round(self.execution_price[direction * -1] - spread if is_buying else self.execution_price[direction * -1] + spread,2)
 
             # def cover_loss(direction, evaluate):
             #     spread = evaluate(-1) - evaluate(1)
@@ -139,7 +139,7 @@ class TradingDashboard:
                 timeout_seconds = min(duration_remaining, 20)
 
                 OPEN_POS = L_BTCEUR.to_order(
-                    qty=0.025,
+                    qty=0.0025,
                     order_type='LMT',
                     price_fn= cross_spread,
                     timeout = timeout_seconds,
@@ -147,7 +147,7 @@ class TradingDashboard:
                 ) # BUY
 
                 CLOSE_POS = L_BTCEUR.to_order(
-                    qty=0.025,
+                    qty=0.0025,
                     order_type='LMT',
                     price_fn=make_profit,
                     timeout = 1,
