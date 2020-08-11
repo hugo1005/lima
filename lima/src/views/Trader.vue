@@ -4,7 +4,7 @@
     <p>Trader View {{getTID}}</p>
 
     <!-- <h1>Books</h1> -->
-    <div id='book-pair' style='max-height: 500px;'>
+    <!-- <div id='book-pair' style='max-height: 500px;'>
       <Book :ticker="ticker" orderType="LMT" v-for="ticker in tickers" v-bind:key="ticker"></Book>
     </div>
      <div id='book-pair'>

@@ -489,6 +489,8 @@ class ExchangeConnection:
                 await self.pass_to_app(ws_app, s_type, data)
             elif s_type == 'order_opened':
                 order_id = data['order_id']
+                print("order_opened")
+                print(data)
                 new_order = to_named_tuple(data, ExchangeOrder)
 
                 self._open_orders[order_id] = new_order
@@ -513,6 +515,8 @@ class ExchangeConnection:
                     # and cancellations
                     # del(self._open_orders[order_id])              
             elif s_type == 'order_fill':
+                print("order_fill")
+                print(data)
                 # 1. Get the qty, price of fill, order id [x]
                 # 2. update the open order [x]
                 # 3. if it has been fully filled close the order [x]

@@ -390,6 +390,7 @@ class ExternalOrderbook(ABC):
 
         # Similarly we need some way to deal with None Types here (and replciate to other exchange implementations)
         await self.update_pnls(transaction_pair)
+
         tape_transaction = TapeTransaction(self.ticker, taker.action, qty, taker.price, taker_transaction.timestamp)
         self._tape += [tape_transaction]
 
@@ -401,11 +402,12 @@ class ExternalOrderbook(ABC):
                 await self._traders[tid].send(latest_tape_data)
 
     def get_internal_order_id(self, external_order_id):
+
         if external_order_id in self._client_orders:
             return self._client_orders[external_order_id].order_id
         else:
             return -1
-    
+
     def get_external_order_id(self, internal_order_id):
         print("Looking for internal id: ",internal_order_id," in: ", self._client_orders)
         for external_order_id in self._client_orders:
