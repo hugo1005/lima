@@ -1209,18 +1209,19 @@ class LunoOrderbook(ExternalOrderbook):
 
     def post_order(self, order_spec):
         """:returns order_id"""
+        print("Posting order:", order_spec)
         if order_spec.order_type == 'LMT':
             print(order_spec)
             order_action = 'BID' if  order_spec.action == 'BUY' else 'ASK'
             res = self._client.post_limit_order(order_spec.ticker, order_spec.price, order_action, order_spec.qty)
         else:
             if order_spec.action == 'BUY':
-                ask_price = self._asks.best_price # best bid
+                ask_price = round(self._asks.best_price,2) # best bid
                 counter_volume = order_spec.qty * ask_price # How much euro to purchase order_spec.qty in BTC
-                res = self._client.post_market_order(order_spec.ticker, order_spec.action, counter_volume = counter_volume)
+                print(counter_volume)
+                res = self._client.post_market_order(order_spec.ticker, order_spec.action, counter_volume = round(counter_volume,2))
             else:
-                
-                res = self._client.post_market_order(order_spec.ticker, order_spec.action, base_volume = order_spec.qty)
+                res = self._client.post_market_order(order_spec.ticker, order_spec.action, base_volume = round(order_spec.qty,4))
 
         return res['order_id']
     
