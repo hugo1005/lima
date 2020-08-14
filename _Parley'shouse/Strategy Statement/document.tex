@@ -1,0 +1,134 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[latin1]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{makeidx}
+\usepackage{graphicx,textcomp,marvosym}
+\usepackage[left=3.00cm, right=3.00cm, top=4.00cm, bottom=3.00cm]{geometry}
+\author{Parley Ruogu Yang\footnote{Department of Statistics, University of Oxford and Faculty of Mathematics, University of Cambridge}, Hugo Dolan\footnote{University College Dublin}, Ondrej Bohdal\footnote{School of Informatics, University of Edinburgh} \\ Team HOP for Luno \& General Challenge, Spark Hackathon }
+\title{Trading Strategies Fact Sheet}
+\date{This version: 14 Aug 2020}
+\begin{document}
+\thispagestyle{empty}
+
+
+	\maketitle
+	\vfill
+	Insert  Logos here
+	
+\vfill
+		Background and summary: \begin{itemize}
+		\item Some degree of lead-lag relationships between the main exchange (i.e. the more popular ones, here we use Bitstamp and Kraken for example) and the Luno's prices, especially on crypto-sovereign currency pairs. This is mainly due to the lack of liquidity on Luno's exchange.
+		\item There exists arbitrage opportunities both in a crypto-sovereign-crypto currency route and a crypto-sovereign-sovereign route. 
+		\item Traditional financial strategies are functional, subject to trading costs, which is zero for limit orders but 0.25\% for filling the limit orders or market orders.
+		\item We designed two Market Making Strategies (M1 \& M2) which can facilitate potential liquidity provision in Luno's exchange and make low-risk profits.
+		\item We designed two Speculative Strategies (S1 \& S2) which are the applications of traditional trading strategies that can  make profits with controllable risks.
+	\end{itemize}
+\vfill
+	\pagebreak
+		\section{Market Making Strategy 1 (M1)}
+		\begin{table}[h]
+			\centering
+		\begin{tabular}{c|c}
+			
+		Profitability& \textdollaroldstyle \\
+		
+		Risk & \Radioactivity \\
+		
+		Liquidity provision &$ \bigtriangleup \bigtriangleup $\\
+		
+		\end{tabular}
+		\end{table}
+	
+This is a classic market-making strategy where we buy from low and sell from high the difference on the same asset.
+
+At time $t$, write $y_t$ as the LUNO price of an asset and $z_t$ as the main exchange price.
+	Let $C_1$ be the threshold of equal, whereby we judge $|y_t-z_t|<C_1$ as ``equal state".
+\begin{itemize}
+	\item 	If we start from being equal to a state where $y_t>z_t+C_1$, then we initiate a trade by shorting LUNO and longing from the main exchange and aim at a price level near $z_t+C_1$ as we believe $y_t$ will fall to such a level soon.
+	\item If we start from being equal to a state where  $y_t< z_t -C_1$, then we initiate a trade by longing LUNO and shorting from the main exchange and aim at a price level near $z_t-C_1$ as we believe $y_t$ will raise to such a level soon.
+\end{itemize}
+
+\textbf{Note on execution}: We execute them in a Fill-or-Kill limit order manner on LUNO, i.e. we provide one-sided liquidity to LUNO and only trigger the strategy if our limit order gets filled. The execution on main exchange is of no concern, benefited from its liquidity.
+	
+\textbf{Note on LUNO's asset}: The simple asset can be BTC/GBP and BTC/EUR while we may extend this definition to a chained asset. For example, while $y_t$ being BTC/GBP, we may have $z_t$ being BTC/EUR $\times$ EUR/GBP.
+
+\pagebreak
+\section{Market Making Strategy 2 (M2)}
+
+		\begin{table}[h]
+	\centering
+	\begin{tabular}{c|c}
+		
+		Profitability& \textdollaroldstyle \\
+		
+		Risk & \Radioactivity  \\
+		
+		Liquidity provision &$ \bigtriangleup \bigtriangleup  \bigtriangleup$\\
+		
+	\end{tabular}
+\end{table}
+
+This is a Limit-Order-Book (LOB) based market-making strategy in which we aim to provide liquidity on both side of the order book and hedge our position from the main exchange.
+
+At time $t$, write $P^{bid}_t$ and $P^{ask}_t$ as the best bid and ask prices for an asset on LUNO's exchange (i.e. LUNO's LOB). Write $z_t$ as the mid price of the same asset on the main exchange.
+
+Consider the spread $S_t := P^{ask}_t - P^{bid}_t$. We aim to provide liquidity by shrinking the spread by $S_t^\prime >0$, thus start by putting a limit sell order at $P^{ask}_t - \frac{S_t^\prime}{2}$ and a limit buy order at $P^{bid}_t + \frac{S_t^\prime}{2}$.
+
+Upon triggering any of the order, we enter a risk management --- exit state, where: \begin{itemize}
+	\item If $z_t$ moves in the adverse direction,\footnote{E.g. if we are long the asset and the price moves down.} we stop loss at an appropriate level and execute at the main exchange to secure the price. Full exit happens when we close our current position on LUNO via limit order and the hedged position on the main exchange.
+	\item If $z_t$ moves in the favourable direction, \footnote{E.g. if we are long the asset and the price moves up.} we keep offering the best side of the book to be filled, that is, if we are long we keep posting a limit sell order at $P^{ask}_t - \varepsilon$ with a small $\varepsilon > 0$, and vice versa for the case if we are short.
+\end{itemize}
+
+
+
+\vfill
+
+\pagebreak
+
+\section{Speculative Strategy 1 (S1)}
+
+\begin{table}[h]
+	\centering
+	\begin{tabular}{c|c}
+		
+		Profitability& \textdollaroldstyle \textdollaroldstyle \textdollaroldstyle \\
+		
+		Risk & \Radioactivity  \Radioactivity \Radioactivity \\
+		
+		Liquidity provision &$ \bigtriangleup$\\
+		
+	\end{tabular}
+\end{table}
+
+In this strategy we chase the break-out / momentum via traditional statistical indicators on the main exchange.
+
+At time $t$, write $z_t$ as the mid price of the same asset on the main exchange. We wait for a trigger, either up- or down-side of break-out on $z_t$, this can be, for example, a penetration of a Bollinger Band or other time series evaluators.
+
+We buy or sell via market order first to obtain the entry\footnote{If the LUNO's spread is too wide, this would have to be done in the main exchange with the possibility to transfer it back to LUNO at an appropriate time.}, then place limit order at the associate target price. E.g. if we use an upper $2\sigma$ Bollinger as the break-out signal, we buy via market order as the price penetrates the upper Bollinger, then wait until, say the  $4\sigma$ Bollinger or higher for an exit via limit order.
+
+Risk management is done by setting an associated exit handle, whereas if $z_t$ drops below such level, a stop-market order to close the position is entered at the main exchange with a transfer back to LUNO at an appropriate time.
+%\vfill
+%\pagebreak
+\section{Speculative Strategy 2 (S2)}
+
+\begin{table}[h]
+	\centering
+	\begin{tabular}{c|c}
+		
+		Profitability& \textdollaroldstyle  \textdollaroldstyle \\
+		
+		Risk & \Radioactivity  \Radioactivity \\
+		
+		Liquidity provision &$ \bigtriangleup \bigtriangleup$\\
+		
+	\end{tabular}
+\end{table}
+This is a more rewarding --- thus more risky version of M2, where we do not execute on the main exchange.
+
+We inherit the same notation as in M2 and use $z_t$ as a signal feed-in. But, when we execute the exit, we always do it in a limit sell order at $P^{ask}_t - \varepsilon$. This decreases the trading complexity thus cost, but is more risky in chaotic market conditions.
+
+An additional option is we exit by stages --- this reduces the risk while ensures the liquidity provision on one side to be longer. Another variation is that we do multiple stages of entry --- this can be achieved by having, say, multiple 
+pairs of $\{(P^{ask}_t - \frac{S_t^\prime}{2} , P^{bid}_t + \frac{S_t^\prime}{2}) | S_t^\prime \in X \}$ for a set of spread improvements $X$ and wait for execution and its associated staggered exit strategies. 
+\end{document}

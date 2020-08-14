@@ -49,42 +49,28 @@ def buy_and_sell_entries_S1E(LAhandle,LBhandle,df_general=None):
             i.pop(-1)
 
     return [buyentry, sellentry]
-
-def trading_plugin_S1E(buysellentries,df_general=None):
+def trading_plugin_SS2(buysellentries,feesb=0.0025,feess=0.0025,df_price=None):
     
-    [buyentry,sellentry]=buysellentries
-    Entries=df(buyentry).join(df(sellentry),rsuffix='r')
-    Entries.columns=['B','S']
+	[buyentry,sellentry]=buysellentries
+	Entries=df(buyentry).join(df(sellentry),rsuffix='r')
+	Entries.columns=['B','S']
 
-    if len(buyentry)>len(sellentry):
-        Entries=Entries.iloc[:(Entries.shape[0]-1),]
+	if len(buyentry)>len(sellentry):
+		Entries=Entries.iloc[:(Entries.shape[0]-1),]
 
-    RoT_AC1=[None]*(Entries.shape[0])
-    RoT_AC2=[None]*(Entries.shape[0])
+	RoT=[None]*(Entries.shape[0])
 
+	for i in range(Entries.shape[0]):
+		buyprice=df_price.loc[Entries['B'][i]][2]*(1+feesb)
+		sellprice=df_price.loc[Entries['S'][i]][1]*(1-feess)
+		RoT[i]=sellprice/buyprice
 
-    for i in range(Entries.shape[0]):
-        buyprice_AC1=df_general.loc[Entries['B'][i]]['lAsk'] 
-        sellprice_AC1=df_general.loc[Entries['S'][i]]['lBid']
+	Entries_in_time=df(df_price.loc[Entries['B']]['timestamp']).reset_index(
+    drop=True).join(df(df_price.loc[Entries['S']]['timestamp']).reset_index(drop=True),rsuffix='S')
+	
+	Entries_in_time.columns=Entries.columns
 
-        sellprice_AC2=df_general.loc[Entries['B'][i]]['kBid'] 
-        buyprice_AC2=df_general.loc[Entries['S'][i]]['kAsk']
+	return [Entries_in_time, RoT]
 
-        RoT_AC1[i]=sellprice_AC1/buyprice_AC1
-        RoT_AC2[i]=sellprice_AC2/buyprice_AC2
-
-
-    Entries_in_time=df(df_general.loc[Entries['B']]['Time']).reset_index(
-    drop=True).join(df(df_general.loc[Entries['S']]['Time']).reset_index(drop=True),rsuffix='S')
-
-    Entries_in_time.columns=Entries.columns
-
-    Synthetic=Entries_in_time.copy()
-
-    Synthetic['RoT_AC1']=RoT_AC1
-    Synthetic['RoT_AC2']=RoT_AC2
-
-
-    return Synthetic
 
 
