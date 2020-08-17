@@ -6,28 +6,49 @@
 \usepackage{makeidx}
 \usepackage{graphicx,textcomp,marvosym}
 \usepackage[left=3.00cm, right=3.00cm, top=4.00cm, bottom=3.00cm]{geometry}
-\author{Parley Ruogu Yang\footnote{Department of Statistics, University of Oxford and Faculty of Mathematics, University of Cambridge}, Hugo Dolan\footnote{University College Dublin}, Ondrej Bohdal\footnote{School of Informatics, University of Edinburgh} \\ Team HOP for Luno \& General Challenge, Spark Hackathon }
+\author{%Parley Ruogu Yang\footnote{Department of Statistics, University of Oxford and Faculty of Mathematics, University of Cambridge}, Hugo Dolan\footnote{University College Dublin}, Ondrej Bohdal\footnote{School of Informatics, University of Edinburgh} \\ 
+Team HOP for Luno \& General Challenge, Spark Hackathon }
 \title{Trading Strategies Fact Sheet}
 \date{This version: 14 Aug 2020}
 \begin{document}
 \thispagestyle{empty}
-
-
-	\maketitle
-	\vfill
-	Insert  Logos here
+\maketitle
+\vfill
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=\linewidth]{../Logo}
+\end{figure}
+\vfill
+\tableofcontents
+\thispagestyle{empty}
+	
+	\pagebreak
 	
 \vfill
-		Background and summary: \begin{itemize}
-		\item Some degree of lead-lag relationships between the main exchange (i.e. the more popular ones, here we use Bitstamp and Kraken for example) and the Luno's prices, especially on crypto-sovereign currency pairs. This is mainly due to the lack of liquidity on Luno's exchange.
-		\item There exists arbitrage opportunities both in a crypto-sovereign-crypto currency route and a crypto-sovereign-sovereign route. 
-		\item Traditional financial strategies are functional, subject to trading costs, which is zero for limit orders but 0.25\% for filling the limit orders or market orders.
-		\item We designed two Market Making Strategies (M1 \& M2) which can facilitate potential liquidity provision in Luno's exchange and make low-risk profits.
-		\item We designed two Speculative Strategies (S1 \& S2) which are the applications of traditional trading strategies that can  make profits with controllable risks.
+\section{Trading Summary}
+\begin{itemize}
+\item We designed two Market Making Strategies (M1 \& M2) which can facilitate potential liquidity provision in Luno's exchange and make low-risk profits.
+\item We designed two Speculative Strategies (S1 \& S2) which apply traditional trading strategies that can  make profits with controllable risks.
+\item We translated M1, M2, and S1 into the LIMA system and deployed them successfully in a live trading environment.
+\item However we soon discovered that the bid-ask spread of certain currency pairs (e.g. BTC/EUR) on many exchanges including LUNO is quite tight meaning that the margin on each trade is quite small. Compounding this effect we found that trades occurring on LUNO tend to be quite small in volume and also relatively infrequent compared to larger exchanges. This particularly affected our statistical arbitrage strategies (M1 and in some cases  S1) as they relied on using limit orders with lower execution costs to achieve a profit, thus low levels of liquidity on LUNO made these strategies infeasible as many arbitrage opportunities exist for shorter periods than the average time to fill on LUNO.
+
+\item Similarly we attempted a liquidity provision strategy (M2) which increased the trade volume on LUNO thus aimed to capture a small profit from executing the market and limit orders on both sides of the book. This strategy was also successfully executed, however due to the costs of LUNO market orders the profitability of these strategies is unclear as of yet,  as we have only run this particular strategy for several days.
+
+\item From our trading work, we suggest that further research should focus more on the longer term (hourly or daily) technical trading strategies rather than shorter term market making style approach taken in our existing research. This would provide the opportunity for larger profits per trade due to possible large intra-day market volatility and eliminate concerns about trading costs.
+
+\end{itemize}
+
+\section{Introductory Background}
+ \begin{itemize}
+		\item There are some degrees of lead-lag relationships between the main exchange (i.e. the more popular ones, here we use Bitstamp and Kraken for example) and the Luno's prices, especially on crypto-sovereign currency pairs. This is mainly due to the lack of liquidity on Luno's exchange.
+		\item There are arbitrage opportunities both in a crypto-sovereign-crypto currency route and a crypto-sovereign-sovereign route. 
+		\item Traditional financial strategies are functional, subject to trading costs, which are zero for limit orders but 0.25\% for filling the limit orders or market orders.
+	
 	\end{itemize}
 \vfill
 	\pagebreak
-		\section{Market Making Strategy 1 (M1)}
+	\section{Technical details of the strategies}
+		\subsection{Market Making Strategy 1 (M1)}
 		\begin{table}[h]
 			\centering
 		\begin{tabular}{c|c}
@@ -41,7 +62,7 @@
 		\end{tabular}
 		\end{table}
 	
-This is a classic market-making strategy where we buy from low and sell from high the difference on the same asset.
+This is a classic market-making / statistical arbitrage strategy where we buy from low and sell from high the difference on the same asset.
 
 At time $t$, write $y_t$ as the LUNO price of an asset and $z_t$ as the main exchange price.
 	Let $C_1$ be the threshold of equal, whereby we judge $|y_t-z_t|<C_1$ as ``equal state".
@@ -54,8 +75,9 @@ At time $t$, write $y_t$ as the LUNO price of an asset and $z_t$ as the main exc
 	
 \textbf{Note on LUNO's asset}: The simple asset can be BTC/GBP and BTC/EUR while we may extend this definition to a chained asset. For example, while $y_t$ being BTC/GBP, we may have $z_t$ being BTC/EUR $\times$ EUR/GBP.
 
+
 \pagebreak
-\section{Market Making Strategy 2 (M2)}
+\subsection{Market Making Strategy 2 (M2)}
 
 		\begin{table}[h]
 	\centering
@@ -87,7 +109,7 @@ Upon triggering any of the order, we enter a risk management --- exit state, whe
 
 \pagebreak
 
-\section{Speculative Strategy 1 (S1)}
+\subsection{Speculative Strategy 1 (S1)}
 
 \begin{table}[h]
 	\centering
@@ -106,12 +128,12 @@ In this strategy we chase the break-out / momentum via traditional statistical i
 
 At time $t$, write $z_t$ as the mid price of the same asset on the main exchange. We wait for a trigger, either up- or down-side of break-out on $z_t$, this can be, for example, a penetration of a Bollinger Band or other time series evaluators.
 
-We buy or sell via market order first to obtain the entry\footnote{If the LUNO's spread is too wide, this would have to be done in the main exchange with the possibility to transfer it back to LUNO at an appropriate time.}, then place limit order at the associate target price. E.g. if we use an upper $2\sigma$ Bollinger as the break-out signal, we buy via market order as the price penetrates the upper Bollinger, then wait until, say the  $4\sigma$ Bollinger or higher for an exit via limit order.
+We buy or sell via market order first to obtain the entry\footnote{If the LUNO's spread is too wide, this would have to be done in the main exchange with the possibility to transfer it back to LUNO at an appropriate time.}, then place limit order at the associate target price. E.g. if we use an upper $2\sigma$ Bollinger as the break-out signal, we buy via market order as the price penetrates the upper Bollinger, then wait until, say the  $3\sigma$ Bollinger or higher for an exit via limit order.
 
 Risk management is done by setting an associated exit handle, whereas if $z_t$ drops below such level, a stop-market order to close the position is entered at the main exchange with a transfer back to LUNO at an appropriate time.
 %\vfill
 %\pagebreak
-\section{Speculative Strategy 2 (S2)}
+\subsection{Speculative Strategy 2 (S2)}
 
 \begin{table}[h]
 	\centering
@@ -131,4 +153,13 @@ We inherit the same notation as in M2 and use $z_t$ as a signal feed-in. But, wh
 
 An additional option is we exit by stages --- this reduces the risk while ensures the liquidity provision on one side to be longer. Another variation is that we do multiple stages of entry --- this can be achieved by having, say, multiple 
 pairs of $\{(P^{ask}_t - \frac{S_t^\prime}{2} , P^{bid}_t + \frac{S_t^\prime}{2}) | S_t^\prime \in X \}$ for a set of spread improvements $X$ and wait for execution and its associated staggered exit strategies. 
+
+
+
+%\pagebreak
+%\section{Key Findings from backtestting \& trading}
+
+
+%Lack of liquidity on LUNO: the rate of limit orders being filled on LUNO is slow, thus profitability in some strategies are lowered as we may be forced to execute market orders.
+
 \end{document}
